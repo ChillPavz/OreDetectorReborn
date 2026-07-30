@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  S",
+    " IS",
+    "ICS"
+  ],
+  "key": {
+    "I": "minecraft:netherite_ingot",
+    "C": "minecraft:comparator",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "oredetector:netherite_detector",
+    "count": 1
+  }
+}

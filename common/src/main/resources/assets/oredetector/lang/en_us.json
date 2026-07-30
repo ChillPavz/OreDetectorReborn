@@ -1,0 +1,35 @@
+{
+  "item.oredetector.iron_detector": "Iron Detector",
+  "item.oredetector.gold_detector": "Gold Detector",
+  "item.oredetector.diamond_detector": "Diamond Detector",
+  "item.oredetector.netherite_detector": "Netherite Detector",
+  "item.oredetector.lapis_detector": "Lapis Lazuli Detector",
+  "item.oredetector.redstone_detector": "Redstone Detector",
+  "item.oredetector.zinc_detector": "Zinc Detector",
+  "sounds.oredetector.not_found": "Ore detector beep",
+  "sounds.oredetector.found": "Ore detector beep",
+  "itemGroup.oredetector.ore_detector": "Ore Detector Reborn",
+
+  "ore.oredetector.iron": "Iron Ore",
+  "ore.oredetector.gold": "Gold Ore",
+  "ore.oredetector.diamond": "Diamond Ore",
+  "ore.oredetector.netherite": "Ancient Debris",
+  "ore.oredetector.lapis": "Lapis Lazuli Ore",
+  "ore.oredetector.redstone": "Redstone Ore",
+  "ore.oredetector.zinc": "Zinc Ore",
+  "ore.oredetector.unknown": "Ore",
+
+  "hud.oredetector.found": "Detected %s %s nearby",
+  "hud.oredetector.none": "No %s detected",
+
+  "tooltip.oredetector.usage": "Right-click a surface to scan it for %s.",
+  "tooltip.oredetector.range": "Reaches %s blocks down, %s blocks sideways or up.",
+
+  "text.autoconfig.oredetector.title": "Ore Detector Reborn",
+  "text.autoconfig.oredetector.option.downReach": "Downward reach (blocks)",
+  "text.autoconfig.oredetector.option.sideReach": "Sideways / upward reach (blocks)",
+  "text.autoconfig.oredetector.option.columnRadius": "Column radius (0 = 1x1, 1 = 3x3, 3 = 7x7)",
+  "text.autoconfig.oredetector.option.cooldownTicks": "Scan cooldown (ticks; 20 = 1 second)",
+  "text.autoconfig.oredetector.option.durabilityPercent": "Durability (%, requires restart to apply)",
+  "text.autoconfig.oredetector.option.soundVolumePercent": "Detector beep volume (%)"
+}

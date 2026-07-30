@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "oredetector:iron_detector",
+    "oredetector:gold_detector",
+    "oredetector:diamond_detector",
+    "oredetector:netherite_detector",
+    "oredetector:lapis_detector",
+    "oredetector:redstone_detector",
+    { "id": "oredetector:zinc_detector", "required": false }
+  ]
+}
