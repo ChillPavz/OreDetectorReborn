@@ -41,5 +41,8 @@
   "text.autoconfig.oredetector.option.columnRadius": "Column radius (0 = 1x1, 1 = 3x3, 3 = 7x7)",
   "text.autoconfig.oredetector.option.cooldownTicks": "Scan cooldown (ticks; 20 = 1 second)",
   "text.autoconfig.oredetector.option.durabilityPercent": "Durability (%, requires restart to apply)",
-  "text.autoconfig.oredetector.option.soundVolumePercent": "Detector beep volume (%)"
+  "text.autoconfig.oredetector.option.soundVolumePercent": "Detector beep volume (%)",
+
+  "gui.oredetector.reset": "Reset",
+  "gui.oredetector.reset_all": "Reset All"
 }

@@ -49,6 +49,15 @@ public final class OreDetectorConfig {
         OreDetectorConfig.soundVolume = clampDouble(soundVolume, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     }
 
+    /**
+     * Applies only the durability multiplier, as a percentage. Durability is baked into the items
+     * when they are created, so a loader whose config system is not guaranteed to have loaded by
+     * then needs to set this on its own, ahead of registration.
+     */
+    public static void applyDurabilityPercent(int percent) {
+        durabilityMultiplier = clampDouble(percent / 100.0, DURABILITY_MULT_MIN, DURABILITY_MULT_MAX);
+    }
+
     /** Scales a base durability by the configured multiplier (never below 1). */
     public static int scaleDurability(int base) {
         return Math.max(1, (int) Math.round(base * durabilityMultiplier));
