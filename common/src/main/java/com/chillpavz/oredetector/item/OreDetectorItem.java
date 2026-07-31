@@ -38,6 +38,16 @@ public class OreDetectorItem extends Item {
 
     private static final float SOUND_PITCH = 1.0f;
 
+    /**
+     * Placeholder duration for the cooldown-group component below. It is never read — the real
+     * duration is passed to {@code addCooldown} from the live config — but it MUST be strictly
+     * positive: {@code UseCooldown}'s codec validates the field with {@code POSITIVE_FLOAT}, and a
+     * zero makes the whole ItemStack fail to encode. That breaks inventory saving ("Value must be
+     * positive: 0.0") and disconnects the client when a creative-slot packet re-validates the
+     * stack. One tick is the smallest legal value.
+     */
+    private static final float COOLDOWN_GROUP_MARKER_SECONDS = 0.05f;
+
     public OreDetectorItem(Properties properties) {
         super(properties);
     }
@@ -93,9 +103,8 @@ public class OreDetectorItem extends Item {
         if (cooldown == null || cooldown.cooldownGroup().isEmpty()) {
             Identifier group = Identifier.fromNamespaceAndPath(Constants.MOD_ID,
                     "cooldown/" + UUID.randomUUID().toString().replace("-", ""));
-            // The duration is passed to addCooldown below from the live config, so the seconds
-            // baked into the component stay 0 and can never go stale when the config changes.
-            stack.set(DataComponents.USE_COOLDOWN, new UseCooldown(0.0f, Optional.of(group)));
+            stack.set(DataComponents.USE_COOLDOWN,
+                    new UseCooldown(COOLDOWN_GROUP_MARKER_SECONDS, Optional.of(group)));
         }
         player.getCooldowns().addCooldown(stack, OreDetectorConfig.cooldownTicks);
     }
