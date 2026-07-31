@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  S",
+    " IS",
+    "ICS"
+  ],
+  "key": {
+    "I": "minecraft:coal",
+    "C": "minecraft:comparator",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "oredetector:coal_detector",
+    "count": 1
+  }
+}

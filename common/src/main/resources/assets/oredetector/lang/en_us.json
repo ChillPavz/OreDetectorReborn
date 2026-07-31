@@ -8,6 +8,8 @@
   "item.oredetector.emerald_detector": "Emerald Detector",
   "item.oredetector.quartz_detector": "Quartz Detector",
   "item.oredetector.copper_detector": "Copper Detector",
+  "item.oredetector.coal_detector": "Coal Detector",
+  "item.oredetector.amethyst_detector": "Amethyst Detector",
   "item.oredetector.zinc_detector": "Zinc Detector",
   "sounds.oredetector.not_found": "Ore detector beep",
   "sounds.oredetector.found": "Ore detector beep",
@@ -22,6 +24,8 @@
   "ore.oredetector.emerald": "Emerald Ore",
   "ore.oredetector.quartz": "Nether Quartz Ore",
   "ore.oredetector.copper": "Copper Ore",
+  "ore.oredetector.coal": "Coal Ore",
+  "ore.oredetector.amethyst": "Amethyst",
   "ore.oredetector.zinc": "Zinc Ore",
   "ore.oredetector.unknown": "Ore",
 

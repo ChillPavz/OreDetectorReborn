@@ -12,7 +12,7 @@ A lightweight, no‑cheats way to decide where to start digging.
 
 ## Features
 
-- **Nine detectors:** Iron, Gold, Diamond, Emerald, Quartz, Copper, Netherite (Ancient Debris), Lapis Lazuli and Redstone.
+- **Eleven detectors:** Iron, Gold, Diamond, Emerald, Quartz, Copper, Coal, Amethyst, Netherite (Ancient Debris), Lapis Lazuli and Redstone (plus an optional Zinc detector with Create).
 - **Directional scanning:** point at the ground to reach deep (16 blocks), or at a wall/ceiling for a
   shorter range (8 blocks), across a 3×3 column.
 - **Clear feedback:** an action‑bar message tinted to the ore's colour tells you the exact count

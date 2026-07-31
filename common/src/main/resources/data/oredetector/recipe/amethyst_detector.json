@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  S",
+    " IS",
+    "ICS"
+  ],
+  "key": {
+    "I": "minecraft:amethyst_shard",
+    "C": "minecraft:comparator",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "oredetector:amethyst_detector",
+    "count": 1
+  }
+}

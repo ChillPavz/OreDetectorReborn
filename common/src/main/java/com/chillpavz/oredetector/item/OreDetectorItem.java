@@ -20,6 +20,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 /**
  * Base detector item. Right-click a surface: it scans an N x N beam INTO that surface (opposite the
@@ -49,8 +50,13 @@ public class OreDetectorItem extends Item {
             int found = scan(level, context.getClickedPos(), scanDir);
 
             SoundEvent sound = found > 0 ? ModSounds.FOUND : ModSounds.NOT_FOUND;
-            level.playSound(null, context.getClickedPos(), sound, SoundSource.PLAYERS,
-                    (float) OreDetectorConfig.soundVolume, SOUND_PITCH);
+            if (OreDetectorConfig.soundVolume > 0.0) {
+                level.playSound(null, context.getClickedPos(), sound, SoundSource.PLAYERS,
+                        (float) OreDetectorConfig.soundVolume, SOUND_PITCH);
+                // The beep is a real noise: emit a vibration so nearby sculk sensors react to it.
+                // Muting the detector (volume 0) therefore also makes it sculk-safe.
+                level.gameEvent(player, GameEvent.INSTRUMENT_PLAY, context.getClickedPos());
+            }
 
             if (player instanceof ServerPlayer serverPlayer) {
                 Component message = found > 0
