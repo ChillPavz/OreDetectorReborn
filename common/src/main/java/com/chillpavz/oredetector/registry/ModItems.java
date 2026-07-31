@@ -12,6 +12,7 @@ import com.chillpavz.oredetector.item.GoldDetector;
 import com.chillpavz.oredetector.item.IronDetector;
 import com.chillpavz.oredetector.item.LapisDetector;
 import com.chillpavz.oredetector.item.NetheriteDetector;
+import com.chillpavz.oredetector.item.QuartzDetector;
 import com.chillpavz.oredetector.item.RedstoneDetector;
 import com.chillpavz.oredetector.item.ZincDetector;
 import net.minecraft.core.registries.Registries;
@@ -38,6 +39,7 @@ public final class ModItems {
     public static final Item LAPIS_DETECTOR = create("lapis_detector", 180, Items.LAPIS_LAZULI, LapisDetector::new);
     public static final Item REDSTONE_DETECTOR = create("redstone_detector", 200, Items.REDSTONE, RedstoneDetector::new);
     public static final Item EMERALD_DETECTOR = create("emerald_detector", 120, Items.EMERALD, EmeraldDetector::new);
+    public static final Item QUARTZ_DETECTOR = create("quartz_detector", 200, Items.QUARTZ, QuartzDetector::new);
 
     // Optional Create integration. Created LAZILY and only when Create is installed — an item is
     // built with its id baked in (an "intrusive holder"), and an unregistered one crashes NeoForge
