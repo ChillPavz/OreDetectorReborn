@@ -6,13 +6,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CopperDetector extends OreDetectorItem {
 
+    private static final ModdedOres UNIVERSAL_COPPER = ModdedOres.universalOres("copper");
+
     public CopperDetector(Properties properties) {
         super(properties);
     }
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        return state.is(Blocks.COPPER_ORE) || state.is(Blocks.DEEPSLATE_COPPER_ORE);
+        return state.is(Blocks.COPPER_ORE) || state.is(Blocks.DEEPSLATE_COPPER_ORE)
+                || UNIVERSAL_COPPER.matches(state);
     }
 
     @Override

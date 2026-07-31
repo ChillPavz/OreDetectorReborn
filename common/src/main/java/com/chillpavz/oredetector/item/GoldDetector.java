@@ -6,13 +6,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class GoldDetector extends OreDetectorItem {
 
+    private static final ModdedOres UNIVERSAL_GOLD = ModdedOres.universalOres("gold");
+
     public GoldDetector(Properties properties) {
         super(properties);
     }
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        return state.is(Blocks.GOLD_ORE) || state.is(Blocks.DEEPSLATE_GOLD_ORE) || state.is(Blocks.NETHER_GOLD_ORE);
+        return state.is(Blocks.GOLD_ORE) || state.is(Blocks.DEEPSLATE_GOLD_ORE) || state.is(Blocks.NETHER_GOLD_ORE)
+                || UNIVERSAL_GOLD.matches(state);
     }
 
     @Override

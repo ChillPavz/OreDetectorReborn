@@ -6,13 +6,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class IronDetector extends OreDetectorItem {
 
+    private static final ModdedOres UNIVERSAL_IRON = ModdedOres.universalOres("iron");
+
     public IronDetector(Properties properties) {
         super(properties);
     }
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        return state.is(Blocks.IRON_ORE) || state.is(Blocks.DEEPSLATE_IRON_ORE);
+        return state.is(Blocks.IRON_ORE) || state.is(Blocks.DEEPSLATE_IRON_ORE)
+                || UNIVERSAL_IRON.matches(state);
     }
 
     @Override

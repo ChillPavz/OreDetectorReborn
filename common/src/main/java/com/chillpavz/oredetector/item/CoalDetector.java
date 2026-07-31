@@ -6,13 +6,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CoalDetector extends OreDetectorItem {
 
+    private static final ModdedOres UNIVERSAL_COAL = ModdedOres.universalOres("coal");
+
     public CoalDetector(Properties properties) {
         super(properties);
     }
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        return state.is(Blocks.COAL_ORE) || state.is(Blocks.DEEPSLATE_COAL_ORE);
+        return state.is(Blocks.COAL_ORE) || state.is(Blocks.DEEPSLATE_COAL_ORE)
+                || UNIVERSAL_COAL.matches(state);
     }
 
     @Override

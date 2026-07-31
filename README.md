@@ -23,6 +23,10 @@ A lightweight, no‑cheats way to decide where to start digging.
   all bounded to sane limits. Fabric uses Mod Menu; NeoForge uses its built‑in mod‑list config button.
 - **Optional Create integration:** if [Create Fly](https://modrinth.com/mod/create-fly) is installed,
   a **Zinc Detector** is added automatically.
+- **Optional Universal Ores integration:** if [Universal Ores](https://modrinth.com/mod/universal_ores)
+  is installed, the Coal, Iron, Gold, Copper, Lapis Lazuli, Redstone, Emerald, Diamond and Quartz
+  detectors also pick up its andesite / diorite / granite / tuff / calcite / blackstone / basalt ore
+  variants, counted together with the vanilla ore.
 
 ## Dependencies
 
@@ -32,6 +36,7 @@ A lightweight, no‑cheats way to decide where to start digging.
 | Cloth Config | required | required | powers the config screen |
 | Mod Menu | optional | — | adds the config button on Fabric |
 | Create Fly | optional | — | unlocks the Zinc Detector |
+| Universal Ores | optional | — | its ore variants are detected too (that mod is Fabric/Quilt only) |
 
 ## Building
 

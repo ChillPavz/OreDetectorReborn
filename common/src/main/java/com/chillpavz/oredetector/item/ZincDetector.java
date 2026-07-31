@@ -1,8 +1,6 @@
 package com.chillpavz.oredetector.item;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -13,8 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class ZincDetector extends OreDetectorItem {
 
-    private static final Identifier ZINC_ORE = Identifier.fromNamespaceAndPath("create", "zinc_ore");
-    private static final Identifier DEEPSLATE_ZINC_ORE = Identifier.fromNamespaceAndPath("create", "deepslate_zinc_ore");
+    private static final ModdedOres ZINC = ModdedOres.of("create", "zinc_ore", "deepslate_zinc_ore");
 
     public ZincDetector(Properties properties) {
         super(properties);
@@ -22,8 +19,7 @@ public class ZincDetector extends OreDetectorItem {
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        Identifier id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-        return id.equals(ZINC_ORE) || id.equals(DEEPSLATE_ZINC_ORE);
+        return ZINC.matches(state);
     }
 
     @Override

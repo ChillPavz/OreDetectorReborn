@@ -6,13 +6,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class RedstoneDetector extends OreDetectorItem {
 
+    private static final ModdedOres UNIVERSAL_REDSTONE = ModdedOres.universalOres("redstone");
+
     public RedstoneDetector(Properties properties) {
         super(properties);
     }
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        return state.is(Blocks.REDSTONE_ORE) || state.is(Blocks.DEEPSLATE_REDSTONE_ORE);
+        return state.is(Blocks.REDSTONE_ORE) || state.is(Blocks.DEEPSLATE_REDSTONE_ORE)
+                || UNIVERSAL_REDSTONE.matches(state);
     }
 
     @Override

@@ -6,13 +6,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class DiamondDetector extends OreDetectorItem {
 
+    private static final ModdedOres UNIVERSAL_DIAMOND = ModdedOres.universalOres("diamond");
+
     public DiamondDetector(Properties properties) {
         super(properties);
     }
 
     @Override
     public boolean isValidBlock(BlockState state) {
-        return state.is(Blocks.DIAMOND_ORE) || state.is(Blocks.DEEPSLATE_DIAMOND_ORE);
+        return state.is(Blocks.DIAMOND_ORE) || state.is(Blocks.DEEPSLATE_DIAMOND_ORE)
+                || UNIVERSAL_DIAMOND.matches(state);
     }
 
     @Override
