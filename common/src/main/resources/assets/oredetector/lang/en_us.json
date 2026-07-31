@@ -5,6 +5,7 @@
   "item.oredetector.netherite_detector": "Netherite Detector",
   "item.oredetector.lapis_detector": "Lapis Lazuli Detector",
   "item.oredetector.redstone_detector": "Redstone Detector",
+  "item.oredetector.emerald_detector": "Emerald Detector",
   "item.oredetector.zinc_detector": "Zinc Detector",
   "sounds.oredetector.not_found": "Ore detector beep",
   "sounds.oredetector.found": "Ore detector beep",
@@ -16,6 +17,7 @@
   "ore.oredetector.netherite": "Ancient Debris",
   "ore.oredetector.lapis": "Lapis Lazuli Ore",
   "ore.oredetector.redstone": "Redstone Ore",
+  "ore.oredetector.emerald": "Emerald Ore",
   "ore.oredetector.zinc": "Zinc Ore",
   "ore.oredetector.unknown": "Ore",
 

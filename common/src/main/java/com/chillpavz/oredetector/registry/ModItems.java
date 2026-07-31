@@ -7,6 +7,7 @@ import java.util.function.Function;
 import com.chillpavz.oredetector.Constants;
 import com.chillpavz.oredetector.config.OreDetectorConfig;
 import com.chillpavz.oredetector.item.DiamondDetector;
+import com.chillpavz.oredetector.item.EmeraldDetector;
 import com.chillpavz.oredetector.item.GoldDetector;
 import com.chillpavz.oredetector.item.IronDetector;
 import com.chillpavz.oredetector.item.LapisDetector;
@@ -36,6 +37,7 @@ public final class ModItems {
     public static final Item NETHERITE_DETECTOR = create("netherite_detector", 80, Items.NETHERITE_INGOT, NetheriteDetector::new);
     public static final Item LAPIS_DETECTOR = create("lapis_detector", 180, Items.LAPIS_LAZULI, LapisDetector::new);
     public static final Item REDSTONE_DETECTOR = create("redstone_detector", 200, Items.REDSTONE, RedstoneDetector::new);
+    public static final Item EMERALD_DETECTOR = create("emerald_detector", 120, Items.EMERALD, EmeraldDetector::new);
 
     // Optional Create integration. Created LAZILY and only when Create is installed — an item is
     // built with its id baked in (an "intrusive holder"), and an unregistered one crashes NeoForge

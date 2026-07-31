@@ -6,13 +6,13 @@ Craft a detector, **right‑click a surface**, and it scans the blocks *behind* 
 specific ore — a short beep and an action‑bar message tell you whether it's there and how much.
 A lightweight, no‑cheats way to decide where to start digging.
 
-> **Unofficial, updated port of [Ore Detector](https://www.curseforge.com/minecraft/mc-mods/ore-detector) by restonic4.**
+> **Unofficial, updated port of [Ore Detector](https://modrinth.com/mod/ore-detector) by restonic4.**
 > This is a community continuation for Minecraft 26.2; it is not made by or affiliated with the original author.
 > Original mod © restonic4, MIT. Port and expansion by chillpavz, MIT.
 
 ## Features
 
-- **Six detectors:** Iron, Gold, Diamond, Netherite (Ancient Debris), Lapis Lazuli and Redstone.
+- **Seven detectors:** Iron, Gold, Diamond, Emerald, Netherite (Ancient Debris), Lapis Lazuli and Redstone.
 - **Directional scanning:** point at the ground to reach deep (16 blocks), or at a wall/ceiling for a
   shorter range (8 blocks), across a 3×3 column.
 - **Clear feedback:** an action‑bar message tinted to the ore's colour tells you the exact count
