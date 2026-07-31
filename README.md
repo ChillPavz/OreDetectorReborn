@@ -26,7 +26,8 @@ A lightweight, no‑cheats way to decide where to start digging.
 - **Optional Universal Ores integration:** if [Universal Ores](https://modrinth.com/mod/universal_ores)
   is installed, the Coal, Iron, Gold, Copper, Lapis Lazuli, Redstone, Emerald, Diamond and Quartz
   detectors also pick up its andesite / diorite / granite / tuff / calcite / blackstone / basalt ore
-  variants, counted together with the vanilla ore.
+  variants, counted together with the vanilla ore. *Universal Ores has no 26.2 build yet — the
+  support is already in place and will simply start working once it does.*
 
 ## Dependencies
 
@@ -36,7 +37,7 @@ A lightweight, no‑cheats way to decide where to start digging.
 | Cloth Config | required | required | powers the config screen |
 | Mod Menu | optional | — | adds the config button on Fabric |
 | Create Fly | optional | — | unlocks the Zinc Detector |
-| Universal Ores | optional | — | its ore variants are detected too (that mod is Fabric/Quilt only) |
+| Universal Ores | optional | — | its ore variants are detected too — no 26.2 build of it exists yet |
 
 ## Building
 
