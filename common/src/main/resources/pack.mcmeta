@@ -2,9 +2,7 @@
     "pack": {
         "description": "${mod_name}",
         "pack_format": 88,
-        "supported_formats": {
-            "min_inclusive": 4,
-            "max_inclusive": 999
-        }
+        "min_format": 15,
+        "max_format": 999
     }
 }
