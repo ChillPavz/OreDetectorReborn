@@ -1,13 +1,18 @@
 package com.chillpavz.oredetector.item;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.chillpavz.oredetector.Constants;
 import com.chillpavz.oredetector.config.OreDetectorConfig;
 import com.chillpavz.oredetector.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -17,6 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.component.UseCooldown;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -66,12 +72,32 @@ public class OreDetectorItem extends Item {
             }
 
             if (player != null) {
-                player.getCooldowns().addCooldown(stack, OreDetectorConfig.cooldownTicks);
+                applyCooldown(stack, player);
                 // 1 for the scan itself, plus 1 per ore found.
                 stack.hurtAndBreak(1 + found, player, context.getHand());
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    /**
+     * Puts THIS detector on cooldown rather than every detector of the same type. Vanilla keys
+     * cooldowns by a "cooldown group" that defaults to the item's registry id, so a spare iron
+     * detector anywhere in the inventory would otherwise share one timer with the one being used.
+     * Stamping each stack with its own group the first time it is used makes the cooldown per-item
+     * while keeping vanilla's cooldown sweep on the icon. Detectors are damageable and therefore
+     * never stack, so a per-stack component costs nothing.
+     */
+    private static void applyCooldown(ItemStack stack, Player player) {
+        UseCooldown cooldown = stack.get(DataComponents.USE_COOLDOWN);
+        if (cooldown == null || cooldown.cooldownGroup().isEmpty()) {
+            Identifier group = Identifier.fromNamespaceAndPath(Constants.MOD_ID,
+                    "cooldown/" + UUID.randomUUID().toString().replace("-", ""));
+            // The duration is passed to addCooldown below from the live config, so the seconds
+            // baked into the component stay 0 and can never go stale when the config changes.
+            stack.set(DataComponents.USE_COOLDOWN, new UseCooldown(0.0f, Optional.of(group)));
+        }
+        player.getCooldowns().addCooldown(stack, OreDetectorConfig.cooldownTicks);
     }
 
     /** Counts matching ore in an N x N beam that starts at {@code origin} and extends along {@code dir}. */
