@@ -9,6 +9,7 @@
     "oredetector:redstone_detector",
     "oredetector:emerald_detector",
     "oredetector:quartz_detector",
+    "oredetector:copper_detector",
     { "id": "oredetector:zinc_detector", "required": false }
   ]
 }

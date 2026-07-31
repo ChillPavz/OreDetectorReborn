@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  S",
+    " IS",
+    "ICS"
+  ],
+  "key": {
+    "I": "minecraft:copper_ingot",
+    "C": "minecraft:comparator",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "oredetector:copper_detector",
+    "count": 1
+  }
+}
