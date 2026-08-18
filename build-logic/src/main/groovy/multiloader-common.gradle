@@ -14,9 +14,9 @@ java {
 }
 
 tasks.withType(Jar).configureEach {
-    // LGPL-3.0 needs both licence texts in the artifact, and NOTICE records the MIT material
-    // this mod still descends from.
-    from(rootProject.files('LICENSE', 'COPYING', 'COPYING.LESSER', 'NOTICE')) {
+    // Ship the licence and the notice, which PolyForm Shield requires be passed on, alongside
+    // the record of MIT material this mod still descends from.
+    from(rootProject.files('LICENSE', 'NOTICE')) {
         rename { "${it}_${mod_name}" }
     }
 }

@@ -65,9 +65,16 @@ files.
 
 ## Licence and credits
 
-Licensed under the **GNU Lesser General Public License v3.0**. See `COPYING.LESSER` and `COPYING`.
+Licensed under the **[PolyForm Shield License 1.0.0](https://polyformproject.org/licenses/shield/1.0.0)**
+(see `LICENSE`). The source is public and you are free to read it, learn from it, modify it and
+redistribute it. The one thing the licence does not permit is using this code to provide a product
+that competes with Ore Detector Reborn.
+
+To be clear about what that does and does not cover: it is a restriction on **this code and these
+assets**, not on the ideas. Game mechanics are not anyone's property, and nothing here stops you
+building your own ore detection mod.
 
 This project began as an unofficial port of [Ore Detector](https://github.com/restonic4/OreDetector)
 by **restonic4** (MIT), and material still descends from it. `NOTICE` records exactly what, along
 with the vanilla Minecraft art the new textures are drawn from and the CC0 project template the build
-is based on.
+is based on. That MIT material stays available under MIT from its original author.
