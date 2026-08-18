@@ -1,0 +1,57 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber"
+      }
+    },
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber_bottle0"
+      },
+      "when": {
+        "has_bottle_0": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber_bottle1"
+      },
+      "when": {
+        "has_bottle_1": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber_bottle2"
+      },
+      "when": {
+        "has_bottle_2": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber_empty0"
+      },
+      "when": {
+        "has_bottle_0": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber_empty1"
+      },
+      "when": {
+        "has_bottle_1": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "ore_detector_reborn:block/resonance_chamber_empty2"
+      },
+      "when": {
+        "has_bottle_2": "false"
+      }
+    }
+  ]
+}
