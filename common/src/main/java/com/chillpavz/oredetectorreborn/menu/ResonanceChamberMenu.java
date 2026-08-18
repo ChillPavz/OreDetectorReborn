@@ -26,7 +26,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 /**
  * The Resonance Chamber's menu.
@@ -113,7 +112,7 @@ public class ResonanceChamberMenu extends AbstractContainerMenu {
                     ResonanceChamberBlockEntity.SLOT_INGREDIENT + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (stack.is(Items.GLASS_BOTTLE)) {
+        } else if (ResonanceChamberBlockEntity.isWaterBottle(stack)) {
             if (!moveItemStackTo(stack, 0, 3, false)) {
                 return ItemStack.EMPTY;
             }

@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "ore_detector_reborn:item/quartz_resonance"
+    "layer0": "ore_detector_reborn:item/quartz_resonance",
+    "layer1": "minecraft:item/potion"
   }
 }

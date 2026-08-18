@@ -1,15 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#minecraft:stone_crafting_materials",
+    "R": "minecraft:breeze_rod"
+  },
   "pattern": [
     " R ",
-    "CCC"
+    "###"
   ],
-  "key": {
-    "R": "minecraft:breeze_rod",
-    "C": "minecraft:cobblestone"
-  },
   "result": {
-    "id": "ore_detector_reborn:resonance_chamber",
-    "count": 1
+    "id": "ore_detector_reborn:resonance_chamber"
   }
 }

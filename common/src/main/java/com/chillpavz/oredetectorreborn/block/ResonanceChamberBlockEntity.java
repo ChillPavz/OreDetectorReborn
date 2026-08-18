@@ -28,7 +28,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -108,6 +111,21 @@ public class ResonanceChamberBlockEntity extends BaseContainerBlockEntity {
         return stack.is(ModItems.BREEZE_POWDER);
     }
 
+    /**
+     * A water bottle, the chamber's input vessel, exactly as a brewing stand takes.
+     *
+     * <p>A water bottle is not its own item: it is {@code minecraft:potion} carrying a
+     * POTION_CONTENTS component whose potion is water, so an empty glass bottle and a healing
+     * potion both fail this.
+     */
+    public static boolean isWaterBottle(ItemStack stack) {
+        if (!stack.is(Items.POTION)) {
+            return false;
+        }
+        PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        return contents.potion().map(potion -> potion.value() == Potions.WATER.value()).orElse(false);
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, ResonanceChamberBlockEntity be) {
         ItemStack fuelStack = be.items.get(SLOT_FUEL);
         if (be.fuel <= 0 && isFuel(fuelStack)) {
@@ -117,7 +135,7 @@ public class ResonanceChamberBlockEntity extends BaseContainerBlockEntity {
         }
 
         String ore = ingredientOre(be.items.get(SLOT_INGREDIENT));
-        boolean canBrew = ore != null && be.hasEmptyBottle() && be.fuel > 0;
+        boolean canBrew = ore != null && be.hasWaterBottle() && be.fuel > 0;
 
         if (be.brewTime > 0) {
             if (!canBrew || !ore.equals(be.brewingOre)) {
@@ -145,9 +163,9 @@ public class ResonanceChamberBlockEntity extends BaseContainerBlockEntity {
         }
     }
 
-    private boolean hasEmptyBottle() {
+    private boolean hasWaterBottle() {
         for (int i = 0; i < 3; i++) {
-            if (items.get(i).is(Items.GLASS_BOTTLE)) {
+            if (isWaterBottle(items.get(i))) {
                 return true;
             }
         }
@@ -159,7 +177,7 @@ public class ResonanceChamberBlockEntity extends BaseContainerBlockEntity {
             return;
         }
         for (int i = 0; i < 3; i++) {
-            if (items.get(i).is(Items.GLASS_BOTTLE)) {
+            if (isWaterBottle(items.get(i))) {
                 items.set(i, AttunementLiquidItem.of(ModItems.ATTUNEMENT_LIQUID, brewingOre, 1));
             }
         }
@@ -201,7 +219,7 @@ public class ResonanceChamberBlockEntity extends BaseContainerBlockEntity {
         if (slot == SLOT_INGREDIENT) {
             return ingredientOre(stack) != null;
         }
-        return stack.is(Items.GLASS_BOTTLE) || stack.is(ModItems.ATTUNEMENT_LIQUID);
+        return isWaterBottle(stack) || stack.is(ModItems.ATTUNEMENT_LIQUID);
     }
 
     @Override
