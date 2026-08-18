@@ -16,6 +16,7 @@
 package com.chillpavz.oredetectorreborn.registry;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -31,6 +32,7 @@ import com.chillpavz.oredetectorreborn.item.GoldDetector;
 import com.chillpavz.oredetectorreborn.item.IronDetector;
 import com.chillpavz.oredetectorreborn.item.LapisDetector;
 import com.chillpavz.oredetectorreborn.item.NetheriteDetector;
+import com.chillpavz.oredetectorreborn.item.OreGrinding;
 import com.chillpavz.oredetectorreborn.item.QuartzDetector;
 import com.chillpavz.oredetectorreborn.item.RedstoneDetector;
 import com.chillpavz.oredetectorreborn.item.ZincDetector;
@@ -40,6 +42,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Defines the mod's items. Instances are created here (loader-agnostic) with their registry id,
@@ -120,6 +123,22 @@ public final class ModItems {
         Item item = factory.apply(properties);
         ITEMS.put(id, item);
         return item;
+    }
+
+    /**
+     * The stacks the creative tab should show for one registered item.
+     *
+     * <p>Almost always a single stack. Crushed Ore is the exception: the item alone carries no ore,
+     * so a bare stack renders as the fallback texture and is the only dust a player could ever take
+     * from the tab. It expands to one properly attuned stack per grindable ore instead.
+     */
+    public static List<ItemStack> creativeStacks(Item item) {
+        if (item == CRUSHED_ORE) {
+            return OreGrinding.BY_INPUT.values().stream()
+                    .map(entry -> CrushedOreItem.of(CRUSHED_ORE, entry.oreType(), 1))
+                    .toList();
+        }
+        return List.of(new ItemStack(item));
     }
 
     /** Forces class initialization so the static fields populate {@link #ITEMS}. */

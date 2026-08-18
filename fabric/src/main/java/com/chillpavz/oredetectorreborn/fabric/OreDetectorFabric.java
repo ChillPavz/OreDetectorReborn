@@ -67,7 +67,8 @@ public class OreDetectorFabric implements ModInitializer {
 
         CreativeModeTabEvents.modifyOutputEvent(ModCreativeTabs.KEY).register(output -> {
             ModItems.ITEMS.values().forEach(item ->
-                    output.accept(new ItemStack(item), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
+                    ModItems.creativeStacks(item).forEach(stack ->
+                            output.accept(stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS)));
             if (createLoaded) {
                 output.accept(new ItemStack(ModItems.ZINC_DETECTOR), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             }

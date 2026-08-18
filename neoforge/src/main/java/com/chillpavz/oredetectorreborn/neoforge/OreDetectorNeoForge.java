@@ -89,7 +89,7 @@ public class OreDetectorNeoForge {
 
     private static void onBuildTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == ModCreativeTabs.KEY) {
-            ModItems.ITEMS.values().forEach(event::accept);
+            ModItems.ITEMS.values().forEach(item -> ModItems.creativeStacks(item).forEach(event::accept));
             if (isCreateLoaded()) {
                 event.accept(ModItems.ZINC_DETECTOR);
             }
