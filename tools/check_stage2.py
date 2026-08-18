@@ -92,5 +92,23 @@ for loader in ("fabric", "neoforge"):
         if c not in files:
             bad("missing class: %s" % c)
 
+
+# --- creative tab must expand crushed ore into one stack per ore ---------------------------
+# A bare crushed_ore stack carries no ore, so it renders as the fallback and is useless. Both
+# loaders must go through ModItems.creativeStacks, and nothing in the build enforces that.
+_strip = lambda t: re.sub(r'//.*', '', t)
+items_src = io.open("common/src/main/java/com/chillpavz/oredetectorreborn/registry/ModItems.java",
+                    encoding="utf-8").read()
+if "creativeStacks(Item" not in _strip(items_src) or "item == CRUSHED_ORE" not in _strip(items_src):
+    bad("ModItems.creativeStacks does not special-case CRUSHED_ORE")
+for _loader, _path in (
+        ("fabric", "fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/OreDetectorFabric.java"),
+        ("neoforge", "neoforge/src/main/java/com/chillpavz/oredetectorreborn/neoforge/OreDetectorNeoForge.java")):
+    if "ModItems.creativeStacks(" not in _strip(io.open(_path, encoding="utf-8").read()):
+        bad("%s builds its creative tab without ModItems.creativeStacks, so only a bare "
+            "crushed ore would appear in it" % _loader)
+    else:
+        print("  %s expands crushed ore in the creative tab: OK" % _loader)
+
 print("\n" + ("STAGE 2 AUDIT PASSED" if ok else "STAGE 2 AUDIT FAILED"))
 sys.exit(0 if ok else 1)
