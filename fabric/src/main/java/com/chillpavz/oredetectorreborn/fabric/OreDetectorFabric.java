@@ -18,7 +18,10 @@ package com.chillpavz.oredetectorreborn.fabric;
 import com.chillpavz.oredetectorreborn.fabric.config.OreDetectorConfigData;
 import com.chillpavz.oredetectorreborn.fabric.loot.BreezeLootInjection;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
+import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
+import com.chillpavz.oredetectorreborn.registry.ModBlocks;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
+import com.chillpavz.oredetectorreborn.registry.ModMenus;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
@@ -54,7 +57,12 @@ public class OreDetectorFabric implements ModInitializer {
         ModDataComponents.COMPONENTS.forEach((id, type) ->
                 Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, id, type));
         ModSounds.SOUND_EVENTS.forEach((id, sound) -> Registry.register(BuiltInRegistries.SOUND_EVENT, id, sound));
+        ModBlocks.BLOCKS.forEach((id, block) -> Registry.register(BuiltInRegistries.BLOCK, id, block));
         ModItems.ITEMS.forEach((id, item) -> Registry.register(BuiltInRegistries.ITEM, id, item));
+        ModBlocks.BLOCK_ITEMS.forEach((id, item) -> Registry.register(BuiltInRegistries.ITEM, id, item));
+        ModBlockEntities.BLOCK_ENTITIES.forEach((id, type) ->
+                Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id, type));
+        ModMenus.MENUS.forEach((id, type) -> Registry.register(BuiltInRegistries.MENU, id, type));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.KEY, ModCreativeTabs.MAIN);
 
         boolean createLoaded = isCreateLoaded();
@@ -69,6 +77,8 @@ public class OreDetectorFabric implements ModInitializer {
             ModItems.ITEMS.values().forEach(item ->
                     ModItems.creativeStacks(item).forEach(stack ->
                             output.accept(stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS)));
+            ModBlocks.BLOCK_ITEMS.values().forEach(item ->
+                    output.accept(new ItemStack(item), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
             if (createLoaded) {
                 output.accept(new ItemStack(ModItems.ZINC_DETECTOR), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             }

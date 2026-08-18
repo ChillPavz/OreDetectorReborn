@@ -3,6 +3,19 @@
   "item.ore_detector_reborn.breeze_crystals": "Breeze Crystals",
   "item.ore_detector_reborn.breeze_powder": "Breeze Powder",
   "item.ore_detector_reborn.crushed_ore": "Crushed Ore",
+  "item.ore_detector_reborn.attunement_liquid": "Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.coal": "Coal Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.copper": "Copper Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.lapis": "Lapis Lazuli Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.iron": "Iron Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.gold": "Gold Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.quartz": "Quartz Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.amethyst": "Amethyst Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.diamond": "Diamond Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.emerald": "Emerald Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.netherite": "Netherite Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.redstone": "Redstone Attunement Liquid",
+  "item.ore_detector_reborn.attunement_liquid.zinc": "Zinc Attunement Liquid",
   "item.ore_detector_reborn.crushed_ore.coal": "Coal Dust",
   "item.ore_detector_reborn.crushed_ore.copper": "Copper Dust",
   "item.ore_detector_reborn.crushed_ore.lapis": "Lapis Lazuli Dust",
@@ -54,5 +67,7 @@
   "text.autoconfig.ore_detector_reborn.option.durabilityPercent": "Durability (%, requires restart to apply)",
   "text.autoconfig.ore_detector_reborn.option.soundVolumePercent": "Detector beep volume (%)",
   "gui.ore_detector_reborn.reset": "Reset",
-  "gui.ore_detector_reborn.reset_all": "Reset All"
+  "gui.ore_detector_reborn.reset_all": "Reset All",
+  "block.ore_detector_reborn.resonance_chamber": "Resonance Chamber",
+  "container.ore_detector_reborn.resonance_chamber": "Resonance Chamber"
 }

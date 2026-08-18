@@ -14,10 +14,14 @@
     },
     "license": "${license}",
     "icon": "${mod_id}.png",
+    "accessWidener": "${mod_id}.accesswidener",
     "environment": "*",
     "entrypoints": {
         "main": [
             "com.chillpavz.oredetectorreborn.fabric.OreDetectorFabric"
+        ],
+        "client": [
+            "com.chillpavz.oredetectorreborn.fabric.client.OreDetectorFabricClient"
         ],
         "modmenu": [
             "com.chillpavz.oredetectorreborn.fabric.config.ModMenuIntegration"

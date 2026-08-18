@@ -1,0 +1,10 @@
+accessWidener v2 official
+# MenuType cannot be constructed by a mod at 26.2: both its constructor and its MenuSupplier
+# interface are private. Widening the two is the smallest change that lets the Resonance Chamber's
+# menu be built in common and registered on either loader.
+#
+# NOTE: javap on the LOOM jar reports the constructor as public, because Fabric API's transitive
+# access wideners are already applied there. The NeoForm jar that common compiles against
+# (common/build/moddev/artifacts/vanilla-*.jar) is the one that tells the truth about visibility.
+accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
+accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V

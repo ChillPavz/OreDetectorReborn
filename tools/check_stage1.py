@@ -27,12 +27,19 @@ for loader in ("fabric", "neoforge"):
     lang = json.loads(z.read("assets/%s/lang/en_us.json" % NS).decode("utf-8"))
 
     for i in ids:
-        for p, label in [("assets/%s/textures/item/%s.png" % (NS, i), "texture"),
-                         ("assets/%s/models/item/%s.json" % (NS, i), "model"),
-                         ("assets/%s/items/%s.json" % (NS, i), "item definition")]:
-            if p not in files: bad("%s missing for '%s'" % (label, i))
+        defn_path = "assets/%s/items/%s.json" % (NS, i)
+        if defn_path not in files:
+            bad("item definition missing for '%s'" % i)
+        else:
+            # A component-driven item has a select model and no plain texture of its own, so only
+            # demand a matching texture and model when the definition actually names one.
+            model = json.loads(z.read(defn_path).decode("utf-8"))["model"]
+            if model.get("type") == "minecraft:model":
+                for p, label in [("assets/%s/textures/item/%s.png" % (NS, i), "texture"),
+                                 ("assets/%s/models/item/%s.json" % (NS, i), "model")]:
+                    if p not in files: bad("%s missing for '%s'" % (label, i))
         if "item.%s.%s" % (NS, i) not in lang: bad("lang key missing for '%s'" % i)
-    print("  all %d items have texture, model, definition and lang: OK" % len(ids))
+    print("  all %d items have a definition and a name: OK" % len(ids))
 
     for t in ("trial_chambers_supply", "trial_chambers_pot", "trial_chambers_reward"):
         p = "data/%s/loot_table/inject/%s.json" % (NS, t)

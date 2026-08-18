@@ -24,6 +24,7 @@ import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.item.AmethystDetector;
 import com.chillpavz.oredetectorreborn.item.CoalDetector;
+import com.chillpavz.oredetectorreborn.item.AttunementLiquidItem;
 import com.chillpavz.oredetectorreborn.item.CrushedOreItem;
 import com.chillpavz.oredetectorreborn.item.CopperDetector;
 import com.chillpavz.oredetectorreborn.item.DiamondDetector;
@@ -64,6 +65,9 @@ public final class ModItems {
     // One item for every ore's dust; the ore itself rides in the ore_type data component. Its
     // texture is chosen client-side by a select model, so this needs no per-ore registry entries.
     public static final Item CRUSHED_ORE = create("crushed_ore", CrushedOreItem::new);
+
+    // Bottled Attunement Liquid, keyed on the same ore_type component as the dust.
+    public static final Item ATTUNEMENT_LIQUID = create("attunement_liquid", AttunementLiquidItem::new);
 
     // Durability is tuned inverse to ore rarity/value: abundant, big-vein ores (coal/copper/iron) get
     // the most scans; rare, high-value ores (diamond/emerald/netherite) get the fewest so a detector
@@ -136,6 +140,14 @@ public final class ModItems {
         if (item == CRUSHED_ORE) {
             return OreGrinding.BY_INPUT.values().stream()
                     .map(entry -> CrushedOreItem.of(CRUSHED_ORE, entry.oreType(), 1))
+                    .toList();
+        }
+        if (item == ATTUNEMENT_LIQUID) {
+            // Redstone has a liquid but no dust, because vanilla redstone is its input.
+            return java.util.stream.Stream.concat(
+                            OreGrinding.BY_INPUT.values().stream().map(OreGrinding.Entry::oreType),
+                            java.util.stream.Stream.of("redstone"))
+                    .map(ore -> AttunementLiquidItem.of(ATTUNEMENT_LIQUID, ore, 1))
                     .toList();
         }
         return List.of(new ItemStack(item));

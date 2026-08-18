@@ -19,7 +19,10 @@ import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigData;
 import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigScreen;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
+import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
+import com.chillpavz.oredetectorreborn.registry.ModBlocks;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
+import com.chillpavz.oredetectorreborn.registry.ModMenus;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
@@ -62,6 +65,9 @@ public class OreDetectorNeoForge {
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             OreDetectorConfigScreen.register(container);
+            // RegisterMenuScreensEvent is a MOD bus event, unlike RightClickItem above.
+            eventBus.addListener(
+                    com.chillpavz.oredetectorreborn.neoforge.client.OreDetectorNeoForgeClient::onRegisterScreens);
         }
     }
 
@@ -69,8 +75,13 @@ public class OreDetectorNeoForge {
         event.register(Registries.DATA_COMPONENT_TYPE,
                 helper -> ModDataComponents.COMPONENTS.forEach(helper::register));
         event.register(Registries.SOUND_EVENT, helper -> ModSounds.SOUND_EVENTS.forEach(helper::register));
+        event.register(Registries.BLOCK, helper -> ModBlocks.BLOCKS.forEach(helper::register));
+        event.register(Registries.BLOCK_ENTITY_TYPE,
+                helper -> ModBlockEntities.BLOCK_ENTITIES.forEach(helper::register));
+        event.register(Registries.MENU, helper -> ModMenus.MENUS.forEach(helper::register));
         event.register(Registries.ITEM, helper -> {
             ModItems.ITEMS.forEach(helper::register);
+            ModBlocks.BLOCK_ITEMS.forEach(helper::register);
             if (isCreateLoaded()) {
                 helper.register(ModItems.ZINC_ID, ModItems.createZinc());
             }
@@ -90,6 +101,7 @@ public class OreDetectorNeoForge {
     private static void onBuildTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == ModCreativeTabs.KEY) {
             ModItems.ITEMS.values().forEach(item -> ModItems.creativeStacks(item).forEach(event::accept));
+            ModBlocks.BLOCK_ITEMS.values().forEach(event::accept);
             if (isCreateLoaded()) {
                 event.accept(ModItems.ZINC_DETECTOR);
             }

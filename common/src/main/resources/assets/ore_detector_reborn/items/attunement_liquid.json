@@ -1,0 +1,97 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "ore_detector_reborn:ore_type",
+    "cases": [
+      {
+        "when": "coal",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/coal_resonance"
+        }
+      },
+      {
+        "when": "copper",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/copper_resonance"
+        }
+      },
+      {
+        "when": "lapis",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/lapis_resonance"
+        }
+      },
+      {
+        "when": "iron",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/iron_resonance"
+        }
+      },
+      {
+        "when": "gold",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/gold_resonance"
+        }
+      },
+      {
+        "when": "quartz",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/quartz_resonance"
+        }
+      },
+      {
+        "when": "amethyst",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/amethyst_resonance"
+        }
+      },
+      {
+        "when": "diamond",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/diamond_resonance"
+        }
+      },
+      {
+        "when": "emerald",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/emerald_resonance"
+        }
+      },
+      {
+        "when": "netherite",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/netherite_resonance"
+        }
+      },
+      {
+        "when": "redstone",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/redstone_resonance"
+        }
+      },
+      {
+        "when": "zinc",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/zinc_resonance"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "ore_detector_reborn:item/iron_resonance"
+    }
+  }
+}
