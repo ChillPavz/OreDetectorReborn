@@ -14,7 +14,9 @@ java {
 }
 
 tasks.withType(Jar).configureEach {
-    from(rootProject.file('LICENSE')) {
+    // LGPL-3.0 needs both licence texts in the artifact, and NOTICE records the MIT material
+    // this mod still descends from.
+    from(rootProject.files('LICENSE', 'COPYING', 'COPYING.LESSER', 'NOTICE')) {
         rename { "${it}_${mod_name}" }
     }
 }
@@ -40,6 +42,7 @@ processResources {
             'group'                        : project.group, //Else we target the task's group.
             'minecraft_version'            : minecraft_version,
             'minecraft_version_range'      : minecraft_version_range,
+            'fabric_minecraft_version_range': fabric_minecraft_version_range,
             'fabric_version'               : fabric_version,
             'fabric_loader_version'        : fabric_loader_version,
             'mod_name'                     : mod_name,

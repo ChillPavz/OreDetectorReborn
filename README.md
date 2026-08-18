@@ -1,43 +1,46 @@
-# Ore Detector Reborn
+# Ore Detector Reborn 2.0
 
-Simple handheld **ore detectors** for Minecraft **26.2** (Fabric & NeoForge).
+A ground-up rework of Ore Detector Reborn for Minecraft **26.2** (Fabric and NeoForge), built around
+the Trial Chamber. Where the 1.x line gave you twelve single-ore detectors, 2.0 gives you **one**
+detector that you attune to whichever ore you want to find.
 
-Craft a detector, **right‑click a surface**, and it scans the blocks *behind* that surface for a
-specific ore — a short beep and an action‑bar message tell you whether it's there and how much.
-A lightweight, no‑cheats way to decide where to start digging.
+> **In development.** This branch is a working scaffold. The build is green on both loaders and the
+> project identity is final, but the 2.0 gameplay described below is being implemented stage by
+> stage. The 1.x line continues separately and still supports Minecraft 1.20 through 26.2.
 
-> **Unofficial, updated port of [Ore Detector](https://modrinth.com/mod/ore-detector) by restonic4.**
-> This is a community continuation for Minecraft 26.2; it is not made by or affiliated with the original author.
-> Original mod © restonic4, MIT. Port and expansion by chillpavz, MIT.
+## The loop
 
-## Features
+1. **Raid a Trial Chamber.** Breeze Rods, Breeze Shards, Breeze Crystals and Heavy Cores are the
+   mod's structural materials, and every one of them comes from inside a chamber.
+2. **Grind ore into dust.** Hold shears in your off hand and raw ore material in your main hand, then
+   right-click. Rarer material blunts the shears faster.
+3. **Brew Attunement Liquid.** A **Resonance Chamber**, built like a brewing stand but burning Breeze
+   Powder, turns ore dust into bottled Attunement Liquid.
+4. **Attune the detector.** Pour the liquid in. The detector now finds that ore. Load it with a
+   single ore type for full range, or mix several and trade range for coverage.
+5. **Scan.** Right-click a surface and the detector reports what is behind it, exactly as before.
 
-- **Eleven detectors:** Iron, Gold, Diamond, Emerald, Quartz, Copper, Coal, Amethyst, Netherite (Ancient Debris), Lapis Lazuli and Redstone (plus an optional Zinc detector with Create).
-- **Directional scanning:** point at the ground to reach deep (16 blocks), or at a wall/ceiling for a
-  shorter range (8 blocks), across a 3×3 column.
-- **Clear feedback:** an action‑bar message tinted to the ore's colour tells you the exact count
-  (e.g. *"Detected 4 Iron Ore nearby"*), plus a beep.
-- **Durability & repair:** detectors wear down (1 per scan + 1 per ore found), repair in an anvil
-  with their material, and support Mending/Unbreaking.
-- **In‑game config** (via Cloth Config) for reach, column radius, cooldown, durability and volume —
-  all bounded to sane limits. Fabric uses Mod Menu; NeoForge uses its built‑in mod‑list config button.
-- **Optional Create integration:** if [Create Fly](https://modrinth.com/mod/create-fly) is installed,
-  a **Zinc Detector** is added automatically.
-- **Optional Universal Ores integration:** if [Universal Ores](https://modrinth.com/mod/universal_ores)
-  is installed, the Coal, Iron, Gold, Copper, Lapis Lazuli, Redstone, Emerald, Diamond and Quartz
-  detectors also pick up its andesite / diorite / granite / tuff / calcite / blackstone / basalt ore
-  variants, counted together with the vanilla ore. *Universal Ores has no 26.2 build yet — the
-  support is already in place and will simply start working once it does.*
+## Two resource pools
 
-## Dependencies
+The Attuned Ore Detector tracks wear and fuel separately:
 
-| Mod | Fabric | NeoForge | Notes |
-|-----|:---:|:---:|-------|
-| Fabric API | required | — | |
-| Cloth Config | required | required | powers the config screen |
-| Mod Menu | optional | — | adds the config button on Fabric |
-| Create Fly | optional | — | unlocks the Zinc Detector |
-| Universal Ores | optional | — | its ore variants are detected too — no 26.2 build of it exists yet |
+| Pool | Capacity | Drains |
+|---|---|---|
+| Durability | 1000 | 1 per scan, plus more for each ore block actually found, scaled by rarity |
+| Attunement Liquid | 600 units (6 bottles) | a flat 15 per scan |
+
+## Modded ores
+
+Modded ores are a first-class feature, not an add-on. Any ore that carries the usual common tags
+plugs into the same pipeline: dust, liquid, detection. Create's zinc, Universal Ores and Seamless
+Ores all work through that one mechanism rather than through special cases.
+
+## Relationship to the 1.x line
+
+2.0 is a **separate mod id** (`ore_detector_reborn`, where the 1.x line is `oredetector`), so the two
+install side by side without colliding. Nothing carries over between them: different items, tabs,
+recipes and config files. If you want the twelve classic detectors, or you play below 1.21, stay on
+the 1.x line. Trial Chambers arrived in 1.21, which is why this rework cannot be backported further.
 
 ## Building
 
@@ -47,11 +50,24 @@ Requires **JDK 25**.
 ./gradlew build
 ```
 
-Output jars are in `fabric/build/libs/` and `neoforge/build/libs/` (ignore the `-sources` /
-`-javadoc` files).
+Jars land in `fabric/build/libs/` and `neoforge/build/libs/`. Ignore the `-sources` and `-javadoc`
+files.
 
-## Credits & License
+## Dependencies
 
-- Original **Ore Detector** by **restonic4** — https://github.com/restonic4/OreDetector
-- Multi‑loader project structure based on Jared's [MultiLoader‑Template](https://github.com/jaredlll08/MultiLoader-Template).
-- Licensed under the **MIT License** (see `LICENSE`), preserving the original author's copyright.
+| Mod | Fabric | NeoForge | Notes |
+|-----|:---:|:---:|-------|
+| Fabric API | required | not applicable | |
+| Cloth Config | required | required | powers the config screen |
+| Mod Menu | optional | not applicable | adds the config button on Fabric |
+| Create | optional | optional | adds zinc to the ore pipeline |
+| Universal Ores | optional | not applicable | its ore variants are detected too |
+
+## Licence and credits
+
+Licensed under the **GNU Lesser General Public License v3.0**. See `COPYING.LESSER` and `COPYING`.
+
+This project began as an unofficial port of [Ore Detector](https://github.com/restonic4/OreDetector)
+by **restonic4** (MIT), and material still descends from it. `NOTICE` records exactly what, along
+with the vanilla Minecraft art the new textures are drawn from and the CC0 project template the build
+is based on.

@@ -1,0 +1,14 @@
+{
+  "not_found": {
+    "subtitle": "sounds.ore_detector_reborn.not_found",
+    "sounds": [
+      "ore_detector_reborn:not_found"
+    ]
+  },
+  "found": {
+    "subtitle": "sounds.ore_detector_reborn.found",
+    "sounds": [
+      "ore_detector_reborn:found"
+    ]
+  }
+}

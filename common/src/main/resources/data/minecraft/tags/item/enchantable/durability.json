@@ -1,17 +1,17 @@
 {
   "replace": false,
   "values": [
-    "oredetector:iron_detector",
-    "oredetector:gold_detector",
-    "oredetector:diamond_detector",
-    "oredetector:netherite_detector",
-    "oredetector:lapis_detector",
-    "oredetector:redstone_detector",
-    "oredetector:emerald_detector",
-    "oredetector:quartz_detector",
-    "oredetector:copper_detector",
-    "oredetector:coal_detector",
-    "oredetector:amethyst_detector",
-    { "id": "oredetector:zinc_detector", "required": false }
+    "ore_detector_reborn:iron_detector",
+    "ore_detector_reborn:gold_detector",
+    "ore_detector_reborn:diamond_detector",
+    "ore_detector_reborn:netherite_detector",
+    "ore_detector_reborn:lapis_detector",
+    "ore_detector_reborn:redstone_detector",
+    "ore_detector_reborn:emerald_detector",
+    "ore_detector_reborn:quartz_detector",
+    "ore_detector_reborn:copper_detector",
+    "ore_detector_reborn:coal_detector",
+    "ore_detector_reborn:amethyst_detector",
+    { "id": "ore_detector_reborn:zinc_detector", "required": false }
   ]
 }

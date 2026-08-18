@@ -8,29 +8,31 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://www.curseforge.com/minecraft/mc-mods/ore-detector",
-        "sources": "https://github.com/restonic4/OreDetector"
+        "homepage": "https://modrinth.com/mod/ore-detector-reborn",
+        "sources": "https://github.com/ChillPavz/OreDetectorReborn",
+        "issues": "https://github.com/ChillPavz/OreDetectorReborn/issues"
     },
     "license": "${license}",
     "icon": "${mod_id}.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.chillpavz.oredetector.fabric.OreDetectorFabric"
+            "com.chillpavz.oredetectorreborn.fabric.OreDetectorFabric"
         ],
         "modmenu": [
-            "com.chillpavz.oredetector.fabric.config.ModMenuIntegration"
+            "com.chillpavz.oredetectorreborn.fabric.config.ModMenuIntegration"
         ]
     },
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
-        "minecraft": "~${minecraft_version}",
+        "minecraft": "${fabric_minecraft_version_range}",
         "java": ">=${java_version}",
         "cloth-config2": "*"
     },
     "suggests": {
         "modmenu": "*",
+        "create": "*",
         "universal_ores": "*"
     }
 }
