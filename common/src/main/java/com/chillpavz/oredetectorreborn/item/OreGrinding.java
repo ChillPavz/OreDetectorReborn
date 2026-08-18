@@ -56,9 +56,10 @@ public final class OreGrinding {
         // Precious.
         add("diamond", Items.DIAMOND, 1, 6);
         add("emerald", Items.EMERALD, 1, 6);
-        // Legendary. Kept at SCRAP rather than the ingot: an ingot is 4 scrap plus 4 gold, so
-        // grinding one would cost over four times what every other entry does.
-        add("netherite", Items.NETHERITE_SCRAP, 1, 10);
+        // Legendary. The INGOT, deliberately: 4 scrap plus 4 gold for a single dust, which is
+        // several times what any other entry costs. Netherite is the most valuable thing the
+        // detector looks for, so attuning to it is meant to hurt.
+        add("netherite", Items.NETHERITE_INGOT, 1, 10);
         // Zinc and the other modded materials arrive in the modded-ore stage, where their item ids
         // can be checked against the real jars rather than guessed.
     }
