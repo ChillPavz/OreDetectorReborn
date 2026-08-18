@@ -25,8 +25,9 @@ import net.minecraft.world.item.Items;
 /**
  * The ore materials the mod knows how to grind, and what grinding one costs.
  *
- * <p>Yield is inverse to value, and shears wear is proportional to it, so bulk ores are cheap to
- * process and precious ones are not. Vanilla shears have 238 durability, which is 119 grinds of
+ * <p>Inputs are the PROCESSED form of each material: the ingot where one exists, otherwise the
+ * item the ore itself drops. Yield is inverse to value, and shears wear is proportional to it,
+ * so bulk ores are cheap to process and precious ones are not. Vanilla shears have 238 durability, which is 119 grinds of
  * coal but only 23 of netherite.
  *
  * <p><b>Redstone is deliberately absent.</b> Redstone ore already drops a dust, so that dust feeds
@@ -44,18 +45,19 @@ public final class OreGrinding {
     static {
         // Mass-producer: abundant, big-vein ores.
         add("coal", Items.COAL, 4, 2);
-        add("copper", Items.RAW_COPPER, 4, 2);
+        add("copper", Items.COPPER_INGOT, 4, 2);
         // Standard.
         add("lapis", Items.LAPIS_LAZULI, 3, 3);
         // Baseline.
-        add("iron", Items.RAW_IRON, 2, 4);
-        add("gold", Items.RAW_GOLD, 2, 4);
+        add("iron", Items.IRON_INGOT, 2, 4);
+        add("gold", Items.GOLD_INGOT, 2, 4);
         add("quartz", Items.QUARTZ, 2, 4);
         add("amethyst", Items.AMETHYST_SHARD, 2, 4);
         // Precious.
         add("diamond", Items.DIAMOND, 1, 6);
         add("emerald", Items.EMERALD, 1, 6);
-        // Legendary.
+        // Legendary. Kept at SCRAP rather than the ingot: an ingot is 4 scrap plus 4 gold, so
+        // grinding one would cost over four times what every other entry does.
         add("netherite", Items.NETHERITE_SCRAP, 1, 10);
         // Zinc and the other modded materials arrive in the modded-ore stage, where their item ids
         // can be checked against the real jars rather than guessed.
