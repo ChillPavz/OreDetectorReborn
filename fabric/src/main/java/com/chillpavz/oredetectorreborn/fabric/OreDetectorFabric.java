@@ -16,6 +16,7 @@
 package com.chillpavz.oredetectorreborn.fabric;
 
 import com.chillpavz.oredetectorreborn.fabric.config.OreDetectorConfigData;
+import com.chillpavz.oredetectorreborn.fabric.loot.BreezeLootInjection;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
@@ -55,6 +56,8 @@ public class OreDetectorFabric implements ModInitializer {
         if (createLoaded) {
             Registry.register(BuiltInRegistries.ITEM, ModItems.ZINC_ID, ModItems.createZinc());
         }
+
+        BreezeLootInjection.register();
 
         CreativeModeTabEvents.modifyOutputEvent(ModCreativeTabs.KEY).register(output -> {
             ModItems.ITEMS.values().forEach(item ->

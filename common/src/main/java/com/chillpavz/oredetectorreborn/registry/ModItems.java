@@ -50,6 +50,13 @@ public final class ModItems {
 
     public static final Map<Identifier, Item> ITEMS = new LinkedHashMap<>();
 
+    // --- Trial Chamber materials (2.0) ---------------------------------------------------------
+    // Plain crafting materials, no durability. Breeze Rod and Heavy Core are vanilla items and are
+    // used as-is; these three are what the mod adds to the chamber's loot economy.
+    public static final Item BREEZE_SHARD = material("breeze_shard");
+    public static final Item BREEZE_CRYSTALS = material("breeze_crystals");
+    public static final Item BREEZE_POWDER = material("breeze_powder");
+
     // Durability is tuned inverse to ore rarity/value: abundant, big-vein ores (coal/copper/iron) get
     // the most scans; rare, high-value ores (diamond/emerald/netherite) get the fewest so a detector
     // can't cheaply farm them. See CHANGELOG for the reasoning.
@@ -80,6 +87,14 @@ public final class ModItems {
         TagKey<Item> zincIngots = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/zinc"));
         ZINC_DETECTOR = new ZincDetector(new Item.Properties().setId(key).durability(OreDetectorConfig.scaleDurability(200)).repairable(zincIngots));
         return ZINC_DETECTOR;
+    }
+
+    /** A plain crafting material: no durability, no repair material, no custom class. */
+    private static Item material(String name) {
+        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
+        Item item = new Item(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)));
+        ITEMS.put(id, item);
+        return item;
     }
 
     private static Item create(String name, int durability, Item repairMaterial, Function<Item.Properties, Item> factory) {
