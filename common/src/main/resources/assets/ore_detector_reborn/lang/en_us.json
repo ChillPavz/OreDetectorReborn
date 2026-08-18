@@ -2,7 +2,18 @@
   "item.ore_detector_reborn.breeze_shard": "Breeze Shard",
   "item.ore_detector_reborn.breeze_crystals": "Breeze Crystals",
   "item.ore_detector_reborn.breeze_powder": "Breeze Powder",
-
+  "item.ore_detector_reborn.crushed_ore": "Crushed Ore",
+  "item.ore_detector_reborn.crushed_ore.coal": "Coal Dust",
+  "item.ore_detector_reborn.crushed_ore.copper": "Copper Dust",
+  "item.ore_detector_reborn.crushed_ore.lapis": "Lapis Lazuli Dust",
+  "item.ore_detector_reborn.crushed_ore.iron": "Iron Dust",
+  "item.ore_detector_reborn.crushed_ore.gold": "Gold Dust",
+  "item.ore_detector_reborn.crushed_ore.quartz": "Quartz Dust",
+  "item.ore_detector_reborn.crushed_ore.amethyst": "Amethyst Dust",
+  "item.ore_detector_reborn.crushed_ore.diamond": "Diamond Dust",
+  "item.ore_detector_reborn.crushed_ore.emerald": "Emerald Dust",
+  "item.ore_detector_reborn.crushed_ore.netherite": "Netherite Dust",
+  "item.ore_detector_reborn.crushed_ore.zinc": "Zinc Dust",
   "item.ore_detector_reborn.iron_detector": "Iron Detector",
   "item.ore_detector_reborn.gold_detector": "Gold Detector",
   "item.ore_detector_reborn.diamond_detector": "Diamond Detector",
@@ -18,7 +29,6 @@
   "sounds.ore_detector_reborn.not_found": "Ore detector beep",
   "sounds.ore_detector_reborn.found": "Ore detector beep",
   "itemGroup.ore_detector_reborn.ore_detector": "Ore Detector Reborn",
-
   "ore.ore_detector_reborn.iron": "Iron Ore",
   "ore.ore_detector_reborn.gold": "Gold Ore",
   "ore.ore_detector_reborn.diamond": "Diamond Ore",
@@ -32,13 +42,10 @@
   "ore.ore_detector_reborn.amethyst": "Amethyst",
   "ore.ore_detector_reborn.zinc": "Zinc Ore",
   "ore.ore_detector_reborn.unknown": "Ore",
-
   "hud.ore_detector_reborn.found": "Detected %s %s nearby",
   "hud.ore_detector_reborn.none": "No %s detected",
-
   "tooltip.ore_detector_reborn.usage": "Right-click a surface to scan it for %s.",
   "tooltip.ore_detector_reborn.range": "Reaches %s blocks down, %s blocks sideways or up.",
-
   "text.autoconfig.ore_detector_reborn.title": "Ore Detector Reborn",
   "text.autoconfig.ore_detector_reborn.option.downReach": "Downward reach (blocks)",
   "text.autoconfig.ore_detector_reborn.option.sideReach": "Sideways / upward reach (blocks)",
@@ -46,7 +53,6 @@
   "text.autoconfig.ore_detector_reborn.option.cooldownTicks": "Scan cooldown (ticks; 20 = 1 second)",
   "text.autoconfig.ore_detector_reborn.option.durabilityPercent": "Durability (%, requires restart to apply)",
   "text.autoconfig.ore_detector_reborn.option.soundVolumePercent": "Detector beep volume (%)",
-
   "gui.ore_detector_reborn.reset": "Reset",
   "gui.ore_detector_reborn.reset_all": "Reset All"
 }

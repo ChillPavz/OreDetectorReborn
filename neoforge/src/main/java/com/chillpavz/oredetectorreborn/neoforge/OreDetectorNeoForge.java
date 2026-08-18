@@ -18,7 +18,9 @@ package com.chillpavz.oredetectorreborn.neoforge;
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigData;
 import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigScreen;
+import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
+import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -31,7 +33,10 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraft.world.InteractionResult;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 @Mod(Constants.MOD_ID)
@@ -50,6 +55,9 @@ public class OreDetectorNeoForge {
         });
 
         eventBus.addListener(OreDetectorNeoForge::onRegister);
+        // RightClickItem is a GAME bus event, not a mod bus one. Registering it on the
+        // wrong bus fails silently.
+        NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onRightClickItem);
         eventBus.addListener(OreDetectorNeoForge::onBuildTabContents);
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
@@ -58,6 +66,8 @@ public class OreDetectorNeoForge {
     }
 
     private static void onRegister(RegisterEvent event) {
+        event.register(Registries.DATA_COMPONENT_TYPE,
+                helper -> ModDataComponents.COMPONENTS.forEach(helper::register));
         event.register(Registries.SOUND_EVENT, helper -> ModSounds.SOUND_EVENTS.forEach(helper::register));
         event.register(Registries.ITEM, helper -> {
             ModItems.ITEMS.forEach(helper::register);
@@ -66,6 +76,15 @@ public class OreDetectorNeoForge {
             }
         });
         event.register(Registries.CREATIVE_MODE_TAB, helper -> helper.register(ModCreativeTabs.KEY, ModCreativeTabs.MAIN));
+    }
+
+    private static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        InteractionResult result = OreGrindingInteraction.tryGrind(
+                event.getLevel(), event.getEntity(), event.getHand());
+        if (result != InteractionResult.PASS) {
+            event.setCancellationResult(result);
+            event.setCanceled(true);
+        }
     }
 
     private static void onBuildTabContents(BuildCreativeModeTabContentsEvent event) {

@@ -23,6 +23,7 @@ import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.item.AmethystDetector;
 import com.chillpavz.oredetectorreborn.item.CoalDetector;
+import com.chillpavz.oredetectorreborn.item.CrushedOreItem;
 import com.chillpavz.oredetectorreborn.item.CopperDetector;
 import com.chillpavz.oredetectorreborn.item.DiamondDetector;
 import com.chillpavz.oredetectorreborn.item.EmeraldDetector;
@@ -57,6 +58,10 @@ public final class ModItems {
     public static final Item BREEZE_CRYSTALS = material("breeze_crystals");
     public static final Item BREEZE_POWDER = material("breeze_powder");
 
+    // One item for every ore's dust; the ore itself rides in the ore_type data component. Its
+    // texture is chosen client-side by a select model, so this needs no per-ore registry entries.
+    public static final Item CRUSHED_ORE = create("crushed_ore", CrushedOreItem::new);
+
     // Durability is tuned inverse to ore rarity/value: abundant, big-vein ores (coal/copper/iron) get
     // the most scans; rare, high-value ores (diamond/emerald/netherite) get the fewest so a detector
     // can't cheaply farm them. See CHANGELOG for the reasoning.
@@ -87,6 +92,14 @@ public final class ModItems {
         TagKey<Item> zincIngots = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/zinc"));
         ZINC_DETECTOR = new ZincDetector(new Item.Properties().setId(key).durability(OreDetectorConfig.scaleDurability(200)).repairable(zincIngots));
         return ZINC_DETECTOR;
+    }
+
+    /** A plain item built by a specific class. */
+    private static Item create(String name, Function<Item.Properties, Item> factory) {
+        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
+        Item item = factory.apply(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)));
+        ITEMS.put(id, item);
+        return item;
     }
 
     /** A plain crafting material: no durability, no repair material, no custom class. */

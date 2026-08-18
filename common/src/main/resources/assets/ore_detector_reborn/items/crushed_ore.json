@@ -1,0 +1,90 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "ore_detector_reborn:ore_type",
+    "cases": [
+      {
+        "when": "coal",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/coal_dust"
+        }
+      },
+      {
+        "when": "copper",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/copper_dust"
+        }
+      },
+      {
+        "when": "lapis",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/lapis_dust"
+        }
+      },
+      {
+        "when": "iron",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/iron_dust"
+        }
+      },
+      {
+        "when": "gold",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/gold_dust"
+        }
+      },
+      {
+        "when": "quartz",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/quartz_dust"
+        }
+      },
+      {
+        "when": "amethyst",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/amethyst_dust"
+        }
+      },
+      {
+        "when": "diamond",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/diamond_dust"
+        }
+      },
+      {
+        "when": "emerald",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/emerald_dust"
+        }
+      },
+      {
+        "when": "netherite",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/netherite_dust"
+        }
+      },
+      {
+        "when": "zinc",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/zinc_dust"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "ore_detector_reborn:item/iron_dust"
+    }
+  }
+}

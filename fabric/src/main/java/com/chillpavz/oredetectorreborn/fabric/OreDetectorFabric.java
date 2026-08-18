@@ -17,7 +17,9 @@ package com.chillpavz.oredetectorreborn.fabric;
 
 import com.chillpavz.oredetectorreborn.fabric.config.OreDetectorConfigData;
 import com.chillpavz.oredetectorreborn.fabric.loot.BreezeLootInjection;
+import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
+import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -25,6 +27,7 @@ import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.event.player.ItemEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -48,6 +51,8 @@ public class OreDetectorFabric implements ModInitializer {
             return InteractionResult.SUCCESS;
         });
 
+        ModDataComponents.COMPONENTS.forEach((id, type) ->
+                Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, id, type));
         ModSounds.SOUND_EVENTS.forEach((id, sound) -> Registry.register(BuiltInRegistries.SOUND_EVENT, id, sound));
         ModItems.ITEMS.forEach((id, item) -> Registry.register(BuiltInRegistries.ITEM, id, item));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.KEY, ModCreativeTabs.MAIN);
@@ -58,6 +63,7 @@ public class OreDetectorFabric implements ModInitializer {
         }
 
         BreezeLootInjection.register();
+        ItemEvents.USE.register(OreGrindingInteraction::tryGrind);
 
         CreativeModeTabEvents.modifyOutputEvent(ModCreativeTabs.KEY).register(output -> {
             ModItems.ITEMS.values().forEach(item ->
