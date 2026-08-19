@@ -112,6 +112,12 @@ if "paidFor" not in detector_src:
 if "positions.sort(" not in detector_src or "distanceToSqr" not in detector_src:
     bad("the drawn blocks are not sorted by distance, so a partial charge shows an arbitrary set")
 
+# The highlight belongs to the goggles. Without this it outlives taking them off, and even
+# throwing them away, which reads as the mod having handed out permanent x-ray.
+if "EquipmentSlot.HEAD" not in highlight_src or "ModItems.GOGGLES" not in highlight_src:
+    bad("the highlight never re-checks that the goggles are still worn, so it survives "
+        "unequipping them")
+
 # --- per-loader wiring, all four halves ------------------------------------------------------
 WIRING = {
     "fabric": [
