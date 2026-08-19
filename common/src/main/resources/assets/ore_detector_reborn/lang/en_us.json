@@ -58,5 +58,7 @@
   "hud.ore_detector_reborn.no_liquid": "The tank is empty",
   "tooltip.ore_detector_reborn.tank": "Tank: %s / %s mB",
   "tooltip.ore_detector_reborn.tank_empty": "Tank empty. Pour in Attunement Liquid to attune it.",
-  "text.autoconfig.ore_detector_reborn.option.reachStep": "Scan reach (1 liquid = 3x, 2 = 2x, 3+ = 1x)"
+  "text.autoconfig.ore_detector_reborn.option.reachStep": "Scan reach (1 liquid = 3x, 2 = 2x, 3+ = 1x)",
+  "item.ore_detector_reborn.goggles": "Goggles",
+  "tooltip.ore_detector_reborn.goggles": "Worn on the head. Wears down as the detector finds ore."
 }

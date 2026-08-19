@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "CNC"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "C": "ore_detector_reborn:breeze_crystals",
+    "N": "minecraft:netherite_ingot"
+  },
+  "result": {
+    "id": "ore_detector_reborn:goggles"
+  }
+}

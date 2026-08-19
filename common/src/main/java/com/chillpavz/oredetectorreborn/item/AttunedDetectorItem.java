@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
+import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -256,10 +257,25 @@ public class AttunedDetectorItem extends Item {
             reported += spend;
         }
         setTank(detector, remaining);
+        wearGoggles(player, reported);
 
         report(player, found, reported);
         player.getCooldowns().addCooldown(detector, OreDetectorConfig.cooldownTicks);
         return InteractionResult.SUCCESS;
+    }
+
+    /**
+     * Goggles wear by one per ore block reported, and only while actually worn. They are the pool
+     * that scales with how much the scan found, now that the detector's own wear is flat.
+     */
+    private static void wearGoggles(Player player, int oreFound) {
+        if (oreFound <= 0) {
+            return;
+        }
+        ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
+        if (head.is(ModItems.GOGGLES)) {
+            head.hurtAndBreak(oreFound, player, EquipmentSlot.HEAD);
+        }
     }
 
     private static BlockPos offset(BlockPos origin, Direction into, int depth, int a, int b) {

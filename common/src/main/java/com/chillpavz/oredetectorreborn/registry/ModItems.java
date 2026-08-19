@@ -63,7 +63,29 @@ public final class ModItems {
     // material, so no custom repair code is needed.
     public static final Item ORE_DETECTOR = createDetector();
 
+    // Worn on the head, and worn DOWN by what the detector finds: 1 durability per ore block
+    // reported while they are on. Half the detector's pool, since they only cost two crystals.
+    public static final Item GOGGLES = createGoggles();
+
     private ModItems() {
+    }
+
+    private static Item createGoggles() {
+        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "goggles");
+        Item item = new Item(new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, id))
+                .durability(500)
+                .repairable(BREEZE_SHARD)
+                // No armour layer texture: a worn non-armour item renders through its model's
+                // "head" display context, which is how the item definition drives it.
+                .component(net.minecraft.core.component.DataComponents.EQUIPPABLE,
+                        net.minecraft.world.item.equipment.Equippable
+                                .builder(net.minecraft.world.entity.EquipmentSlot.HEAD)
+                                .setEquipSound(net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_LEATHER)
+                                .setSwappable(true)
+                                .build()));
+        ITEMS.put(id, item);
+        return item;
     }
 
     private static Item createDetector() {
