@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:ore_detector"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.ore_detector.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.ore_detector.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_detector": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ore_detector_reborn:ore_detector"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "ore_detector_reborn:heavy_core",
+  "requirements": [
+    [
+      "has_detector"
+    ]
+  ]
+}

@@ -99,6 +99,12 @@ public class AttunedDetectorItem extends Item {
         if (player == null) {
             return InteractionResult.PASS;
         }
+        // MAIN hand only. Without this the detector scans from the OFF hand too, so right-clicking
+        // while holding anything else fires a scan the player never asked for, and the goggles it
+        // then wears down look like they are losing durability at random.
+        if (context.getHand() != InteractionHand.MAIN_HAND) {
+            return InteractionResult.PASS;
+        }
         // Draining is a hold handled in use(); everything else is a scan. Pouring is NOT checked
         // here any more: it lives on the liquid item, so a bottle in either hand cannot block a scan.
         if (looksAtCauldron(context.getLevel(), player)) {

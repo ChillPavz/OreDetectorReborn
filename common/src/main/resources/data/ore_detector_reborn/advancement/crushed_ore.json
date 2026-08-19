@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:crushed_ore"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.crushed_ore.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.crushed_ore.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_dust": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ore_detector_reborn:crushed_ore"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "ore_detector_reborn:resonance_chamber",
+  "requirements": [
+    [
+      "has_dust"
+    ]
+  ]
+}

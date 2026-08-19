@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:heavy_core"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.heavy_core.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.heavy_core.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_core": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:heavy_core"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "ore_detector_reborn:breeze_shard",
+  "requirements": [
+    [
+      "has_core"
+    ]
+  ]
+}

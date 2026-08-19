@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:ore_detector"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.root.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/block/deepslate.png"
+  },
+  "criteria": {
+    "has_breeze_rod": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:breeze_rod"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_breeze_rod"
+    ]
+  ]
+}

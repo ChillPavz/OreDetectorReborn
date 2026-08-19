@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:attunement_liquid"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.attunement_liquid.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.attunement_liquid.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_liquid": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ore_detector_reborn:attunement_liquid"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "ore_detector_reborn:crushed_ore",
+  "requirements": [
+    [
+      "has_liquid"
+    ]
+  ]
+}

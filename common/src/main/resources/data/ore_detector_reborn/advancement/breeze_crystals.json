@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:breeze_crystals"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.breeze_crystals.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.breeze_crystals.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_crystals": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ore_detector_reborn:breeze_crystals"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "ore_detector_reborn:root",
+  "requirements": [
+    [
+      "has_crystals"
+    ]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:goggles"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.goggles.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.goggles.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_goggles": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ore_detector_reborn:goggles"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "ore_detector_reborn:breeze_crystals",
+  "requirements": [
+    [
+      "has_goggles"
+    ]
+  ]
+}
