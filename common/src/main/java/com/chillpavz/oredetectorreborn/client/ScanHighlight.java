@@ -25,7 +25,9 @@ import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -63,6 +65,7 @@ public final class ScanHighlight {
     private static boolean disabled;
 
     private static List<Entry> entries = List.of();
+    private static ResourceKey<Level> dimension;
     private static BlockPos origin = BlockPos.ZERO;
     private static int cancelRadius;
     private static long expiresAtTick;
@@ -73,7 +76,8 @@ public final class ScanHighlight {
     }
 
     /** Takes a scan result. A later scan replaces an earlier one outright rather than stacking. */
-    public static void accept(ScanHighlightPayload payload, long gameTime) {
+    public static void accept(ScanHighlightPayload payload, long gameTime, ResourceKey<Level> dimension) {
+        ScanHighlight.dimension = dimension;
         List<Entry> next = new ArrayList<>();
         for (ScanHighlightPayload.Group group : payload.groups()) {
             int rgb = OreLookup.colorOf(group.oreType());
@@ -98,11 +102,18 @@ public final class ScanHighlight {
      * Emits this tick's highlight. Must be called from a client tick, which vanilla already runs
      * inside a gizmo collector, so no collector has to be opened here.
      *
-     * @param gameTime the client level's game time
-     * @param viewer   where the player is, for the walk-away check
+     * @param gameTime  the client level's game time
+     * @param viewer    where the player is, for the walk-away check
+     * @param dimension the world the player is in now, so a highlight cannot cross a portal
      */
-    public static void tick(long gameTime, Vec3 viewer) {
+    public static void tick(long gameTime, Vec3 viewer, ResourceKey<Level> dimension) {
         if (entries.isEmpty() || disabled) {
+            return;
+        }
+        // A dimension change does not disconnect, so without this a highlight could survive a
+        // portal and be drawn over whatever happens to sit at those coordinates in the next world.
+        if (!dimension.equals(ScanHighlight.dimension)) {
+            clear();
             return;
         }
         long remaining = expiresAtTick - gameTime;

@@ -36,7 +36,8 @@ public class OreDetectorFabricClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.RESONANCE_CHAMBER, ResonanceChamberScreen::new);
 
         ClientPlayNetworking.registerGlobalReceiver(ScanHighlightPayload.TYPE,
-                (payload, context) -> ScanHighlight.accept(payload, context.player().level().getGameTime()));
+                (payload, context) -> ScanHighlight.accept(payload,
+                        context.player().level().getGameTime(), context.player().level().dimension()));
 
         // END_CLIENT_TICK fires at the tail of Minecraft.tick(), which vanilla already runs inside
         // a gizmo collector. That is what lets the highlight be drawn without opening one here.
@@ -45,7 +46,8 @@ public class OreDetectorFabricClient implements ClientModInitializer {
                 return;
             }
             ClientClock.set(client.level.getGameTime());
-            ScanHighlight.tick(client.level.getGameTime(), client.player.getEyePosition());
+            ScanHighlight.tick(client.level.getGameTime(), client.player.getEyePosition(),
+                    client.level.dimension());
         });
 
         // Leaving a world must drop the highlight, or it would reappear over unrelated terrain in

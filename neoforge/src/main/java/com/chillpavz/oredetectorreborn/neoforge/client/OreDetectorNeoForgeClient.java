@@ -46,6 +46,7 @@ public final class OreDetectorNeoForgeClient {
             return;
         }
         ClientClock.set(client.level.getGameTime());
-        ScanHighlight.tick(client.level.getGameTime(), client.player.getEyePosition());
+        ScanHighlight.tick(client.level.getGameTime(), client.player.getEyePosition(),
+                client.level.dimension());
     }
 }

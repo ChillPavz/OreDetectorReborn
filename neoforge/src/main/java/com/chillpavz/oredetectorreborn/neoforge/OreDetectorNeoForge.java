@@ -106,7 +106,8 @@ public class OreDetectorNeoForge {
                 ScanHighlightPayload.TYPE,
                 ScanHighlightPayload.STREAM_CODEC,
                 (payload, context) -> com.chillpavz.oredetectorreborn.client.ScanHighlight
-                        .accept(payload, context.player().level().getGameTime()));
+                        .accept(payload, context.player().level().getGameTime(),
+                                context.player().level().dimension()));
     }
 
     private static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
