@@ -135,15 +135,18 @@ public final class ModItems {
      * from the tab. It expands to one properly attuned stack per grindable ore instead.
      */
     public static List<ItemStack> creativeStacks(Item item) {
+        // allOreTypes(), never BY_INPUT: that map holds the VANILLA materials only, so
+        // enumerating it left every modded ore out of the tab. Zinc had a texture, a name, a
+        // select case and a working grind, and still could not be found in creative.
         if (item == CRUSHED_ORE) {
-            return OreGrinding.BY_INPUT.values().stream()
-                    .map(entry -> CrushedOreItem.of(CRUSHED_ORE, entry.oreType(), 1))
+            return OreGrinding.allOreTypes().stream()
+                    .map(ore -> CrushedOreItem.of(CRUSHED_ORE, ore, 1))
                     .toList();
         }
         if (item == ATTUNEMENT_LIQUID) {
             // Redstone has a liquid but no dust, because vanilla redstone is its input.
             return java.util.stream.Stream.concat(
-                            OreGrinding.BY_INPUT.values().stream().map(OreGrinding.Entry::oreType),
+                            OreGrinding.allOreTypes().stream(),
                             java.util.stream.Stream.of("redstone"))
                     .map(ore -> AttunementLiquidItem.of(ATTUNEMENT_LIQUID, ore, 1))
                     .toList();

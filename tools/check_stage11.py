@@ -84,25 +84,39 @@ def depth_of(node):
     return depths[node]
 
 
-# Vanilla hides an unfinished advancement unless itself, its PARENT or its GRANDPARENT is done
-# (AdvancementVisibilityEvaluator, VISIBILITY_DEPTH = 2). With the root granted that covers depth
-# 0, 1 and 2 and nothing deeper, so a chain three or more below the root is invisible until the
-# player is already most of the way along it.
-MAX_DEPTH = 2
-deepest = 0
-for node in tree:
-    d = depth_of(node)
-    deepest = max(deepest, d)
-    if d > MAX_DEPTH:
-        bad("%s sits %d below the root; anything past %d is hidden until nearby progress"
-            % (node, d, MAX_DEPTH))
-print("  %d advancements, deepest is %d below the root: OK" % (len(tree), deepest))
+# NOTE ON DEPTH, deliberately not asserted. Vanilla hides an unfinished advancement unless itself,
+# its parent or its grandparent is done (AdvancementVisibilityEvaluator, VISIBILITY_DEPTH = 2), so
+# anything more than two below the root appears only as the player approaches it. The tree was
+# flattened to two levels once to make everything visible from the start, and the owner tried both
+# and preferred the chains: the progression reads as a dependency chain, which is worth more than
+# seeing every node up front. So depth is a free choice here and only the ROOT grant matters for
+# the tab existing at all.
+deepest = max(depth_of(node) for node in tree)
+print("  %d advancements, deepest is %d below the root (chains, revealed as reached)"
+      % (len(tree), deepest))
 
 for node, data in tree.items():
     if node != root_id and data.get("parent") not in tree:
         bad("%s names a parent that does not exist: %s" % (node, data.get("parent")))
     if data.get("display", {}).get("hidden"):
         bad("%s is marked hidden, which keeps it out of the tab entirely" % node)
+    if "display" not in data:
+        bad("%s has no display block, so it is invisible in the tab whatever else is true" % node)
+
+# Every node must actually hang off the root, or it forms a second tab nobody expects.
+for node in tree:
+    chain, seen = node, set()
+    while tree[chain].get("parent") is not None:
+        if chain in seen:
+            bad("%s is part of a parent cycle" % node)
+            break
+        seen.add(chain)
+        chain = tree[chain]["parent"]
+    else:
+        if chain != root_id:
+            bad("%s hangs off %s rather than the mod's root, so it makes its own tab"
+                % (node, chain))
+print("  every advancement descends from the root: OK")
 
 # --- the strain options must exist identically on BOTH loaders -----------------------------------
 OPTIONS = ["nauseaSeconds", "strainPerScan", "strainDecayTicks"]
@@ -120,16 +134,37 @@ for loader in ("fabric", "neoforge"):
     else:
         print("  %-8s exposes and applies all %d strain options: OK" % (loader, len(OPTIONS)))
 
+# --- EVERY config option needs a label AND a hover description ---
+# Cloth falls back to the raw key for a missing label, and shows no tooltip at all for a
+# missing one, so an option can look finished while telling the player nothing about what
+# it does.
+option_fields = re.findall(r"public int (\w+)\s*=", source(
+    "fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/config/OreDetectorConfigData.java"))
+print()
+print("  config options: %s" % ", ".join(option_fields))
+
 # --- the built jars --------------------------------------------------------------------------------
 for loader in ("fabric", "neoforge"):
     print("\n=== %s jar ===" % loader)
     jar = zipfile.ZipFile("%s/build/libs/%s-%s-26.2-%s.jar" % (loader, NS, loader, VER))
     lang = json.loads(jar.read("assets/%s/lang/en_us.json" % NS).decode("utf-8"))
-    for option in OPTIONS:
-        key = "text.autoconfig.%s.option.%s" % (NS, option)
-        if key not in lang:
-            bad("%s has no label, so the slider shows its raw key" % key)
-    print("  all %d strain options have labels: OK" % len(OPTIONS))
+    for option in option_fields:
+        base = "text.autoconfig.%s.option.%s" % (NS, option)
+        if base not in lang:
+            bad("%s has no label, so the slider shows its raw key" % base)
+        # Cloth reads a single-line tooltip as <key>.@Tooltip and a multi-line one as
+        # <key>.@Tooltip[0], [1], ... with no count recorded anywhere.
+        if base + ".@Tooltip" not in lang and base + ".@Tooltip[0]" not in lang:
+            bad("%s has no hover description, so the option explains nothing" % base)
+    print("  all %d config options have a label and a description: OK"
+          % len(option_fields))
+
+    # A label left behind for an option that no longer exists reads as a missing feature
+    # to anyone grepping for it.
+    prefix = "text.autoconfig.%s.option." % NS
+    labelled = {k[len(prefix):] for k in lang if k.startswith(prefix) and "@" not in k}
+    for stale in sorted(labelled - set(option_fields)):
+        bad("there is a label for %r but no such config option" % stale)
 
     # An element-less model still needs a particle texture, or the loader warns on every reload.
     hidden = json.loads(jar.read("assets/%s/models/item/goggles_hidden.json" % NS).decode("utf-8"))

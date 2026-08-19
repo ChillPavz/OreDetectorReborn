@@ -28,7 +28,7 @@
       }
     }
   },
-  "parent": "ore_detector_reborn:breeze_powder",
+  "parent": "ore_detector_reborn:resonance_chamber",
   "requirements": [
     [
       "has_dust"

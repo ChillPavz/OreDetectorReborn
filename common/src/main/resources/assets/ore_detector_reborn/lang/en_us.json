@@ -46,7 +46,6 @@
   "tooltip.ore_detector_reborn.range": "Reaches %s down, %s sideways, %sx%s column",
   "text.autoconfig.ore_detector_reborn.title": "Ore Detector Reborn",
   "text.autoconfig.ore_detector_reborn.option.cooldownTicks": "Scan cooldown (ticks; 20 = 1 second)",
-  "text.autoconfig.ore_detector_reborn.option.durabilityPercent": "Durability (%, requires restart to apply)",
   "text.autoconfig.ore_detector_reborn.option.soundVolumePercent": "Detector beep volume (%)",
   "gui.ore_detector_reborn.reset": "Reset",
   "gui.ore_detector_reborn.reset_all": "Reset All",
@@ -102,5 +101,9 @@
   "text.autoconfig.ore_detector_reborn.option.strainPerScan.@Tooltip": "Strain added each time the goggles show a scan, against a fixed ceiling of 100.",
   "text.autoconfig.ore_detector_reborn.option.strainDecayTicks": "Goggle strain: ticks per point recovered",
   "text.autoconfig.ore_detector_reborn.option.strainDecayTicks.@Tooltip[0]": "Ticks for one point of strain to bleed off. Higher recovers more slowly.",
-  "text.autoconfig.ore_detector_reborn.option.strainDecayTicks.@Tooltip[1]": "Strain only rises while the amount added per scan beats what decays during the scan cooldown."
+  "text.autoconfig.ore_detector_reborn.option.strainDecayTicks.@Tooltip[1]": "Strain only rises while the amount added per scan beats what decays during the scan cooldown.",
+  "text.autoconfig.ore_detector_reborn.option.reachStep.@Tooltip[0]": "Base reach of the beam. It goes three times this far down on a single loaded liquid, twice on two, and once on three or more.",
+  "text.autoconfig.ore_detector_reborn.option.reachStep.@Tooltip[1]": "Sideways and upward reach is three quarters of the downward reach, and the column widens from 3x3 to 7x7 as the beam shortens.",
+  "text.autoconfig.ore_detector_reborn.option.cooldownTicks.@Tooltip": "How long the detector rests between scans. 20 ticks is one second.",
+  "text.autoconfig.ore_detector_reborn.option.soundVolumePercent.@Tooltip": "Volume of the detector's beep. Set to 0 to silence it without affecting anything else."
 }

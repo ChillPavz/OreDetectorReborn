@@ -15,7 +15,9 @@
  */
 package com.chillpavz.oredetectorreborn.item;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -83,6 +85,31 @@ public final class OreGrinding {
     }
 
     private OreGrinding() {
+    }
+
+    /**
+     * Every ore that can be ground into dust, vanilla first and then whichever modded materials
+     * are actually present.
+     *
+     * <p>This exists because {@link #BY_INPUT} is the VANILLA half only. Enumerating that map
+     * directly is how the creative tab quietly ended up with no zinc dust and no zinc liquid even
+     * with Create installed: grinding zinc worked, the textures and names were all there, and the
+     * items were simply never offered. Anything that wants "all the ores" must come through here.
+     *
+     * <p>Only safe to call once registries are populated, which covers the creative tab and
+     * anything in gameplay, but NOT a loader's own init.
+     */
+    public static List<String> allOreTypes() {
+        List<String> types = new ArrayList<>();
+        for (Entry entry : BY_INPUT.values()) {
+            types.add(entry.oreType());
+        }
+        for (Entry entry : moddedInputs().values()) {
+            if (!types.contains(entry.oreType())) {
+                types.add(entry.oreType());
+            }
+        }
+        return types;
     }
 
     /** The grind for this input, or null if it is not a grindable material. */

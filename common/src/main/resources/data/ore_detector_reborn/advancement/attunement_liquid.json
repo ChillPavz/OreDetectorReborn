@@ -28,7 +28,7 @@
       }
     }
   },
-  "parent": "ore_detector_reborn:breeze_powder",
+  "parent": "ore_detector_reborn:crushed_ore",
   "requirements": [
     [
       "has_liquid"

@@ -116,6 +116,30 @@ for ns, entries in table.items():
             bad("ore type %r (from %s) has no colour, so it would be drawn plain white" % (ore, ns))
 print("  every modded ore type has a colour: OK")
 
+# --- modded ores must reach the creative tab, and have art and a name -------------------------
+# The bug this exists for: creativeStacks() enumerated OreGrinding.BY_INPUT, which is the VANILLA
+# half only. Zinc had a texture, a translation, a select case and a working grind, and still never
+# appeared in creative, because nothing ever offered it. Grinding worked, so nothing looked broken.
+items_src = source(SRC + "registry/ModItems.java")
+stacks = items_src[items_src.find("creativeStacks"):]
+stacks = stacks[:stacks.find("Forces class initialization")]
+if "BY_INPUT" in stacks:
+    bad("creativeStacks enumerates OreGrinding.BY_INPUT, which is vanilla only, so no modded ore "
+        "is ever offered in the creative tab")
+elif "allOreTypes()" not in stacks:
+    bad("creativeStacks does not enumerate OreGrinding.allOreTypes(), so it may be missing ores")
+else:
+    print()
+    print("  creative tab enumerates vanilla AND modded ores: OK")
+
+# Every material the mod can grind, vanilla or modded, needs a model case and a texture in both
+# component-driven items, or it renders as the fallback with no way to tell which ore it is.
+grind_src = source(SRC + "item/OreGrinding.java")
+grindable = set(re.findall(r'add\("([^"]+)"\s*,\s*Items\.', grind_src))
+grindable |= {m[2] for m in re.findall(
+    r'addModded\("([^"]+)",\s*"([^"]+)",\s*"([^"]+)"', grind_src)}
+print("  grindable materials, vanilla and modded: %d" % len(grindable))
+
 # --- the welcome message -----------------------------------------------------------------------
 welcome = source(SRC + "welcome/WelcomeMessage.java")
 welcome_keys = ["message.%s.welcome.%s" % (NS, name)
@@ -153,6 +177,21 @@ for loader in ("fabric", "neoforge"):
         if "ore.%s.%s" % (NS, ore) not in lang:
             bad("ore.%s.%s has no name" % (NS, ore))
     print("  every modded ore type has a name: OK")
+
+    # Both component-driven items must have a case AND a real model for every grindable material.
+    for item, prefix in (("crushed_ore", "crushed_ore"), ("attunement_liquid", "attunement_liquid")):
+        defn = json.loads(jar.read("assets/%s/items/%s.json" % (NS, item)).decode("utf-8"))["model"]
+        cases = {c["when"]: c["model"]["model"] for c in defn.get("cases", [])}
+        for ore in sorted(grindable):
+            if ore not in cases:
+                bad("%s has no model case for %r, so it renders as the fallback" % (item, ore))
+                continue
+            model = "assets/%s/models/%s.json" % (cases[ore].split(":")[0], cases[ore].split(":")[1])
+            if model not in names:
+                bad("%s's %r case points at a missing model %s" % (item, ore, cases[ore]))
+            if "item.%s.%s.%s" % (NS, prefix, ore) not in lang:
+                bad("item.%s.%s.%s has no name" % (NS, prefix, ore))
+        print("  %-18s has art and a name for all %d materials: OK" % (item, len(grindable)))
 
     # The goggles head model must not inherit a parent that declares textures it never fills;
     # that logs an unresolved-texture warning on every resource reload.
