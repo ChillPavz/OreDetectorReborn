@@ -1,0 +1,4 @@
+{
+  "comment": "Deliberately empty: the goggles are functional but not drawn on the head until a proper model texture exists.",
+  "parent": "minecraft:item/generated"
+}

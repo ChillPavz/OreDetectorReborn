@@ -7,7 +7,10 @@
       "model": "ore_detector_reborn:block/nullified_cauldron_level2"
     },
     "level=3": {
-      "model": "ore_detector_reborn:block/nullified_cauldron_full"
+      "model": "ore_detector_reborn:block/nullified_cauldron_level3"
+    },
+    "level=4": {
+      "model": "ore_detector_reborn:block/nullified_cauldron_level4"
     }
   }
 }

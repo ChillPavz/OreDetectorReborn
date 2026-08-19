@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
+import com.chillpavz.oredetectorreborn.block.NullifiedCauldronBlock;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
@@ -107,7 +108,7 @@ public class AttunedDetectorItem extends Item {
         }
         // Draining is a hold handled in use(); everything else is a scan. Pouring is NOT checked
         // here any more: it lives on the liquid item, so a bottle in either hand cannot block a scan.
-        if (looksAtCauldron(context.getLevel(), player)) {
+        if (cauldronAimedAt(context.getLevel(), player) != null) {
             return InteractionResult.PASS;
         }
         return scan(context.getLevel(), player, context.getClickedPos(), context.getClickedFace(),
@@ -153,12 +154,14 @@ public class AttunedDetectorItem extends Item {
 
     // ------------------------------------------------------------------ drain
 
-    private static boolean looksAtCauldron(Level level, Player player) {
+    /** The cauldron being aimed at, or null. Ours extends the vanilla class, so both qualify. */
+    private static BlockPos cauldronAimedAt(Level level, Player player) {
         BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
         if (hit.getType() != BlockHitResult.Type.BLOCK) {
-            return false;
+            return null;
         }
-        return level.getBlockState(hit.getBlockPos()).getBlock() instanceof AbstractCauldronBlock;
+        BlockPos pos = hit.getBlockPos();
+        return level.getBlockState(pos).getBlock() instanceof AbstractCauldronBlock ? pos : null;
     }
 
     /**
@@ -188,7 +191,14 @@ public class AttunedDetectorItem extends Item {
      */
     private static int drainTicks(Player player, ItemStack detector) {
         String ore = drainTarget(detector);
-        if (ore == null || !looksAtCauldron(player.level(), player)) {
+        if (ore == null) {
+            return 0;
+        }
+        BlockPos pos = cauldronAimedAt(player.level(), player);
+        // Refused rather than clamped when it would tip the cauldron past a full bucket: the
+        // player empties it first. Clamping would silently swallow the difference.
+        if (pos == null || !NullifiedCauldronBlock.canAccept(
+                player.level(), pos, tankOf(detector).amountOf(ore))) {
             return 0;
         }
         // A bottle's worth takes as long as pouring one in, and a dribble is proportionally quick.
@@ -206,9 +216,11 @@ public class AttunedDetectorItem extends Item {
             int amount = tank.amountOf(ore);
             // The liquid loses its ore on the way out, which is why the cauldron needs only one
             // fluid rather than one per combination a player might have mixed.
-            BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
-            com.chillpavz.oredetectorreborn.block.NullifiedCauldronBlock.addTo(
-                    level, hit.getBlockPos(), amount);
+            BlockPos pos = cauldronAimedAt(level, player);
+            if (pos == null || !NullifiedCauldronBlock.canAccept(level, pos, amount)) {
+                return;
+            }
+            NullifiedCauldronBlock.addTo(level, pos, amount);
             setTank(detector, tank.drain(ore, amount));
         }
         level.playSound(null, player.getX(), player.getY(), player.getZ(),

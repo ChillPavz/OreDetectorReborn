@@ -75,9 +75,10 @@ public final class ModItems {
 
     private static Item createBucket() {
         Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "nullified_bucket");
-        Item item = new Item(new Item.Properties()
-                .setId(ResourceKey.create(Registries.ITEM, id))
-                .stacksTo(1));
+        Item item = new com.chillpavz.oredetectorreborn.item.NullifiedBucketItem(
+                new Item.Properties()
+                        .setId(ResourceKey.create(Registries.ITEM, id))
+                        .stacksTo(1));
         ITEMS.put(id, item);
         return item;
     }

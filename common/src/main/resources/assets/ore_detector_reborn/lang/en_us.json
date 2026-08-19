@@ -81,7 +81,10 @@
   "advancements.ore_detector_reborn.ore_detector.description": "Build the detector. Attune it, and go find something.",
   "advancements.ore_detector_reborn.goggles.title": "Through the Stone",
   "advancements.ore_detector_reborn.goggles.description": "Build the Goggles.",
-  "block.ore_detector_reborn.nullified_cauldron": "Cauldron of Nullified Resonance",
-  "item.ore_detector_reborn.nullified_bucket": "Bucket of Nullified Resonance",
-  "tooltip.ore_detector_reborn.nullified": "Spent Attunement Liquid, its ore forgotten."
+  "block.ore_detector_reborn.nullified_cauldron": "Resonance Cauldron",
+  "item.ore_detector_reborn.nullified_bucket": "Nullified Bucket",
+  "tooltip.ore_detector_reborn.nullified": "Spent Attunement Liquid, its ore forgotten.",
+  "advancements.ore_detector_reborn.nullified_bucket.title": "Nothing Left to Find",
+  "advancements.ore_detector_reborn.nullified_bucket.description": "Bucket the spent liquid out of a Resonance Cauldron.",
+  "tooltip.ore_detector_reborn.nullified_dispose": "Can only be emptied into water or lava."
 }

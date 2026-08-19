@@ -1,0 +1,37 @@
+{
+  "parent": "ore_detector_reborn:ore_detector",
+  "display": {
+    "icon": {
+      "id": "ore_detector_reborn:nullified_bucket"
+    },
+    "title": {
+      "translate": "advancements.ore_detector_reborn.nullified_bucket.title"
+    },
+    "description": {
+      "translate": "advancements.ore_detector_reborn.nullified_bucket.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_bucket": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ore_detector_reborn:nullified_bucket"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_bucket"
+    ]
+  ]
+}
