@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.chillpavz.oredetectorreborn.Constants;
+import com.chillpavz.oredetectorreborn.block.NullifiedCauldronBlock;
 import com.chillpavz.oredetectorreborn.block.ResonanceChamberBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -47,7 +48,22 @@ public final class ModBlocks {
                     .noOcclusion(),
             ResonanceChamberBlock::new);
 
+    // Only ever created by draining a detector into a cauldron, so it has no BlockItem of its
+    // own and never appears in the creative tab; breaking it returns the plain cauldron.
+    public static final Block NULLIFIED_CAULDRON = registerNoItem("nullified_cauldron",
+            BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.CAULDRON),
+            NullifiedCauldronBlock::new);
+
     private ModBlocks() {
+    }
+
+    private static Block registerNoItem(String name, BlockBehaviour.Properties properties,
+                                        java.util.function.Function<BlockBehaviour.Properties, Block> factory) {
+        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
+        properties.setId(ResourceKey.create(Registries.BLOCK, id));
+        Block block = factory.apply(properties);
+        BLOCKS.put(id, block);
+        return block;
     }
 
     private static Block register(String name, BlockBehaviour.Properties properties,

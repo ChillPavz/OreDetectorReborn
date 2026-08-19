@@ -202,10 +202,14 @@ public class AttunedDetectorItem extends Item {
             return;
         }
         if (!level.isClientSide()) {
-            // Removes ONE ore, deliberately discarding it. Recovering the liquid needs a cauldron
-            // that remembers an ore and an amount, which is a later stage.
             OreTank tank = tankOf(detector);
-            setTank(detector, tank.drain(ore, tank.amountOf(ore)));
+            int amount = tank.amountOf(ore);
+            // The liquid loses its ore on the way out, which is why the cauldron needs only one
+            // fluid rather than one per combination a player might have mixed.
+            BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
+            com.chillpavz.oredetectorreborn.block.NullifiedCauldronBlock.addTo(
+                    level, hit.getBlockPos(), amount);
+            setTank(detector, tank.drain(ore, amount));
         }
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, SoundSource.PLAYERS, 0.8F, 0.8F);

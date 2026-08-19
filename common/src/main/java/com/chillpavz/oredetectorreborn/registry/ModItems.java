@@ -67,7 +67,19 @@ public final class ModItems {
     // reported while they are on. Half the detector's pool, since they only cost two crystals.
     public static final Item GOGGLES = createGoggles();
 
+    // What you get by bucketing a full cauldron of drained liquid. Stacks to one, like any bucket.
+    public static final Item NULLIFIED_BUCKET = createBucket();
+
     private ModItems() {
+    }
+
+    private static Item createBucket() {
+        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "nullified_bucket");
+        Item item = new Item(new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, id))
+                .stacksTo(1));
+        ITEMS.put(id, item);
+        return item;
     }
 
     private static Item createGoggles() {
