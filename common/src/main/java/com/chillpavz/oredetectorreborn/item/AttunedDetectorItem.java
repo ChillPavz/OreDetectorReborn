@@ -66,7 +66,7 @@ public class AttunedDetectorItem extends Item {
         return stack.getOrDefault(ModDataComponents.ORE_TANK, OreTank.EMPTY);
     }
 
-    private static void setTank(ItemStack stack, OreTank tank) {
+    static void setTank(ItemStack stack, OreTank tank) {
         if (tank.isEmpty()) {
             stack.remove(ModDataComponents.ORE_TANK);
         } else {
@@ -98,8 +98,9 @@ public class AttunedDetectorItem extends Item {
         if (player == null) {
             return InteractionResult.PASS;
         }
-        // Pouring and draining are both holds handled in use(); let them through.
-        if (pourableOffhand(player) != null || looksAtCauldron(context.getLevel(), player)) {
+        // Draining is a hold handled in use(); everything else is a scan. Pouring is NOT checked
+        // here any more: it lives on the liquid item, so a bottle in either hand cannot block a scan.
+        if (looksAtCauldron(context.getLevel(), player)) {
             return InteractionResult.PASS;
         }
         return scan(context.getLevel(), player, context.getClickedPos(), context.getClickedFace(),
@@ -112,7 +113,7 @@ public class AttunedDetectorItem extends Item {
         if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResult.PASS;
         }
-        if (pourTarget(player, detector) != null || drainTicks(player, detector) > 0) {
+        if (drainTicks(player, detector) > 0) {
             player.startUsingItem(hand);
             return InteractionResult.CONSUME;
         }
@@ -124,11 +125,7 @@ public class AttunedDetectorItem extends Item {
         if (!(entity instanceof Player player)) {
             return 0;
         }
-        if (pourTarget(player, stack) != null) {
-            return POUR_TICKS;
-        }
-        int drain = drainTicks(player, stack);
-        return drain > 0 ? drain : 0;
+        return Math.max(0, drainTicks(player, stack));
     }
 
     @Override
@@ -141,58 +138,10 @@ public class AttunedDetectorItem extends Item {
         if (!(entity instanceof Player player)) {
             return stack;
         }
-        ItemStack bottle = pourTarget(player, stack);
-        if (bottle != null) {
-            pour(level, player, stack, bottle);
-            return stack;
-        }
         if (drainTicks(player, stack) > 0) {
             drain(level, player, stack);
         }
         return stack;
-    }
-
-    // ------------------------------------------------------------------ pour
-
-    /** The off-hand stack if it is Attunement Liquid with an ore set, else null. */
-    private static ItemStack pourableOffhand(Player player) {
-        ItemStack offhand = player.getOffhandItem();
-        if (!(offhand.getItem() instanceof AttunementLiquidItem)) {
-            return null;
-        }
-        return offhand.get(ModDataComponents.ORE_TYPE) == null ? null : offhand;
-    }
-
-    /** The bottle to pour, or null when there is nothing to pour or no room for it. */
-    private static ItemStack pourTarget(Player player, ItemStack detector) {
-        ItemStack bottle = pourableOffhand(player);
-        if (bottle == null) {
-            return null;
-        }
-        String ore = bottle.get(ModDataComponents.ORE_TYPE);
-        // A completely full tank, or a seventh ore type, refuses the pour outright rather than
-        // swallowing the bottle for nothing.
-        return tankOf(detector).acceptable(ore) > 0 ? bottle : null;
-    }
-
-    private static void pour(Level level, Player player, ItemStack detector, ItemStack bottle) {
-        String ore = bottle.get(ModDataComponents.ORE_TYPE);
-        OreTank tank = tankOf(detector);
-        int accepted = tank.acceptable(ore);
-        if (accepted <= 0) {
-            return;
-        }
-        if (!level.isClientSide()) {
-            // The whole bottle is consumed even when only part of it fits. That is the only way to
-            // get more than three ore types into a 300 mB tank.
-            setTank(detector, tank.pour(ore, accepted));
-            bottle.shrink(1);
-            if (!player.getInventory().add(new ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE))) {
-                player.drop(new ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE), false);
-            }
-        }
-        level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY, SoundSource.PLAYERS, 0.8F, 1.0F);
     }
 
     // ------------------------------------------------------------------ drain
@@ -206,23 +155,50 @@ public class AttunedDetectorItem extends Item {
     }
 
     /**
-     * How long emptying the tank into a cauldron should take, scaled by what is actually in it, or
-     * 0 when there is nothing to drain or nothing to drain into.
+     * The ore a drain would remove: the SMALLEST charge in the tank.
+     *
+     * <p>Smallest first is deliberate. A tank with 10 mB of something in the way can be cleared in
+     * one short pull without throwing away the charges you actually wanted, which is what makes
+     * re-attuning cheap instead of all-or-nothing.
+     */
+    private static String drainTarget(ItemStack detector) {
+        OreTank tank = tankOf(detector);
+        String smallest = null;
+        int least = Integer.MAX_VALUE;
+        for (Map.Entry<String, Integer> entry : tank.charges().entrySet()) {
+            if (entry.getValue() < least
+                    || (entry.getValue() == least && smallest != null && entry.getKey().compareTo(smallest) < 0)) {
+                least = entry.getValue();
+                smallest = entry.getKey();
+            }
+        }
+        return smallest;
+    }
+
+    /**
+     * How long emptying one ore out takes, scaled by how much of it there is, or 0 when there is
+     * nothing to drain or nothing to drain into.
      */
     private static int drainTicks(Player player, ItemStack detector) {
-        OreTank tank = tankOf(detector);
-        if (tank.isEmpty() || !looksAtCauldron(player.level(), player)) {
+        String ore = drainTarget(detector);
+        if (ore == null || !looksAtCauldron(player.level(), player)) {
             return 0;
         }
-        // One bottle's worth takes as long as pouring one in.
-        return Math.max(POUR_TICKS, tank.total() * POUR_TICKS / OreTank.BOTTLE);
+        // A bottle's worth takes as long as pouring one in, and a dribble is proportionally quick.
+        int amount = tankOf(detector).amountOf(ore);
+        return Math.max(1, amount * POUR_TICKS / OreTank.BOTTLE);
     }
 
     private static void drain(Level level, Player player, ItemStack detector) {
+        String ore = drainTarget(detector);
+        if (ore == null) {
+            return;
+        }
         if (!level.isClientSide()) {
-            // Deliberately discards. Recovering the liquid needs a cauldron that remembers an ore
-            // and an amount, which is a later stage.
-            setTank(detector, OreTank.EMPTY);
+            // Removes ONE ore, deliberately discarding it. Recovering the liquid needs a cauldron
+            // that remembers an ore and an amount, which is a later stage.
+            OreTank tank = tankOf(detector);
+            setTank(detector, tank.drain(ore, tank.amountOf(ore)));
         }
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, SoundSource.PLAYERS, 0.8F, 0.8F);
@@ -348,8 +324,9 @@ public class AttunedDetectorItem extends Item {
                     .append(Component.literal(": " + entry.getValue() + " mB"))
                     .withColor(OreLookup.colorOf(entry.getKey())));
         }
+        int width = columnRadius(types) * 2 + 1;
         adder.accept(Component.translatable("tooltip." + Constants.MOD_ID + ".range",
-                downReach(types), sideReach(types), columnRadius(types) * 2 + 1)
+                downReach(types), sideReach(types), width, width)
                 .withStyle(ChatFormatting.DARK_GRAY));
     }
 }

@@ -60,9 +60,6 @@
   "tooltip.ore_detector_reborn.usage": "Right-click a surface to scan it for %s.",
   "tooltip.ore_detector_reborn.range": "Reaches %s down, %s sideways, %sx%s column",
   "text.autoconfig.ore_detector_reborn.title": "Ore Detector Reborn",
-  "text.autoconfig.ore_detector_reborn.option.downReach": "Downward reach (blocks)",
-  "text.autoconfig.ore_detector_reborn.option.sideReach": "Sideways / upward reach (blocks)",
-  "text.autoconfig.ore_detector_reborn.option.columnRadius": "Column radius (0 = 1x1, 1 = 3x3, 3 = 7x7)",
   "text.autoconfig.ore_detector_reborn.option.cooldownTicks": "Scan cooldown (ticks; 20 = 1 second)",
   "text.autoconfig.ore_detector_reborn.option.durabilityPercent": "Durability (%, requires restart to apply)",
   "text.autoconfig.ore_detector_reborn.option.soundVolumePercent": "Detector beep volume (%)",
@@ -76,5 +73,5 @@
   "hud.ore_detector_reborn.no_liquid": "The tank is empty",
   "tooltip.ore_detector_reborn.tank": "Tank: %s / %s mB",
   "tooltip.ore_detector_reborn.tank_empty": "Tank empty. Pour in Attunement Liquid to attune it.",
-  "text.autoconfig.ore_detector_reborn.option.reachStep": "Base reach (1 liquid = 3x, 2 = 2x, 3+ = 1x)"
+  "text.autoconfig.ore_detector_reborn.option.reachStep": "Scan reach (1 liquid = 3x, 2 = 2x, 3+ = 1x)"
 }

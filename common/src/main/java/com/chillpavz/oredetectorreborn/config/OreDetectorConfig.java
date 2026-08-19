@@ -51,11 +51,20 @@ public final class OreDetectorConfig {
      * Base reach. Down is 3x this with one liquid, 2x with two, 1x with three or more;
      * sideways and up are three quarters of that. One option instead of six.
      */
-    public static volatile int reachStep = 8;
+    public static final int REACH_STEP_MIN = 4;
+    public static final int REACH_STEP_MAX = 8;
+    public static final int DEFAULT_REACH_STEP = 8;
+
+    public static volatile int reachStep = DEFAULT_REACH_STEP;
 
     public static volatile int cooldownTicks = DEFAULT_COOLDOWN;
     public static volatile double durabilityMultiplier = DEFAULT_DURABILITY_MULT;
     public static volatile double soundVolume = DEFAULT_SOUND_VOLUME;
+
+    /** Clamps and stores the one option that drives all six of the detector's reaches. */
+    public static void applyReachStep(int value) {
+        reachStep = Math.max(REACH_STEP_MIN, Math.min(REACH_STEP_MAX, value));
+    }
 
     private OreDetectorConfig() {
     }

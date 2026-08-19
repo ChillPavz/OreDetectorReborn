@@ -27,14 +27,11 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 @Config(name = "ore_detector_reborn")
 public class OreDetectorConfigData implements ConfigData {
 
-    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.REACH_MIN, max = OreDetectorConfig.REACH_MAX)
-    public int downReach = OreDetectorConfig.DEFAULT_DOWN_REACH;
-
-    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.REACH_MIN, max = OreDetectorConfig.REACH_MAX)
-    public int sideReach = OreDetectorConfig.DEFAULT_SIDE_REACH;
-
-    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.COLUMN_RADIUS_MIN, max = OreDetectorConfig.COLUMN_RADIUS_MAX)
-    public int columnRadius = OreDetectorConfig.DEFAULT_COLUMN_RADIUS;
+    // One option drives all six reaches: down is 3x with a single liquid, 2x with two and 1x with
+    // three or more, and sideways is three quarters of down. Column width follows the same tiers
+    // (3x3, 5x5, 7x7) and is not separately configurable, or the two could disagree.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.REACH_STEP_MIN, max = OreDetectorConfig.REACH_STEP_MAX)
+    public int reachStep = OreDetectorConfig.DEFAULT_REACH_STEP;
 
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.COOLDOWN_MIN, max = OreDetectorConfig.COOLDOWN_MAX)
     public int cooldownTicks = OreDetectorConfig.DEFAULT_COOLDOWN;
@@ -48,7 +45,11 @@ public class OreDetectorConfigData implements ConfigData {
     public int soundVolumePercent = 40;
 
     public void applyToRuntime() {
-        OreDetectorConfig.apply(downReach, sideReach, columnRadius, cooldownTicks,
+        OreDetectorConfig.applyReachStep(reachStep);
+        // The legacy per-ore detectors still read the old reach fields; they keep their defaults
+        // until those items are removed.
+        OreDetectorConfig.apply(OreDetectorConfig.DEFAULT_DOWN_REACH, OreDetectorConfig.DEFAULT_SIDE_REACH,
+                OreDetectorConfig.DEFAULT_COLUMN_RADIUS, cooldownTicks,
                 durabilityPercent / 100.0, soundVolumePercent / 100.0);
     }
 }
