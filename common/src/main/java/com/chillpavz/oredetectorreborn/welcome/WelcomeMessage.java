@@ -35,7 +35,7 @@ public final class WelcomeMessage {
      * the message's own version, deliberately not the mod's: a patch release should not re-notify
      * everyone, and a rewritten notice should.
      */
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     private WelcomeMessage() {
     }
@@ -47,7 +47,11 @@ public final class WelcomeMessage {
         if (!state.markSeen(player.getUUID(), VERSION)) {
             return;
         }
-        for (Component line : lines()) {
+        // The guide is handed over with the notice rather than left to be crafted. A player who
+        // has just lost eleven detectors should not have to find out a book exists first.
+        boolean gaveBook = !GuidebookGift.create().isEmpty();
+        GuidebookGift.give(player);
+        for (Component line : lines(gaveBook)) {
             player.sendSystemMessage(line);
         }
     }
@@ -58,17 +62,21 @@ public final class WelcomeMessage {
      * <p>Every line is a translation key so this can be localised, and the colours are applied
      * here rather than written into the strings, so a translator cannot break the formatting.
      */
-    private static Component[] lines() {
-        return new Component[]{
-                Component.empty(),
-                key("title").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD),
-                key("rework").withStyle(ChatFormatting.WHITE),
-                bullet(key("chambers").withStyle(ChatFormatting.GOLD)),
-                bullet(key("advancements").withStyle(ChatFormatting.GREEN)),
-                bullet(key("guidebook").withStyle(ChatFormatting.GRAY)),
-                bullet(key("legacy").withStyle(ChatFormatting.LIGHT_PURPLE)),
-                Component.empty(),
-        };
+    private static java.util.List<Component> lines(boolean gaveBook) {
+        java.util.List<Component> lines = new java.util.ArrayList<>();
+        lines.add(Component.empty());
+        lines.add(key("title").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        lines.add(key("rework").withStyle(ChatFormatting.WHITE));
+        lines.add(bullet(key("chambers").withStyle(ChatFormatting.GOLD)));
+        lines.add(bullet(key("advancements").withStyle(ChatFormatting.GREEN)));
+        // Only promise the book when one was actually handed over. Without Patchouli there is no
+        // book to give, and a notice claiming otherwise sends the player hunting for nothing.
+        if (gaveBook) {
+            lines.add(bullet(key("guidebook").withStyle(ChatFormatting.GRAY)));
+        }
+        lines.add(bullet(key("legacy").withStyle(ChatFormatting.LIGHT_PURPLE)));
+        lines.add(Component.empty());
+        return lines;
     }
 
     private static Component bullet(Component text) {

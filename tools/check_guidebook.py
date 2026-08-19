@@ -22,21 +22,34 @@ def bad(message):
     print("  FAIL: " + message)
 
 
-ROOT = "common/src/main/resources/data/%s/patchouli_books/%s" % (NS, BOOK)
-book = json.loads(io.open(os.path.join(ROOT, "book.json"), encoding="utf-8").read())
+# SINCE 1.20 THE BOOK IS SPLIT ACROSS BOTH ROOTS and Patchouli refuses it otherwise:
+# book.json stays in data/, every category and entry lives CLIENT side under assets/, and
+# book.json must set "use_resource_pack": true. Getting this wrong is one ERROR at load and
+# a book that does not exist, with the files all present and looking correct in the jar.
+DATA_ROOT = "common/src/main/resources/data/%s/patchouli_books/%s" % (NS, BOOK)
+ASSET_ROOT = "common/src/main/resources/assets/%s/patchouli_books/%s" % (NS, BOOK)
+book = json.loads(io.open(os.path.join(DATA_ROOT, "book.json"), encoding="utf-8").read())
 print("book: %r, subtitle %r" % (book.get("name"), book.get("subtitle")))
 for required in ("name", "landing_text"):
     if not book.get(required):
         bad("book.json has no %s, which Patchouli requires" % required)
+if book.get("use_resource_pack") is not True:
+    bad("book.json does not set use_resource_pack, so Patchouli refuses the whole book "
+        "with a single ERROR at load and the guide silently does not exist")
+if book.get("dont_generate_book"):
+    bad("dont_generate_book keeps the book out of every creative tab, including ours")
+if os.path.isdir(os.path.join(DATA_ROOT, "en_us")):
+    bad("categories and entries are still under data/; since 1.20 they must be under "
+        "assets/ or Patchouli refuses the book")
 
 categories = {}
-for name in os.listdir(os.path.join(ROOT, "en_us", "categories")):
+for name in os.listdir(os.path.join(ASSET_ROOT, "en_us", "categories")):
     categories[NS + ":" + name[:-5]] = json.loads(
-        io.open(os.path.join(ROOT, "en_us", "categories", name), encoding="utf-8").read())
+        io.open(os.path.join(ASSET_ROOT, "en_us", "categories", name), encoding="utf-8").read())
 entries = {}
-for name in os.listdir(os.path.join(ROOT, "en_us", "entries")):
+for name in os.listdir(os.path.join(ASSET_ROOT, "en_us", "entries")):
     entries[name[:-5]] = json.loads(
-        io.open(os.path.join(ROOT, "en_us", "entries", name), encoding="utf-8").read())
+        io.open(os.path.join(ASSET_ROOT, "en_us", "entries", name), encoding="utf-8").read())
 print("%d categories, %d entries" % (len(categories), len(entries)))
 
 # --- what the mod actually registers -----------------------------------------------------------
@@ -138,6 +151,14 @@ for loader in ("fabric", "neoforge"):
     # Zip directory entries end in "/" and are not files; counting them inflates this by
     # one per folder.
     shipped = {n for n in names if "/patchouli_books/" in n and not n.endswith("/")}
+    in_data = {n for n in shipped if n.startswith("data/")}
+    in_assets = {n for n in shipped if n.startswith("assets/")}
+    if len(in_data) != 1:
+        bad("%s jar has %d book files under data/, expected just book.json"
+            % (loader, len(in_data)))
+    if len(in_assets) != len(categories) + len(entries):
+        bad("%s jar has %d book files under assets/, expected %d"
+            % (loader, len(in_assets), len(categories) + len(entries)))
     expected = 1 + len(categories) + len(entries)
     if len(shipped) != expected:
         bad("%s jar carries %d book files, expected %d" % (loader, len(shipped), expected))

@@ -21,11 +21,14 @@ import java.util.List;
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.item.OreLookup;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -103,11 +106,18 @@ public final class ScanHighlight {
      * inside a gizmo collector, so no collector has to be opened here.
      *
      * @param gameTime  the client level's game time
-     * @param viewer    where the player is, for the walk-away check
+     * @param player    the local player, for the walk-away and still-wearing checks
      * @param dimension the world the player is in now, so a highlight cannot cross a portal
      */
-    public static void tick(long gameTime, Vec3 viewer, ResourceKey<Level> dimension) {
+    public static void tick(long gameTime, Player player, ResourceKey<Level> dimension) {
         if (entries.isEmpty() || disabled) {
+            return;
+        }
+        // The highlight belongs to the goggles, so taking them off ends it immediately. Without
+        // this it survived unequipping them and even throwing them away, which reads as the mod
+        // having handed out permanent x-ray.
+        if (!player.getItemBySlot(EquipmentSlot.HEAD).is(ModItems.GOGGLES)) {
+            clear();
             return;
         }
         // A dimension change does not disconnect, so without this a highlight could survive a
@@ -123,7 +133,8 @@ public final class ScanHighlight {
         }
         // Walking away drops it. The scanned column runs INTO the surface, so the player is never
         // inside it; the honest reading of "leave the column" is leaving the area it was cast from.
-        if (viewer.distanceToSqr(Vec3.atCenterOf(origin)) > (double) cancelRadius * cancelRadius) {
+        if (player.getEyePosition().distanceToSqr(Vec3.atCenterOf(origin))
+                > (double) cancelRadius * cancelRadius) {
             clear();
             return;
         }
