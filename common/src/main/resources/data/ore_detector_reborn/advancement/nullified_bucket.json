@@ -1,5 +1,5 @@
 {
-  "parent": "ore_detector_reborn:ore_detector",
+  "parent": "ore_detector_reborn:breeze_shard",
   "display": {
     "icon": {
       "id": "ore_detector_reborn:nullified_bucket"

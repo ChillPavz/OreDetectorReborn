@@ -1,4 +1,7 @@
 {
-  "comment": "Deliberately empty: the goggles are functional but not drawn on the head until a proper model sheet exists. No parent and no elements, so nothing is drawn AND no texture reference is left unresolved. Inheriting item/generated instead logs a missing-texture warning on every resource reload.",
+  "comment": "Deliberately empty: the goggles are functional but not drawn on the head until a proper model sheet exists. No parent and no elements, so nothing is drawn. A particle texture is still required even with no faces, or the model loader logs a missing-texture warning on every resource reload.",
+  "textures": {
+    "particle": "ore_detector_reborn:item/goggles"
+  },
   "elements": []
 }

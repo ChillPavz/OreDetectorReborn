@@ -79,7 +79,16 @@ public class OreDetectorFabric implements ModInitializer {
                 (handler, sender, server) -> WelcomeMessage.showIfNew(handler.getPlayer()));
 
         BreezeLootInjection.register();
-        ItemEvents.USE.register(OreGrindingInteraction::tryGrind);
+        // NOT a method reference. Fabric's USE event uses NULL for "I did not handle this", and
+        // returns ANY non-null result straight to the caller instead of running the item's own
+        // use(). Handing it InteractionResult.PASS therefore CANCELS the vanilla interaction:
+        // it silently broke equipping the goggles, pouring liquid into the detector, emptying the
+        // Nullified Bucket and draining into a cauldron, all four on Fabric only. NeoForge's
+        // equivalent event reads PASS correctly, which is why none of it showed up there.
+        ItemEvents.USE.register((level, player, hand) -> {
+            InteractionResult result = OreGrindingInteraction.tryGrind(level, player, hand);
+            return result == InteractionResult.PASS ? null : result;
+        });
 
         CreativeModeTabEvents.modifyOutputEvent(ModCreativeTabs.KEY).register(output -> {
             ModItems.ITEMS.values().forEach(item ->

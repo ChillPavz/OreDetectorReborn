@@ -95,5 +95,12 @@
   "message.ore_detector_reborn.welcome.chambers": "Everything starts in a Trial Chamber. Breeze rods, shards, crystals and heavy cores are what build the detector, the goggles and the Resonance Chamber.",
   "message.ore_detector_reborn.welcome.advancements": "Press L to open your advancements. The whole progression is laid out there, step by step.",
   "message.ore_detector_reborn.welcome.guidebook": "The in-game guidebook arrives once Patchouli updates to this version.",
-  "message.ore_detector_reborn.welcome.legacy": "Still want the old detectors? Version 1.3.0 installs alongside this one and the two do not conflict."
+  "message.ore_detector_reborn.welcome.legacy": "Still want the old detectors? Version 1.3.0 installs alongside this one and the two do not conflict.",
+  "text.autoconfig.ore_detector_reborn.option.nauseaSeconds": "Goggle strain: Nausea length (seconds)",
+  "text.autoconfig.ore_detector_reborn.option.nauseaSeconds.@Tooltip": "How long Nausea lasts when the goggles are pushed past their strain ceiling. Set to 0 to remove the effect and keep only the refusal.",
+  "text.autoconfig.ore_detector_reborn.option.strainPerScan": "Goggle strain: added per scan",
+  "text.autoconfig.ore_detector_reborn.option.strainPerScan.@Tooltip": "Strain added each time the goggles show a scan, against a fixed ceiling of 100.",
+  "text.autoconfig.ore_detector_reborn.option.strainDecayTicks": "Goggle strain: ticks per point recovered",
+  "text.autoconfig.ore_detector_reborn.option.strainDecayTicks.@Tooltip[0]": "Ticks for one point of strain to bleed off. Higher recovers more slowly.",
+  "text.autoconfig.ore_detector_reborn.option.strainDecayTicks.@Tooltip[1]": "Strain only rises while the amount added per scan beats what decays during the scan cooldown."
 }

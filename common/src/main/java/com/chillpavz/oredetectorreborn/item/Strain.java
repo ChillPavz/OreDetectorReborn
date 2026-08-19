@@ -22,16 +22,20 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
+import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 
 /**
  * How hard the goggles have been pushed lately.
  *
- * <p>Each visualisation adds {@link #PER_SCAN}; the total bleeds off at {@link #DECAY_PER_SECOND}
- * a second. Below {@link #MAX} nothing is felt at all: the highlight is drawn at full strength
- * whatever the strain, and the number in the tooltip is the only warning. Crossing {@link #MAX}
- * gives the wearer Nausea and refuses to visualise until it decays back under. So it is a
- * self-clearing pressure on rapid re-scanning rather than a flat cooldown.
+ * <p>Each visualisation adds {@link #perScan()}; the total bleeds off one point every
+ * {@code strainDecayTicks}. Below {@link #MAX} nothing is felt at all: the highlight is drawn at
+ * full strength whatever the strain, and the number in the tooltip is the only warning. Crossing
+ * {@link #MAX} gives the wearer Nausea and refuses to visualise until it decays back under. So it
+ * is a self-clearing pressure on rapid re-scanning rather than a flat cooldown.
+ *
+ * <p>All three of those numbers are config options; only the ceiling is fixed. See
+ * {@link OreDetectorConfig#applyStrain}, which warns when a combination makes strain unreachable.
  *
  * <p>Decay is NOT ticked. The value is stored with the game time it was written at and the decay
  * is worked out on read, so a stack sitting in a chest costs nothing and nothing has to run every
@@ -42,35 +46,33 @@ import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
  */
 public record Strain(int value, long updatedAt) {
 
-    /** At and above this the goggles refuse to fire. */
-    public static final int MAX = 100;
-    /** Added by one visualisation. Five back-to-back scans reach {@link #MAX}. */
-    public static final int PER_SCAN = 20;
     /**
-     * Bleed-off rate. This has to be read against the scan cooldown, not on its own: a scan can
-     * only happen every {@code cooldownTicks}, so strain rises at all only while
-     * {@code PER_SCAN > DECAY_PER_SECOND * cooldownSeconds}. At the default five second cooldown
-     * that is 20 against 10, a net +10 a scan, so the goggles give out on the tenth back to back
-     * scan and are comfortable at any normal pace. The design doc suggested 5 a second; at that
-     * rate the decay (25) outruns the gain (20) and strain could never reach the ceiling at all.
-     */
-    public static final int DECAY_PER_SECOND = 2;
-    /**
-     * How long the Nausea lasts on CROSSING {@link #MAX}. It is not re-applied while blocked.
+     * At and above this the goggles refuse to fire.
      *
-     * <p>Fifteen seconds, and deliberately longer than the ten it takes a crossed pair to fall
-     * back under the ceiling. That ordering is the whole point: the goggles become usable again
-     * while the player is still dealing with the effect, so pushing on costs something real
-     * rather than just making them wait. It is also now the ONLY thing strain does to the player,
-     * since the highlight no longer dims or flickers.
+     * <p>Deliberately NOT configurable: it is the denominator the tooltip shows, so keeping it at
+     * 100 means "Strain: 40 / 100" always reads as a percentage. Everything about how fast that
+     * number moves is tunable instead.
      */
-    public static final int NAUSEA_TICKS = 300;
+    public static final int MAX = 100;
 
     /**
-     * Ceiling on the STORED number. Strain can only be added below {@link #MAX}, so it can never
-     * exceed MAX + PER_SCAN; this is a belt-and-braces clamp against a hand-edited component.
+     * Ceiling on the STORED number. Strain is only ever added below {@link #MAX}, so it cannot
+     * exceed MAX plus one scan's worth; this is a clamp against a hand-edited component.
      */
-    private static final int STORED_CAP = MAX + PER_SCAN;
+    private static final int STORED_CAP = MAX + OreDetectorConfig.STRAIN_PER_SCAN_MAX;
+
+    /** Added by one visualisation. */
+    public static int perScan() {
+        return OreDetectorConfig.strainPerScan;
+    }
+
+    /**
+     * How long the Nausea lasts on CROSSING {@link #MAX}, in ticks. It is not re-applied while
+     * blocked, and zero means the effect is switched off and only the refusal remains.
+     */
+    public static int nauseaTicks() {
+        return OreDetectorConfig.nauseaSeconds * 20;
+    }
 
     public static final Strain NONE = new Strain(0, 0L);
 
@@ -109,7 +111,7 @@ public record Strain(int value, long updatedAt) {
      */
     public int currentAt(long gameTime) {
         long elapsed = Math.max(0L, gameTime - updatedAt);
-        long decayed = value - elapsed * DECAY_PER_SECOND / 20L;
+        long decayed = value - elapsed / Math.max(1, OreDetectorConfig.strainDecayTicks);
         return (int) Math.max(0L, decayed);
     }
 
@@ -120,6 +122,6 @@ public record Strain(int value, long updatedAt) {
 
     /** Adds one visualisation's worth, rebased on the current game time. */
     public Strain plusScan(long gameTime) {
-        return new Strain(currentAt(gameTime) + PER_SCAN, gameTime);
+        return new Strain(currentAt(gameTime) + perScan(), gameTime);
     }
 }

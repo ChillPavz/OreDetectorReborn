@@ -381,8 +381,9 @@ public class AttunedDetectorItem extends Item {
         Strain.set(head, after);
         // Crossing the ceiling is the moment that costs something. This scan is still shown; the
         // next one is what gets refused.
-        if (after.isBlockedAt(now)) {
-            server.addEffect(new MobEffectInstance(MobEffects.NAUSEA, Strain.NAUSEA_TICKS, 0));
+        int nausea = Strain.nauseaTicks();
+        if (nausea > 0 && after.isBlockedAt(now)) {
+            server.addEffect(new MobEffectInstance(MobEffects.NAUSEA, nausea, 0));
         }
     }
 

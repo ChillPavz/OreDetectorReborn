@@ -16,22 +16,13 @@
     "background": "ore_detector_reborn:gui/advancements/backgrounds/trial_chamber"
   },
   "criteria": {
-    "has_breeze_rod": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "minecraft:breeze_rod"
-            ]
-          }
-        ]
-      }
+    "installed": {
+      "trigger": "minecraft:tick"
     }
   },
   "requirements": [
     [
-      "has_breeze_rod"
+      "installed"
     ]
   ]
 }

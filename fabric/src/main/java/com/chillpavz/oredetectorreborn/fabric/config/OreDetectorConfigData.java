@@ -40,6 +40,23 @@ public class OreDetectorConfigData implements ConfigData {
     @ConfigEntry.BoundedDiscrete(min = 0, max = 100)
     public int soundVolumePercent = 40;
 
+    // --- Goggles strain -----------------------------------------------------------------------
+    // Nausea on crossing the strain ceiling, in seconds. 0 switches the effect off and leaves
+    // only the refusal to visualise.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.NAUSEA_SECONDS_MIN,
+            max = OreDetectorConfig.NAUSEA_SECONDS_MAX)
+    public int nauseaSeconds = OreDetectorConfig.DEFAULT_NAUSEA_SECONDS;
+
+    // Strain added per visualisation, against a fixed ceiling of 100.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.STRAIN_PER_SCAN_MIN,
+            max = OreDetectorConfig.STRAIN_PER_SCAN_MAX)
+    public int strainPerScan = OreDetectorConfig.DEFAULT_STRAIN_PER_SCAN;
+
+    // Ticks for one point of strain to bleed off. Higher is slower.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.STRAIN_DECAY_TICKS_MIN,
+            max = OreDetectorConfig.STRAIN_DECAY_TICKS_MAX)
+    public int strainDecayTicks = OreDetectorConfig.DEFAULT_STRAIN_DECAY_TICKS;
+
     public void applyToRuntime() {
         OreDetectorConfig.applyReachStep(reachStep);
         // The legacy per-ore detectors still read the old reach fields; they keep their defaults
@@ -47,5 +64,7 @@ public class OreDetectorConfigData implements ConfigData {
         OreDetectorConfig.apply(OreDetectorConfig.DEFAULT_DOWN_REACH, OreDetectorConfig.DEFAULT_SIDE_REACH,
                 OreDetectorConfig.DEFAULT_COLUMN_RADIUS, cooldownTicks,
                 1.0, soundVolumePercent / 100.0);
+        // After apply(), which sets the cooldown the strain warning is measured against.
+        OreDetectorConfig.applyStrain(nauseaSeconds, strainPerScan, strainDecayTicks);
     }
 }

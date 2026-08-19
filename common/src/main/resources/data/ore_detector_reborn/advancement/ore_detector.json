@@ -28,7 +28,7 @@
       }
     }
   },
-  "parent": "ore_detector_reborn:heavy_core",
+  "parent": "ore_detector_reborn:breeze_shard",
   "requirements": [
     [
       "has_detector"

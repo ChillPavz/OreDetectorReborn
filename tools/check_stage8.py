@@ -37,15 +37,24 @@ print("registered components: %s" % sorted(components))
 if "strain" not in components:
     bad("no 'strain' data component is registered, so the goggles cannot remember any strain")
 
+# Strain's three numbers are config options now, so the defaults come from the config holder.
+config_src = source("common/src/main/java/com/chillpavz/oredetectorreborn/config/OreDetectorConfig.java")
+defaults = {name: int(value) for name, value in re.findall(
+    r"public static final int (DEFAULT_\w+|\w*_MIN|\w*_MAX)\s*=\s*(\d+);", config_src)}
 strain_src = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/Strain.java")
-numbers = {name: int(value) for name, value in re.findall(
-    r"public static final int (\w+)\s*=\s*(\d+);", strain_src)}
-print("strain: max %(MAX)s, +%(PER_SCAN)s per scan, -%(DECAY_PER_SECOND)s/s" % numbers)
-if numbers.get("PER_SCAN", 0) <= 0 or numbers.get("MAX", 0) <= 0:
+max_strain = int(re.search(r"int MAX\s*=\s*(\d+);", strain_src).group(1))
+
+per_scan = defaults["DEFAULT_STRAIN_PER_SCAN"]
+decay_ticks = defaults["DEFAULT_STRAIN_DECAY_TICKS"]
+cooldown_ticks = defaults["DEFAULT_COOLDOWN"]
+print("strain: ceiling %d, +%d per scan, one point per %d ticks, %ds nausea"
+      % (max_strain, per_scan, decay_ticks, defaults["DEFAULT_NAUSEA_SECONDS"]))
+
+if per_scan <= 0 or max_strain <= 0:
     bad("strain must actually rise and have a ceiling, or it gates nothing")
-if numbers.get("DECAY_PER_SECOND", 0) <= 0:
+if decay_ticks <= 0:
     bad("strain never decays, so the goggles would lock permanently after enough scans")
-if numbers["PER_SCAN"] >= numbers["MAX"]:
+if per_scan >= max_strain:
     bad("one scan reaches the ceiling; strain would be a flat cooldown, not a gradient")
 
 # The trap this check exists for: strain is only ever added once per scan, and a scan can only
@@ -53,18 +62,21 @@ if numbers["PER_SCAN"] >= numbers["MAX"]:
 # never reach its ceiling and the whole mechanic is inert -- with a green build, no log line and
 # nothing visible in game except goggles that are never refused. That is exactly how the design
 # doc's own suggested numbers (+20 against -5 a second, on a five second cooldown) behaved.
-config_src = source("common/src/main/java/com/chillpavz/oredetectorreborn/config/OreDetectorConfig.java")
-cooldown_ticks = int(re.search(r"DEFAULT_COOLDOWN\s*=\s*(\d+)", config_src).group(1))
-decay_per_cooldown = numbers["DECAY_PER_SECOND"] * cooldown_ticks / 20.0
-net = numbers["PER_SCAN"] - decay_per_cooldown
+decay_per_cooldown = cooldown_ticks / float(decay_ticks)
+net = per_scan - decay_per_cooldown
 print("at the default %d tick cooldown: +%d a scan, -%.0f decayed, net %+.0f"
-      % (cooldown_ticks, numbers["PER_SCAN"], decay_per_cooldown, net))
+      % (cooldown_ticks, per_scan, decay_per_cooldown, net))
 if net <= 0:
-    bad("strain decays at least as fast as it is gained at the default cooldown (+%d vs -%.0f), "
-        "so it can never reach the ceiling and gates nothing"
-        % (numbers["PER_SCAN"], decay_per_cooldown))
+    bad("strain decays at least as fast as it is gained at the DEFAULT settings (+%d vs -%.0f), "
+        "so it can never reach the ceiling and gates nothing" % (per_scan, decay_per_cooldown))
 else:
-    print("  scans of continuous use before the goggles refuse: %d" % -(-numbers["MAX"] // net))
+    print("  scans of continuous use before the goggles refuse: %d" % -(-max_strain // int(net)))
+
+# The option RANGES must at least allow a working combination, or a player could only ever pick
+# settings that switch the mechanic off.
+best = defaults["STRAIN_PER_SCAN_MAX"] - cooldown_ticks / float(defaults["STRAIN_DECAY_TICKS_MAX"])
+if best <= 0:
+    bad("even the strongest legal strain settings cannot reach the ceiling")
 
 # The strain component is read back by the tooltip and must survive a relog, so it has to be
 # persistent as well as network synchronised. A network-only component would read as zero on

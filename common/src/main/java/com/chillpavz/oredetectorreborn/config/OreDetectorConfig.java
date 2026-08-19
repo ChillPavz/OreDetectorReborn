@@ -58,6 +58,65 @@ public final class OreDetectorConfig {
     public static volatile int reachStep = DEFAULT_REACH_STEP;
 
     public static volatile int cooldownTicks = DEFAULT_COOLDOWN;
+
+    // --- Goggles strain -----------------------------------------------------------------------
+    // The ceiling is fixed at 100 so the tooltip reads as a percentage. What is tunable is how
+    // fast strain arrives, how fast it leaves, and how hard the Nausea bites.
+
+    /** Nausea on crossing the ceiling, in seconds. 0 turns the effect off and leaves the refusal. */
+    public static final int NAUSEA_SECONDS_MIN = 0;
+    public static final int NAUSEA_SECONDS_MAX = 15;
+    public static final int DEFAULT_NAUSEA_SECONDS = 10;
+
+    /** Strain added per visualisation, against a ceiling of 100. */
+    public static final int STRAIN_PER_SCAN_MIN = 5;
+    public static final int STRAIN_PER_SCAN_MAX = 25;
+    public static final int DEFAULT_STRAIN_PER_SCAN = 20;
+
+    /**
+     * Ticks for one point of strain to bleed off. Higher is slower.
+     *
+     * <p>The floor is 5 rather than 1 because below that the decay outruns any legal
+     * {@code strainPerScan} at the default cooldown and strain could never reach its ceiling at
+     * all. The ceiling of 100 is five seconds a point, which is 500 seconds to clear a full bar.
+     */
+    public static final int STRAIN_DECAY_TICKS_MIN = 5;
+    public static final int STRAIN_DECAY_TICKS_MAX = 100;
+    public static final int DEFAULT_STRAIN_DECAY_TICKS = 10;
+
+    public static volatile int nauseaSeconds = DEFAULT_NAUSEA_SECONDS;
+    public static volatile int strainPerScan = DEFAULT_STRAIN_PER_SCAN;
+    public static volatile int strainDecayTicks = DEFAULT_STRAIN_DECAY_TICKS;
+
+    /**
+     * Clamps and stores the three strain options.
+     *
+     * <p>Warns when the combination makes strain unreachable. Strain only rises once per scan and
+     * a scan only happens once per cooldown, so it accumulates at all only while
+     * {@code strainPerScan > cooldownTicks / strainDecayTicks}. A player is entitled to switch the
+     * mechanic off that way, but they should not do it by accident and then wonder why the goggles
+     * never complain, so it is said out loud once.
+     */
+    public static void applyStrain(int nauseaSeconds, int strainPerScan, int strainDecayTicks) {
+        OreDetectorConfig.nauseaSeconds =
+                clampInt(nauseaSeconds, NAUSEA_SECONDS_MIN, NAUSEA_SECONDS_MAX);
+        OreDetectorConfig.strainPerScan =
+                clampInt(strainPerScan, STRAIN_PER_SCAN_MIN, STRAIN_PER_SCAN_MAX);
+        OreDetectorConfig.strainDecayTicks =
+                clampInt(strainDecayTicks, STRAIN_DECAY_TICKS_MIN, STRAIN_DECAY_TICKS_MAX);
+        warnIfStrainInert();
+    }
+
+    private static void warnIfStrainInert() {
+        double decayPerScan = (double) cooldownTicks / strainDecayTicks;
+        if (strainPerScan <= decayPerScan) {
+            com.chillpavz.oredetectorreborn.Constants.LOG.warn(
+                    "Goggle strain can never reach its ceiling with these settings: a scan adds {} "
+                    + "but {} decays between scans at a {} tick cooldown. The goggles will never "
+                    + "refuse. Raise strainPerScan or strainDecayTicks if that was not intended.",
+                    strainPerScan, Math.round(decayPerScan), cooldownTicks);
+        }
+    }
     public static volatile double durabilityMultiplier = DEFAULT_DURABILITY_MULT;
     public static volatile double soundVolume = DEFAULT_SOUND_VOLUME;
 
@@ -75,6 +134,8 @@ public final class OreDetectorConfig {
         OreDetectorConfig.sideReach = clampInt(sideReach, REACH_MIN, REACH_MAX);
         OreDetectorConfig.columnRadius = clampInt(columnRadius, COLUMN_RADIUS_MIN, COLUMN_RADIUS_MAX);
         OreDetectorConfig.cooldownTicks = clampInt(cooldownTicks, COOLDOWN_MIN, COOLDOWN_MAX);
+        // The strain warning depends on the cooldown, so re-check it whenever the cooldown moves.
+        warnIfStrainInert();
         OreDetectorConfig.durabilityMultiplier = clampDouble(durabilityMultiplier, DURABILITY_MULT_MIN, DURABILITY_MULT_MAX);
         OreDetectorConfig.soundVolume = clampDouble(soundVolume, SOUND_VOLUME_MIN, SOUND_VOLUME_MAX);
     }
