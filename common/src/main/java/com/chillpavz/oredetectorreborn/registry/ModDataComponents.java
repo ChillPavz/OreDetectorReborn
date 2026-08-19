@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.chillpavz.oredetectorreborn.Constants;
+import com.chillpavz.oredetectorreborn.item.OreTank;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -46,6 +47,13 @@ public final class ModDataComponents {
             DataComponentType.<String>builder()
                     .persistent(Codec.STRING)
                     .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+                    .build());
+
+    /** What is loaded in the detector's tank. Persistent, like every component we render from. */
+    public static final DataComponentType<OreTank> ORE_TANK = register("ore_tank",
+            DataComponentType.<OreTank>builder()
+                    .persistent(OreTank.CODEC)
+                    .networkSynchronized(OreTank.STREAM_CODEC)
                     .build());
 
     private ModDataComponents() {

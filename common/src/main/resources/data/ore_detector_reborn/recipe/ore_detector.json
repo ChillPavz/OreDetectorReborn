@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  R",
+    " HR",
+    "HCR"
+  ],
+  "key": {
+    "R": "minecraft:breeze_rod",
+    "H": "minecraft:heavy_core",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "ore_detector_reborn:ore_detector"
+  }
+}

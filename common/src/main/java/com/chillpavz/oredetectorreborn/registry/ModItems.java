@@ -24,6 +24,7 @@ import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.item.AmethystDetector;
 import com.chillpavz.oredetectorreborn.item.CoalDetector;
+import com.chillpavz.oredetectorreborn.item.AttunedDetectorItem;
 import com.chillpavz.oredetectorreborn.item.AttunementLiquidItem;
 import com.chillpavz.oredetectorreborn.item.CrushedOreItem;
 import com.chillpavz.oredetectorreborn.item.CopperDetector;
@@ -69,6 +70,11 @@ public final class ModItems {
     // Bottled Attunement Liquid, keyed on the same ore_type component as the dust.
     public static final Item ATTUNEMENT_LIQUID = create("attunement_liquid", AttunementLiquidItem::new);
 
+    // The flagship item. 1000 durability mirrors the Mace's 500, doubled because the recipe takes
+    // two Heavy Cores. A Breeze Shard repairs 250, which is simply vanilla's 25% per repair
+    // material, so no custom repair code is needed.
+    public static final Item ORE_DETECTOR = createDetector();
+
     // Durability is tuned inverse to ore rarity/value: abundant, big-vein ores (coal/copper/iron) get
     // the most scans; rare, high-value ores (diamond/emerald/netherite) get the fewest so a detector
     // can't cheaply farm them. See CHANGELOG for the reasoning.
@@ -99,6 +105,16 @@ public final class ModItems {
         TagKey<Item> zincIngots = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/zinc"));
         ZINC_DETECTOR = new ZincDetector(new Item.Properties().setId(key).durability(OreDetectorConfig.scaleDurability(200)).repairable(zincIngots));
         return ZINC_DETECTOR;
+    }
+
+    private static Item createDetector() {
+        Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "ore_detector");
+        Item item = new AttunedDetectorItem(new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, id))
+                .durability(1000)
+                .repairable(BREEZE_SHARD));
+        ITEMS.put(id, item);
+        return item;
     }
 
     /** A plain item built by a specific class. */
