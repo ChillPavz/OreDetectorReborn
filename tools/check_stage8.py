@@ -86,6 +86,19 @@ if "Gizmos.cuboid(" not in highlight_src:
 if "catch (Throwable" not in highlight_src:
     bad("the emit is not wrapped; a rendering fault would take the client down instead of "
         "degrading to no highlight")
+# Strain must not touch how the highlight LOOKS. A dimming, flickering picture was tested and is
+# a continuous irritation; the Nausea on crossing is the whole cost now.
+for banned in ("fidelity", "FLICKER"):
+    if banned in highlight_src:
+        bad("the highlight still varies with %s; strain should only refuse, never degrade" % banned)
+
+# Only the blocks the liquid paid for are drawn, nearest first. Without the sort a partial charge
+# would light up an arbitrary slice of the beam, which reads as the mod picking at random.
+detector_src = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/AttunedDetectorItem.java")
+if "paidFor" not in detector_src:
+    bad("the highlight is not limited to what the charge paid for")
+if "positions.sort(" not in detector_src or "distanceToSqr" not in detector_src:
+    bad("the drawn blocks are not sorted by distance, so a partial charge shows an arbitrary set")
 
 # --- per-loader wiring, all four halves ------------------------------------------------------
 WIRING = {

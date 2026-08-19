@@ -21,6 +21,7 @@ import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigScreen;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
 import com.chillpavz.oredetectorreborn.network.ModNetworking;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.welcome.WelcomeMessage;
 import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
 import com.chillpavz.oredetectorreborn.registry.ModBlocks;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
@@ -41,6 +42,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.minecraft.world.InteractionResult;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -64,6 +66,8 @@ public class OreDetectorNeoForge {
         // RightClickItem is a GAME bus event, not a mod bus one. Registering it on the
         // wrong bus fails silently.
         NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onRightClickItem);
+        // PlayerLoggedInEvent is a GAME bus event too.
+        NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onPlayerJoin);
         eventBus.addListener(OreDetectorNeoForge::onBuildTabContents);
         // RegisterPayloadHandlersEvent is a MOD bus event.
         eventBus.addListener(OreDetectorNeoForge::onRegisterPayloads);
@@ -108,6 +112,12 @@ public class OreDetectorNeoForge {
                 (payload, context) -> com.chillpavz.oredetectorreborn.client.ScanHighlight
                         .accept(payload, context.player().level().getGameTime(),
                                 context.player().level().dimension()));
+    }
+
+    private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+            WelcomeMessage.showIfNew(player);
+        }
     }
 
     private static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {

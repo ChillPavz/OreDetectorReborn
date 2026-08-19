@@ -1,4 +1,4 @@
 {
-  "comment": "Deliberately empty: the goggles are functional but not drawn on the head until a proper model texture exists.",
-  "parent": "minecraft:item/generated"
+  "comment": "Deliberately empty: the goggles are functional but not drawn on the head until a proper model sheet exists. No parent and no elements, so nothing is drawn AND no texture reference is left unresolved. Inheriting item/generated instead logs a missing-texture warning on every resource reload.",
+  "elements": []
 }

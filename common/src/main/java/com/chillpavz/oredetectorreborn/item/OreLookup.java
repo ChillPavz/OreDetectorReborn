@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.chillpavz.oredetectorreborn.Constants;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,9 +29,13 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * Which ore a block counts as, plus how that ore is named and coloured.
  *
- * <p>Deliberately a hardcoded vanilla table for now. The modded-ore stage replaces the block map
- * with common tag matching ({@code c:ores/<material>}), at which point this becomes the fallback
- * for untagged blocks rather than the whole answer. The NAMES and COLOURS stay useful either way.
+ * <p>Vanilla blocks are resolved up front, because they always exist. Other mods' ore blocks come
+ * from {@link ModdedOres} by registry id and are resolved LAZILY on first use, since those mods
+ * have not registered anything yet while this class is initialising.
+ *
+ * <p>Deliberately a hardcoded table for now. The modded-ore stage replaces it with common tag
+ * matching ({@code c:ores/<material>}), at which point this becomes the fallback for untagged
+ * blocks rather than the whole answer. The NAMES and COLOURS stay useful either way.
  */
 public final class OreLookup {
 
@@ -49,16 +55,58 @@ public final class OreLookup {
         // Amethyst has no ore block; the geode blocks are what the detector looks for.
         ore("amethyst", 0xB57EDC, Blocks.AMETHYST_BLOCK, Blocks.BUDDING_AMETHYST);
         ore("netherite", 0x9A6B54, Blocks.ANCIENT_DEBRIS);
-        // Zinc and other modded ores arrive with tag matching in the modded-ore stage.
+        // Zinc has no vanilla block, so only its colour is set here; the blocks that count as
+        // zinc come from ModdedOres.
         COLOURS.put("zinc", 0xB8CFCC);
     }
 
     private OreLookup() {
     }
 
+    /**
+     * Every modded ore block that turned out to be registered, resolved once on first use.
+     *
+     * <p>Volatile and replaced wholesale rather than mutated, so the scan thread either sees the
+     * finished map or builds its own identical one. Resolving is idempotent, so a race costs a
+     * duplicated walk of a short list and nothing else.
+     */
+    private static volatile Map<Block, String> modded;
+
     /** The ore this block counts as, or null if it is not an ore the mod knows. */
     public static String oreTypeOf(BlockState state) {
-        return BY_BLOCK.get(state.getBlock());
+        Block block = state.getBlock();
+        String vanilla = BY_BLOCK.get(block);
+        if (vanilla != null) {
+            return vanilla;
+        }
+        return moddedBlocks().get(block);
+    }
+
+    /**
+     * Resolves {@link ModdedOres#BY_ID} against the real block registry, once.
+     *
+     * <p>This cannot happen in a static initialiser: the other mods' blocks are registered after
+     * this class is first touched, so every lookup would miss and the whole table would silently
+     * do nothing.
+     */
+    private static Map<Block, String> moddedBlocks() {
+        Map<Block, String> resolved = modded;
+        if (resolved != null) {
+            return resolved;
+        }
+        resolved = new HashMap<>();
+        for (Map.Entry<Identifier, String> entry : ModdedOres.BY_ID.entrySet()) {
+            // containsKey first, deliberately. The block registry is DEFAULTED, so getValue on an
+            // absent mod's id returns AIR rather than null, and every unregistered id in the table
+            // would map AIR to some ore. Air is very common in a scan.
+            if (BuiltInRegistries.BLOCK.containsKey(entry.getKey())) {
+                resolved.put(BuiltInRegistries.BLOCK.getValue(entry.getKey()), entry.getValue());
+            }
+        }
+        Constants.LOG.info("Matched {} modded ore blocks out of {} known ids.",
+                resolved.size(), ModdedOres.BY_ID.size());
+        modded = resolved;
+        return resolved;
     }
 
     /** Falls back to a readable name so a modded ore without a translation still reads properly. */

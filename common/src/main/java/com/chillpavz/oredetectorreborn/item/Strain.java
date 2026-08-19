@@ -28,8 +28,9 @@ import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
  * How hard the goggles have been pushed lately.
  *
  * <p>Each visualisation adds {@link #PER_SCAN}; the total bleeds off at {@link #DECAY_PER_SECOND}
- * a second. Below {@link #MAX} it only degrades the highlight (dimmer, flickering, shorter);
- * at {@link #MAX} the goggles refuse to fire and give the wearer Nausea instead. So it is a
+ * a second. Below {@link #MAX} nothing is felt at all: the highlight is drawn at full strength
+ * whatever the strain, and the number in the tooltip is the only warning. Crossing {@link #MAX}
+ * gives the wearer Nausea and refuses to visualise until it decays back under. So it is a
  * self-clearing pressure on rapid re-scanning rather than a flat cooldown.
  *
  * <p>Decay is NOT ticked. The value is stored with the game time it was written at and the decay
@@ -54,8 +55,16 @@ public record Strain(int value, long updatedAt) {
      * rate the decay (25) outruns the gain (20) and strain could never reach the ceiling at all.
      */
     public static final int DECAY_PER_SECOND = 2;
-    /** How long the Nausea lasts on CROSSING {@link #MAX}. It is not re-applied while blocked. */
-    public static final int NAUSEA_TICKS = 100;
+    /**
+     * How long the Nausea lasts on CROSSING {@link #MAX}. It is not re-applied while blocked.
+     *
+     * <p>Fifteen seconds, and deliberately longer than the ten it takes a crossed pair to fall
+     * back under the ceiling. That ordering is the whole point: the goggles become usable again
+     * while the player is still dealing with the effect, so pushing on costs something real
+     * rather than just making them wait. It is also now the ONLY thing strain does to the player,
+     * since the highlight no longer dims or flickers.
+     */
+    public static final int NAUSEA_TICKS = 300;
 
     /**
      * Ceiling on the STORED number. Strain can only be added below {@link #MAX}, so it can never
@@ -107,15 +116,6 @@ public record Strain(int value, long updatedAt) {
     /** True when the goggles are too strained to visualise anything. */
     public boolean isBlockedAt(long gameTime) {
         return currentAt(gameTime) >= MAX;
-    }
-
-    /**
-     * How clear the highlight should be, 1.0 when rested down to 0.0 at {@link #MAX}. The client
-     * dims, shortens and flickers the highlight by this, which is the early warning that the
-     * next scan or two will be refused.
-     */
-    public float fidelityAt(long gameTime) {
-        return 1.0F - Math.min(1.0F, currentAt(gameTime) / (float) MAX);
     }
 
     /** Adds one visualisation's worth, rebased on the current game time. */

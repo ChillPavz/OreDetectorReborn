@@ -20,6 +20,7 @@ import com.chillpavz.oredetectorreborn.fabric.loot.BreezeLootInjection;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
 import com.chillpavz.oredetectorreborn.network.ModNetworking;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.welcome.WelcomeMessage;
 import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
 import com.chillpavz.oredetectorreborn.registry.ModBlocks;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
@@ -34,6 +35,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.event.player.ItemEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
@@ -72,6 +74,9 @@ public class OreDetectorFabric implements ModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(
                 ScanHighlightPayload.TYPE, ScanHighlightPayload.STREAM_CODEC);
         ModNetworking.setSender(ServerPlayNetworking::send);
+
+        ServerPlayConnectionEvents.JOIN.register(
+                (handler, sender, server) -> WelcomeMessage.showIfNew(handler.getPlayer()));
 
         BreezeLootInjection.register();
         ItemEvents.USE.register(OreGrindingInteraction::tryGrind);

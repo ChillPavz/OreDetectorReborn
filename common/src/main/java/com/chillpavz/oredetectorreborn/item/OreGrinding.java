@@ -19,6 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
@@ -35,12 +37,26 @@ import net.minecraft.world.item.Items;
  */
 public final class OreGrinding {
 
-    /** One grindable material: what goes in, what comes out, and what it costs the shears. */
+    /**
+     * One grindable material: what goes in, what comes out, and what it costs the shears.
+     *
+     * @param input the vanilla item, or null for a modded material, which is identified by its
+     *              registry id instead and resolved through {@link #BY_MODDED_ID}
+     */
     public record Entry(String oreType, Item input, int dustYield, int shearsDamage) {
     }
 
     /** Input item -> what grinding it produces. Iteration order is the tier order below. */
     public static final Map<Item, Entry> BY_INPUT = new LinkedHashMap<>();
+
+    /**
+     * The same thing for other mods' materials, keyed by registry id because naming their items
+     * would mean a compile dependency on them.
+     */
+    public static final Map<Identifier, Entry> BY_MODDED_ID = new LinkedHashMap<>();
+
+    /** Resolved from {@link #BY_MODDED_ID} on first use; see {@link #moddedInputs()}. */
+    private static volatile Map<Item, Entry> modded;
 
     static {
         // Mass-producer: abundant, big-vein ores.
@@ -60,8 +76,10 @@ public final class OreGrinding {
         // several times what any other entry costs. Netherite is the most valuable thing the
         // detector looks for, so attuning to it is meant to hurt.
         add("netherite", Items.NETHERITE_INGOT, 1, 10);
-        // Zinc and the other modded materials arrive in the modded-ore stage, where their item ids
-        // can be checked against the real jars rather than guessed.
+        // Create's zinc, mirroring copper: it is an abundant, big-vein ore in exactly the same
+        // way. Every Create variant uses the namespace `create`, so this one id covers Create,
+        // Create Fabric and Create Fly alike.
+        addModded("create", "zinc_ingot", "zinc", 4, 2);
     }
 
     private OreGrinding() {
@@ -69,7 +87,37 @@ public final class OreGrinding {
 
     /** The grind for this input, or null if it is not a grindable material. */
     public static Entry forInput(Item input) {
-        return BY_INPUT.get(input);
+        Entry vanilla = BY_INPUT.get(input);
+        return vanilla != null ? vanilla : moddedInputs().get(input);
+    }
+
+    /**
+     * Resolves {@link #BY_MODDED_ID} against the real item registry, once.
+     *
+     * <p>Lazy for the same reason the ore blocks are: the other mod has not registered its items
+     * yet while this class is initialising, so resolving here would silently find nothing.
+     */
+    private static Map<Item, Entry> moddedInputs() {
+        Map<Item, Entry> resolved = modded;
+        if (resolved != null) {
+            return resolved;
+        }
+        resolved = new LinkedHashMap<>();
+        for (Map.Entry<Identifier, Entry> entry : BY_MODDED_ID.entrySet()) {
+            // containsKey first: the item registry is defaulted too, so an absent mod's id would
+            // otherwise resolve to AIR and make an empty hand grindable.
+            if (BuiltInRegistries.ITEM.containsKey(entry.getKey())) {
+                resolved.put(BuiltInRegistries.ITEM.getValue(entry.getKey()), entry.getValue());
+            }
+        }
+        modded = resolved;
+        return resolved;
+    }
+
+    private static void addModded(String namespace, String path, String oreType, int dustYield,
+                                  int shearsDamage) {
+        BY_MODDED_ID.put(Identifier.fromNamespaceAndPath(namespace, path),
+                new Entry(oreType, null, dustYield, shearsDamage));
     }
 
     /** Fallback display name for an ore type with no translation, e.g. "zinc" -> "Zinc Dust". */

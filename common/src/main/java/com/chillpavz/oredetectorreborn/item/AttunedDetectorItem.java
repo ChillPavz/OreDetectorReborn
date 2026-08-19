@@ -16,6 +16,7 @@
 package com.chillpavz.oredetectorreborn.item;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * The Ore Detector: one item, attuned to whatever Attunement Liquid is in its tank.
@@ -293,15 +295,19 @@ public class AttunedDetectorItem extends Item {
 
         OreTank remaining = tank;
         int reported = 0;
+        // What each ore's charge actually covered. The action bar reports everything FOUND, but
+        // only this much was paid for, and only this much is drawn.
+        Map<String, Integer> paidFor = new LinkedHashMap<>();
         for (Map.Entry<String, Integer> entry : found.entrySet()) {
             int available = remaining.amountOf(entry.getKey());
             int spend = Math.min(available, entry.getValue());
             remaining = remaining.drain(entry.getKey(), spend);
+            paidFor.put(entry.getKey(), spend);
             reported += spend;
         }
         setTank(detector, remaining);
         wearGoggles(player, reported);
-        visualise(level, player, clicked, reach, hits);
+        visualise(level, player, clicked, reach, hits, paidFor);
 
         report(player, found, reported);
         player.getCooldowns().addCooldown(detector, OreDetectorConfig.cooldownTicks);
@@ -309,20 +315,25 @@ public class AttunedDetectorItem extends Item {
     }
 
     /**
-     * Shows the wearer what the scan just found, if they have the goggles on and the goggles are
+     * Shows the wearer where the scan's hits are, if they have the goggles on and the goggles are
      * up to it.
+     *
+     * <p>Only the blocks the liquid PAID for are drawn, nearest first. A scan can find ten iron on
+     * three millibuckets of iron charge: the action bar still says ten, because that is what the
+     * detector genuinely detected, but the goggles show the three closest. The text is the survey
+     * and the highlight is what the charge could resolve.
      *
      * <p>This is the only thing Strain gates. It rises per visualisation and bleeds off on its
      * own, so it brakes a player spamming scans to sweep a cave without ever taking the detector
-     * away from someone using it at a normal pace. Below the ceiling it degrades the picture,
-     * which is the warning; at the ceiling the goggles refuse and hand out Nausea instead.
+     * away from someone using it at a normal pace. Crossing the ceiling costs Nausea; below it,
+     * nothing about the picture changes.
      *
      * <p>Nothing here touches the detector: an unworn or exhausted pair of goggles costs the scan
      * nothing, because the numbers in the action bar are the mod's actual output and the
      * highlight is a convenience on top of them.
      */
     private static void visualise(Level level, Player player, BlockPos clicked, int reach,
-                                  Map<String, List<BlockPos>> hits) {
+                                  Map<String, List<BlockPos>> hits, Map<String, Integer> paidFor) {
         if (hits.isEmpty() || !(player instanceof ServerPlayer server)) {
             return;
         }
@@ -342,22 +353,29 @@ public class AttunedDetectorItem extends Item {
             return;
         }
 
-        float fidelity = strain.fidelityAt(now);
-        // A strained pair still shows something, just for less time. Never below 40% of the window,
-        // or the highlight would blink out before the player could look at it.
-        int duration = Math.round(HIGHLIGHT_TICKS * (0.4F + 0.6F * fidelity));
-
+        Vec3 eye = player.getEyePosition();
         List<ScanHighlightPayload.Group> groups = new ArrayList<>();
         for (Map.Entry<String, List<BlockPos>> entry : hits.entrySet()) {
-            List<BlockPos> positions = entry.getValue();
-            if (positions.size() > ScanHighlightPayload.MAX_POSITIONS) {
-                positions = positions.subList(0, ScanHighlightPayload.MAX_POSITIONS);
+            int shown = Math.min(paidFor.getOrDefault(entry.getKey(), 0),
+                    ScanHighlightPayload.MAX_POSITIONS);
+            if (shown <= 0) {
+                continue;
+            }
+            List<BlockPos> positions = new ArrayList<>(entry.getValue());
+            if (positions.size() > shown) {
+                // Nearest to the player, so a partial charge resolves the ore at your feet rather
+                // than an arbitrary slice of the beam.
+                positions.sort(Comparator.comparingDouble(pos -> Vec3.atCenterOf(pos).distanceToSqr(eye)));
+                positions = positions.subList(0, shown);
             }
             groups.add(new ScanHighlightPayload.Group(entry.getKey(), List.copyOf(positions)));
         }
+        if (groups.isEmpty()) {
+            return;
+        }
 
         ModNetworking.send(server, new ScanHighlightPayload(
-                clicked, reach + CANCEL_MARGIN, duration, fidelity, List.copyOf(groups)));
+                clicked, reach + CANCEL_MARGIN, HIGHLIGHT_TICKS, List.copyOf(groups)));
 
         Strain after = strain.plusScan(now);
         Strain.set(head, after);

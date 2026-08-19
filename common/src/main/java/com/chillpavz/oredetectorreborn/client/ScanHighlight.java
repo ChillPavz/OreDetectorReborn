@@ -17,7 +17,6 @@ package com.chillpavz.oredetectorreborn.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.item.OreLookup;
@@ -40,8 +39,13 @@ import net.minecraft.world.phys.Vec3;
  *
  * <p>Re-emitting every tick rather than using {@code persistForMillis} is deliberate. Gizmos
  * cannot be withdrawn once handed over, and this highlight has to be able to stop early: when the
- * player walks away from the scan, when the window lapses, and when strain makes it flicker.
- * Holding the state here keeps all three in one place.
+ * player walks away from the scan, when the window lapses, and when the world changes. Holding
+ * the state here keeps all three in one place.
+ *
+ * <p>The highlight is drawn at ONE fixed strength. An earlier version dimmed and flickered it as
+ * strain rose, and in play that was simply irritating: a degraded picture nags continuously,
+ * where the Nausea on crossing the ceiling is a sharp, interesting cost to play around. Strain is
+ * still tracked and still refuses; it just no longer touches how this looks.
  *
  * <p>Note this class deliberately touches NO client-only class. Everything it needs (game time,
  * where the player is) is passed in by each loader's client tick hook, so it stays compilable and
@@ -59,8 +63,6 @@ public final class ScanHighlight {
     /** Grows the box a hair so it does not fight with the block's own faces. Vanilla uses 0.02. */
     private static final float PADDING = 0.02F;
 
-    private static final Random FLICKER = new Random();
-
     /** Set once if emitting ever throws, after which the highlight quietly stops being drawn. */
     private static boolean disabled;
 
@@ -70,7 +72,6 @@ public final class ScanHighlight {
     private static int cancelRadius;
     private static long expiresAtTick;
     private static int totalTicks;
-    private static float fidelity = 1.0F;
 
     private ScanHighlight() {
     }
@@ -90,7 +91,6 @@ public final class ScanHighlight {
         cancelRadius = payload.cancelRadius();
         totalTicks = Math.max(1, payload.durationTicks());
         expiresAtTick = gameTime + totalTicks;
-        fidelity = Math.max(0.0F, Math.min(1.0F, payload.fidelity()));
     }
 
     /** Drops the highlight. Called when the player leaves a world so it cannot bleed into another. */
@@ -127,16 +127,10 @@ public final class ScanHighlight {
             clear();
             return;
         }
-        // Strain shows itself as a dropped frame before it shows itself as a refusal.
-        if (fidelity < 1.0F && FLICKER.nextFloat() < (1.0F - fidelity) * 0.45F) {
-            return;
-        }
-
+        // The only thing that changes the strength is the window running out.
         float fade = Math.min(1.0F, remaining / (float) FADE_TICKS);
-        // Never below a quarter: a strained highlight should read as unreliable, not as absent.
-        float strength = fade * (0.25F + 0.75F * fidelity);
-        int fillAlpha = Math.round(FILL_ALPHA * strength);
-        int strokeAlpha = Math.round(STROKE_ALPHA * strength);
+        int fillAlpha = Math.round(FILL_ALPHA * fade);
+        int strokeAlpha = Math.round(STROKE_ALPHA * fade);
         if (fillAlpha <= 0 && strokeAlpha <= 0) {
             return;
         }

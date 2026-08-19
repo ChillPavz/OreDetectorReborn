@@ -38,16 +38,17 @@ import net.minecraft.resources.Identifier;
  *
  * @param origin        the block that was clicked, used to drop the highlight once the player leaves
  * @param cancelRadius  how far from {@code origin} the player may stray before it is dropped
- * @param durationTicks how long the highlight lasts, already shortened by strain
- * @param fidelity      1.0 rested, down to 0.0 at full strain; the client dims and flickers by it
- * @param groups        the found blocks, grouped by ore so the ore name is sent once, not per block
+ * @param durationTicks how long the highlight lasts
+ * @param groups        the blocks to draw, grouped by ore so the ore name is sent once per group
+ *                      rather than once per block
  */
 public record ScanHighlightPayload(BlockPos origin, int cancelRadius, int durationTicks,
-                                   float fidelity, List<Group> groups) implements CustomPacketPayload {
+                                   List<Group> groups) implements CustomPacketPayload {
 
     /**
-     * Hard ceiling on positions per ore. A 7x7 column reaching eight blocks can hold 392 blocks,
-     * and while the liquid cost brakes that in practice, the codec must not trust the sender.
+     * Hard ceiling on positions per ore. In practice the liquid charge already caps this far
+     * lower, since only the blocks the scan actually paid for are drawn, but the codec must not
+     * trust the sender.
      */
     public static final int MAX_POSITIONS = 512;
     /** Six is the tank's own type cap, so a well-formed packet can never exceed it. */
@@ -61,7 +62,6 @@ public record ScanHighlightPayload(BlockPos origin, int cancelRadius, int durati
                     BlockPos.STREAM_CODEC, ScanHighlightPayload::origin,
                     ByteBufCodecs.VAR_INT, ScanHighlightPayload::cancelRadius,
                     ByteBufCodecs.VAR_INT, ScanHighlightPayload::durationTicks,
-                    ByteBufCodecs.FLOAT, ScanHighlightPayload::fidelity,
                     Group.STREAM_CODEC.apply(ByteBufCodecs.list(MAX_GROUPS)), ScanHighlightPayload::groups,
                     ScanHighlightPayload::new);
 
