@@ -1,0 +1,25 @@
+{
+  "name": "Ore Detector",
+  "category": "ore_detector_reborn:field_work",
+  "icon": "ore_detector_reborn:ore_detector",
+  "sortnum": 0,
+  "priority": true,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ore_detector_reborn:ore_detector",
+      "title": "Ore Detector",
+      "text": "Two Heavy Cores, three Breeze Rods and a comparator. One detector replaces the eleven separate ones the mod used to have."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Scanning",
+      "text": "Right click a $(thing)surface$() with it in your $(thing)main hand$(). The beam fires straight into that face and reports what it finds in the action bar, tinted per ore.$(br2)It costs $(thing)1 durability$() a scan whatever it finds, and $(thing)1 mB$() of that ore's liquid for every block found."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Two pools",
+      "text": "$(thing)Durability$() is 1000 and is mechanical wear. A Breeze Shard in an anvil restores 250.$(br2)$(thing)Liquid$() is the tank, 750 mB, three bottles. Hover the detector to see what is loaded and how far it reaches.$(br2)Running dry does not break it. The tank simply stops answering for that ore."
+    }
+  ]
+}

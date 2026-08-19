@@ -1,0 +1,24 @@
+{
+  "name": "Crushed Ore",
+  "category": "ore_detector_reborn:resonance",
+  "icon": "ore_detector_reborn:crushed_ore[ore_detector_reborn:ore_type=\"iron\"]",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Grinding",
+      "text": "Hold $(item)Shears$() in your $(thing)off hand$() and the material in your $(thing)main hand$(), then right click.$(br2)The input is the $(thing)processed$() form: the ingot where one exists, otherwise whatever the ore drops. The dust falls at your feet and the shears take the wear."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "ore_detector_reborn:crushed_ore[ore_detector_reborn:ore_type=\"coal\"]",
+      "title": "Yield and wear",
+      "text": "Cheap ore grinds well, precious ore does not.$(br2)$(li)Coal, Copper, Zinc: 4 dust, 2 wear.$(li)Lapis: 3 dust, 3 wear.$(li)Iron, Gold, Quartz, Amethyst: 2 dust, 4 wear.$(li)Diamond, Emerald: 1 dust, 6 wear.$(li)Netherite: 1 dust, 10 wear."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Two exceptions",
+      "text": "$(thing)Redstone$() has no dust of ours, because the ore already drops one. Feed vanilla Redstone Dust to the chamber directly.$(br2)$(thing)Netherite$() takes the ingot, not scrap. That is four scrap and four gold for a single dust, and it is meant to be the most expensive thing you can attune to."
+    }
+  ]
+}

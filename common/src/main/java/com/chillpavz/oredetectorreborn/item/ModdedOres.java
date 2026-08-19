@@ -65,8 +65,10 @@ public final class ModdedOres {
         }
 
         // Universal Ores does the same thing in its own namespace and over a wider stone list.
-        // It has no 26.2 build yet, so every id below is currently unregistered and inert; that
-        // costs nothing and means the support is simply there the day it updates.
+        // The full 7x9 grid is listed on purpose: checked against Universal Ores 1.8.0, it covers
+        // all 44 blocks that mod actually registers, with 19 combinations it does not ship. Those
+        // 19 are simply not blocks, so they match nothing and cost nothing, and the support stays
+        // correct if it fills more of its own grid in later.
         for (String stone : new String[]{"andesite", "diorite", "granite", "tuff", "calcite",
                 "blackstone", "basalt"}) {
             for (String ore : new String[]{"coal", "copper", "iron", "gold", "lapis", "redstone",

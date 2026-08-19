@@ -8,6 +8,12 @@ log line, and a loot modifier in the wrong jar simply never fires.
 import zipfile, json, io, re, sys
 
 NS = "ore_detector_reborn"
+# The Minecraft version is read from gradle.properties rather than hardcoded, so these
+# scripts work unchanged on every backport branch.
+MC = re.search(r"^minecraft_version=(.+)$",
+               io.open("gradle.properties", encoding="utf-8").read(),
+               re.M).group(1).strip()
+
 VER = "2.0.0"
 ok = True
 def bad(m):
@@ -21,7 +27,7 @@ print("items registered via ITEMS: %d (%d new materials: %s)" % (len(ids), len(m
 
 for loader in ("fabric", "neoforge"):
     print("\n=== %s ===" % loader)
-    z = zipfile.ZipFile("%s/build/libs/%s-%s-26.2-%s.jar" % (loader, NS, loader, VER))
+    z = zipfile.ZipFile("%s/build/libs/%s-%s-%s-%s.jar" % (loader, NS, loader, MC, VER))
     names = set(z.namelist())
     files = {n for n in names if not n.endswith("/")}      # skip zip directory entries
     lang = json.loads(z.read("assets/%s/lang/en_us.json" % NS).decode("utf-8"))

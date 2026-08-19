@@ -1,0 +1,19 @@
+{
+  "name": "Draining and Re-attuning",
+  "category": "ore_detector_reborn:field_work",
+  "icon": "ore_detector_reborn:nullified_bucket",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "Getting it back out",
+      "text": "Hold right click on a $(thing)cauldron$() with the detector to drain it. It removes $(thing)one ore at a time, smallest charge first$(), so a stray 10 mB in the way clears in a short pull without costing the charges you wanted."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "ore_detector_reborn:nullified_bucket",
+      "title": "Nullified Bucket",
+      "text": "Draining $(thing)forgets$() which ore the liquid was, which is why one fluid covers every mix.$(br2)The cauldron fills in quarters of 250 mB. A full one is a bucket's worth, and the bucket empties into water or lava only."
+    }
+  ]
+}

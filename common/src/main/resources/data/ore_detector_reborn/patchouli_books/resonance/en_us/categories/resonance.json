@@ -1,0 +1,6 @@
+{
+  "name": "Resonance",
+  "description": "Turning ore into a liquid the detector can be attuned to: grind it to dust, then brew the dust in a Resonance Chamber.",
+  "icon": "ore_detector_reborn:resonance_chamber",
+  "sortnum": 1
+}

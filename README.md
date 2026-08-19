@@ -1,12 +1,15 @@
 # Ore Detector Reborn 2.0
 
-A ground-up rework of Ore Detector Reborn for Minecraft **26.2** (Fabric and NeoForge), built around
-the Trial Chamber. Where the 1.x line gave you twelve single-ore detectors, 2.0 gives you **one**
-detector that you attune to whichever ore you want to find.
+A ground-up rework of Ore Detector Reborn for Minecraft **26.1, 26.1.1 and 26.1.2** (Fabric and
+NeoForge), built around the Trial Chamber. Where the 1.x line gave you twelve single-ore detectors,
+2.0 gives you **one** detector that you attune to whichever ore you want to find.
 
-> **In development.** This branch is a working scaffold. The build is green on both loaders and the
-> project identity is final, but the 2.0 gameplay described below is being implemented stage by
-> stage. The 1.x line continues separately and still supports Minecraft 1.20 through 26.2.
+> **In development.** The 1.x line continues separately and still supports Minecraft 1.20 through
+> 26.2.
+
+This version ships the **Tome of Resonance**, an in-game guide covering the whole loop. It needs
+[Patchouli](https://modrinth.com/mod/patchouli), which is optional: without it you lose the book
+and nothing else. Craft it from a book and a Breeze Shard.
 
 ## The loop
 

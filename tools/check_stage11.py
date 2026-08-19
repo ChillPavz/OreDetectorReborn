@@ -13,6 +13,12 @@ testing there proved nothing about it.
 import io, json, os, re, sys, zipfile
 
 NS, VER = "ore_detector_reborn", "2.0.0"
+# The Minecraft version is read from gradle.properties rather than hardcoded, so these
+# scripts work unchanged on every backport branch.
+MC = re.search(r"^minecraft_version=(.+)$",
+               io.open("gradle.properties", encoding="utf-8").read(),
+               re.M).group(1).strip()
+
 ok = True
 
 
@@ -156,7 +162,7 @@ print("  config options: %s" % ", ".join(option_fields))
 # --- the built jars --------------------------------------------------------------------------------
 for loader in ("fabric", "neoforge"):
     print("\n=== %s jar ===" % loader)
-    jar = zipfile.ZipFile("%s/build/libs/%s-%s-26.2-%s.jar" % (loader, NS, loader, VER))
+    jar = zipfile.ZipFile("%s/build/libs/%s-%s-%s-%s.jar" % (loader, NS, loader, MC, VER))
     lang = json.loads(jar.read("assets/%s/lang/en_us.json" % NS).decode("utf-8"))
     for option in option_fields:
         base = "text.autoconfig.%s.option.%s" % (NS, option)

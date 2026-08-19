@@ -12,6 +12,12 @@ comments first, so a mention in a javadoc block cannot pass them.
 import io, json, re, sys, zipfile
 
 NS, VER = "ore_detector_reborn", "2.0.0"
+# The Minecraft version is read from gradle.properties rather than hardcoded, so these
+# scripts work unchanged on every backport branch.
+MC = re.search(r"^minecraft_version=(.+)$",
+               io.open("gradle.properties", encoding="utf-8").read(),
+               re.M).group(1).strip()
+
 ok = True
 
 
@@ -166,7 +172,7 @@ LANG_KEYS = [
 ]
 for loader in ("fabric", "neoforge"):
     print("\n=== %s jar ===" % loader)
-    jar = zipfile.ZipFile("%s/build/libs/%s-%s-26.2-%s.jar" % (loader, NS, loader, VER))
+    jar = zipfile.ZipFile("%s/build/libs/%s-%s-%s-%s.jar" % (loader, NS, loader, MC, VER))
     names = set(jar.namelist())
     for cls in CLASSES:
         if cls not in names:

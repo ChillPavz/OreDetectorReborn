@@ -8,6 +8,12 @@ texture is a purple cube. A missing lang key shows the raw translation string.
 import zipfile, json, io, re, sys
 
 NS, VER = "ore_detector_reborn", "2.0.0"
+# The Minecraft version is read from gradle.properties rather than hardcoded, so these
+# scripts work unchanged on every backport branch.
+MC = re.search(r"^minecraft_version=(.+)$",
+               io.open("gradle.properties", encoding="utf-8").read(),
+               re.M).group(1).strip()
+
 ok = True
 def bad(m):
     global ok; ok = False; print("  FAIL: " + m)
@@ -31,7 +37,7 @@ if "redstone" in tiers:
 
 for loader in ("fabric", "neoforge"):
     print("\n=== %s ===" % loader)
-    z = zipfile.ZipFile("%s/build/libs/%s-%s-26.2-%s.jar" % (loader, NS, loader, VER))
+    z = zipfile.ZipFile("%s/build/libs/%s-%s-%s-%s.jar" % (loader, NS, loader, MC, VER))
     files = {n for n in z.namelist() if not n.endswith("/")}
     lang = json.loads(z.read("assets/%s/lang/en_us.json" % NS).decode("utf-8"))
 

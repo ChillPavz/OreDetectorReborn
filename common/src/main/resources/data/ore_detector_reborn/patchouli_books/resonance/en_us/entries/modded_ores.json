@@ -1,0 +1,18 @@
+{
+  "name": "Other Mods' Ores",
+  "category": "ore_detector_reborn:field_work",
+  "icon": "minecraft:raw_copper",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "title": "What is supported",
+      "text": "$(li)$(thing)Create$(): zinc ore and deepslate zinc ore, and the zinc ingot grinds like copper. Any Create works, including Create Fabric and Create Fly.$(li)$(thing)Seamless Ores$(): every vanilla ore restyled into andesite, diorite, granite and tuff, plus its nether gold and quartz.$(li)$(thing)Universal Ores$(): the same idea in its own namespace."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "If a mod is missing",
+      "text": "Nothing breaks when one of those is absent. Their ores are matched by name, so an id that is not registered simply never matches anything.$(br2)Wider support that picks up $(thing)any$() ore mod through the common ore tags is planned."
+    }
+  ]
+}

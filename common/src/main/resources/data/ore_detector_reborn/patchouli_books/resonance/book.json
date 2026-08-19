@@ -1,0 +1,17 @@
+{
+  "name": "Tome of Resonance",
+  "landing_text": "Everything this mod adds, from a Trial Chamber raid to a working detector. Start with $(l)Trial Chambers$(/l) if you have just installed it.",
+  "subtitle": "Ore Detector Reborn 2.0",
+  "version": "1",
+  "creative_tab": "ore_detector_reborn:main",
+  "advancements_tab": "ore_detector_reborn:root",
+  "index_icon": "ore_detector_reborn:ore_detector",
+  "model": "patchouli:book_brown",
+  "dont_generate_book": true,
+  "show_progress": false,
+  "text_color": "352E28",
+  "header_color": "2C6A72",
+  "nameplate_color": "B8CFCC",
+  "link_color": "2C6A72",
+  "link_hover_color": "5FA8B0"
+}

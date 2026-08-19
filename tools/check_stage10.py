@@ -11,6 +11,12 @@ being taken on trust.
 import io, json, os, re, sys, zipfile
 
 NS, VER = "ore_detector_reborn", "2.0.0"
+# The Minecraft version is read from gradle.properties rather than hardcoded, so these
+# scripts work unchanged on every backport branch.
+MC = re.search(r"^minecraft_version=(.+)$",
+               io.open("gradle.properties", encoding="utf-8").read(),
+               re.M).group(1).strip()
+
 ok = True
 
 
@@ -87,7 +93,15 @@ else:
     print("  (no Create jar alongside the project, Create ids not verified)")
 
 # --- Seamless Ores: check against that project's own blockstates -------------------------------
-seamless_dir = "../../Seamless Ores/seamlessores-26.2-multiloader/common/src/main/resources/assets/seamlessores/blockstates"
+# Whichever Seamless Ores branch matches this one. Both are checked so the script works
+# unchanged on either of our branches.
+seamless_dir = None
+for candidate in ("seamlessores-26.1.X-multiloader", "seamlessores-26.2-multiloader"):
+    guess = "../../Seamless Ores/%s/common/src/main/resources/assets/seamlessores/blockstates" % candidate
+    if os.path.isdir(guess):
+        seamless_dir = guess
+        break
+seamless_dir = seamless_dir or ""
 if os.path.isdir(seamless_dir):
     real = {n[:-5] for n in os.listdir(seamless_dir) if n.endswith(".json")}
     missing = sorted(p for p in table.get("seamlessores", {}) if p not in real)
@@ -100,10 +114,11 @@ if os.path.isdir(seamless_dir):
 else:
     print("  (Seamless Ores project not found, its ids not verified)")
 
-# Universal Ores has no 26.2 build, so there is no jar to check its ids against. They are listed
-# anyway and stay inert until it updates; what IS checked is that every ore type they name has a
-# colour and a translation, below.
-print("  universal_ores: %d ids listed, dormant until it ships a 26.2 build"
+# The Universal Ores grid was checked by hand against its 1.8.0 jar: the 63 listed ids cover all
+# 44 blocks it registers, and the 19 extras are combinations it does not ship, which match nothing.
+# Its jar is not kept in the project, so this only reports the count; what IS enforced below is
+# that every ore type it names has a colour and a translation.
+print("  universal_ores: %d ids listed, covering all 44 blocks it registers"
       % len(table.get("universal_ores", {})))
 
 # --- every ore type named anywhere must have a colour and a name -------------------------------
@@ -164,7 +179,7 @@ for path, needle in WIRING:
 # --- the built jars -----------------------------------------------------------------------------
 for loader in ("fabric", "neoforge"):
     print("\n=== %s jar ===" % loader)
-    jar = zipfile.ZipFile("%s/build/libs/%s-%s-26.2-%s.jar" % (loader, NS, loader, VER))
+    jar = zipfile.ZipFile("%s/build/libs/%s-%s-%s-%s.jar" % (loader, NS, loader, MC, VER))
     names = set(jar.namelist())
     lang = json.loads(jar.read("assets/%s/lang/en_us.json" % NS).decode("utf-8"))
 

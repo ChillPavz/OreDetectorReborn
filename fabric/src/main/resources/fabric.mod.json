@@ -37,6 +37,8 @@
     "suggests": {
         "modmenu": "*",
         "create": "*",
-        "universal_ores": "*"
+        "universal_ores": "*",
+        "seamlessores": "*",
+        "patchouli": "*"
     }
 }

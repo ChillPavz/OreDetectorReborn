@@ -25,7 +25,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 /**
- * The mod's block entity types. At 26.2 BlockEntityType has no Builder any more; the constructor
+ * The mod's block entity types. At 26.1.x BlockEntityType has no Builder, and unlike 26.2 the constructor
  * takes the factory and the set of blocks it is valid for directly.
  */
 public final class ModBlockEntities {

@@ -1,0 +1,19 @@
+{
+  "name": "Resonance Chamber",
+  "category": "ore_detector_reborn:resonance",
+  "icon": "ore_detector_reborn:resonance_chamber",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ore_detector_reborn:resonance_chamber",
+      "title": "Resonance Chamber",
+      "text": "A Breeze Rod over three cobblestone. It behaves like a brewing stand: fuel on the left, an ingredient on top, three bottles below."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Running it",
+      "text": "$(li)Fuel is $(thing)Breeze Powder$(), one per twenty batches.$(li)The ingredient slot takes $(thing)Crushed Ore$(), or plain $(item)Redstone Dust$() straight from the ground.$(li)The three lower slots take $(item)Glass Bottles$(), not water bottles.$(br2)A batch takes twenty seconds and fills all three bottles at once."
+    }
+  ]
+}

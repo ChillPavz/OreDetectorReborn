@@ -1,10 +1,19 @@
 accessWidener v2 official
-# MenuType cannot be constructed by a mod at 26.2: both its constructor and its MenuSupplier
-# interface are private. Widening the two is the smallest change that lets the Resonance Chamber's
-# menu be built in common and registered on either loader.
+# Two classes a mod cannot construct at 26.1.x, because both the constructor and the nested
+# supplier interface are private and neither has a public factory or Builder:
+#   MenuType        - the Resonance Chamber's menu
+#   BlockEntityType - the Resonance Chamber's block entity
+# The 26.2 branch needs only the MenuType pair; BlockEntityType's constructor is public there.
+# That difference is the ONLY source-level change between this branch and 26.2.
 #
-# NOTE: javap on the LOOM jar reports the constructor as public, because Fabric API's transitive
-# access wideners are already applied there. The NeoForm jar that common compiles against
-# (common/build/moddev/artifacts/vanilla-*.jar) is the one that tells the truth about visibility.
+# TWO javap traps sit behind these four lines, and each one produced a confidently wrong answer:
+#  1. The LOOM jar already has Fabric API's transitive access wideners applied, so it reports
+#     members as public that a mod genuinely cannot touch.
+#  2. The NeoForm jar under common/build/moddev/artifacts/ has THIS FILE's transformer applied to
+#     it by the build. So once an entry exists, that jar reports its target as public and reading
+#     it "confirms" the entry is unnecessary. Only a jar built with no access transformer at all
+#     says what vanilla actually ships.
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V

@@ -93,7 +93,7 @@
   "message.ore_detector_reborn.welcome.rework": "This is a full rework. The eleven old detectors are gone, replaced by one Ore Detector you attune to whatever you want to find.",
   "message.ore_detector_reborn.welcome.chambers": "Everything starts in a Trial Chamber. Breeze rods, shards, crystals and heavy cores are what build the detector, the goggles and the Resonance Chamber.",
   "message.ore_detector_reborn.welcome.advancements": "Press L to open your advancements. The whole progression is laid out there, step by step.",
-  "message.ore_detector_reborn.welcome.guidebook": "The in-game guidebook arrives once Patchouli updates to this version.",
+  "message.ore_detector_reborn.welcome.guidebook": "Craft the Tome of Resonance (a book plus a Breeze Shard) for the full guide, if you have Patchouli installed.",
   "message.ore_detector_reborn.welcome.legacy": "Still want the old detectors? Version 1.3.0 installs alongside this one and the two do not conflict.",
   "text.autoconfig.ore_detector_reborn.option.nauseaSeconds": "Goggle strain: Nausea length (seconds)",
   "text.autoconfig.ore_detector_reborn.option.nauseaSeconds.@Tooltip": "How long Nausea lasts when the goggles are pushed past their strain ceiling. Set to 0 to remove the effect and keep only the refusal.",

@@ -31,6 +31,16 @@ versionRange = "[${cloth_config_version},)"
 ordering = "NONE"
 side = "BOTH"
 
+# Patchouli is OPTIONAL: it renders the Tome of Resonance. The book itself is plain data, so
+# nothing here compiles against it and its absence costs only the book. The recipe that mints the
+# book is gated on this same mod id.
+[[dependencies.${mod_id}]]
+modId = "patchouli"
+type="optional"
+versionRange = "[${patchouli_version},)"
+ordering = "NONE"
+side = "BOTH"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.
