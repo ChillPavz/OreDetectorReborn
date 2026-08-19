@@ -15,7 +15,9 @@
  */
 package com.chillpavz.oredetectorreborn.item;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -24,6 +26,8 @@ import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.block.NullifiedCauldronBlock;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
+import com.chillpavz.oredetectorreborn.network.ModNetworking;
+import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -34,6 +38,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -59,6 +65,16 @@ public class AttunedDetectorItem extends Item {
 
     /** Ticks to pour one bottle. Deliberately close to eating, so it reads as a channelled action. */
     public static final int POUR_TICKS = 32;
+
+    /** How long a rested pair of goggles holds the highlight up: twelve seconds. */
+    public static final int HIGHLIGHT_TICKS = 240;
+
+    /**
+     * How far past the beam's own reach the player may wander before the highlight drops. The
+     * scanned column runs INTO the surface, so the player is never standing inside it; this is
+     * the distance from the block they clicked, which is what "leaving the scan" actually means.
+     */
+    public static final int CANCEL_MARGIN = 12;
 
     public AttunedDetectorItem(Properties properties) {
         super(properties);
@@ -251,7 +267,9 @@ public class AttunedDetectorItem extends Item {
         int reach = into == Direction.DOWN ? downReach(types) : sideReach(types);
         int radius = columnRadius(types);
 
-        Map<String, Integer> found = new LinkedHashMap<>();
+        // Positions, not just counts: the goggles draw exactly the blocks this scan reported, so
+        // the highlight and the action bar can never disagree about what is down there.
+        Map<String, List<BlockPos>> hits = new LinkedHashMap<>();
         // depth 0 is the block that was clicked. It must be included: clicking directly on
         // an ore has to count it.
         for (int depth = 0; depth < reach; depth++) {
@@ -261,11 +279,14 @@ public class AttunedDetectorItem extends Item {
                     BlockState state = level.getBlockState(pos);
                     String ore = OreLookup.oreTypeOf(state);
                     if (ore != null && tank.holds(ore)) {
-                        found.merge(ore, 1, Integer::sum);
+                        hits.computeIfAbsent(ore, key -> new ArrayList<>()).add(pos.immutable());
                     }
                 }
             }
         }
+
+        Map<String, Integer> found = new LinkedHashMap<>();
+        hits.forEach((ore, positions) -> found.put(ore, positions.size()));
 
         // Wear is flat: one per scan regardless of what turned up. The per-ore cost is the liquid.
         detector.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
@@ -280,10 +301,71 @@ public class AttunedDetectorItem extends Item {
         }
         setTank(detector, remaining);
         wearGoggles(player, reported);
+        visualise(level, player, clicked, reach, hits);
 
         report(player, found, reported);
         player.getCooldowns().addCooldown(detector, OreDetectorConfig.cooldownTicks);
         return InteractionResult.SUCCESS;
+    }
+
+    /**
+     * Shows the wearer what the scan just found, if they have the goggles on and the goggles are
+     * up to it.
+     *
+     * <p>This is the only thing Strain gates. It rises per visualisation and bleeds off on its
+     * own, so it brakes a player spamming scans to sweep a cave without ever taking the detector
+     * away from someone using it at a normal pace. Below the ceiling it degrades the picture,
+     * which is the warning; at the ceiling the goggles refuse and hand out Nausea instead.
+     *
+     * <p>Nothing here touches the detector: an unworn or exhausted pair of goggles costs the scan
+     * nothing, because the numbers in the action bar are the mod's actual output and the
+     * highlight is a convenience on top of them.
+     */
+    private static void visualise(Level level, Player player, BlockPos clicked, int reach,
+                                  Map<String, List<BlockPos>> hits) {
+        if (hits.isEmpty() || !(player instanceof ServerPlayer server)) {
+            return;
+        }
+        ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
+        if (!head.is(ModItems.GOGGLES)) {
+            return;
+        }
+
+        long now = level.getGameTime();
+        Strain strain = Strain.of(head);
+        if (strain.isBlockedAt(now)) {
+            // Refused, but NOT punished again. The Nausea is applied once on the way over the
+            // ceiling; re-applying it here would nauseate a player who only wanted the count in
+            // the action bar, which the goggles do not gate and never should.
+            actionBar(server, Component.translatable("hud." + Constants.MOD_ID + ".strained")
+                    .withStyle(ChatFormatting.RED));
+            return;
+        }
+
+        float fidelity = strain.fidelityAt(now);
+        // A strained pair still shows something, just for less time. Never below 40% of the window,
+        // or the highlight would blink out before the player could look at it.
+        int duration = Math.round(HIGHLIGHT_TICKS * (0.4F + 0.6F * fidelity));
+
+        List<ScanHighlightPayload.Group> groups = new ArrayList<>();
+        for (Map.Entry<String, List<BlockPos>> entry : hits.entrySet()) {
+            List<BlockPos> positions = entry.getValue();
+            if (positions.size() > ScanHighlightPayload.MAX_POSITIONS) {
+                positions = positions.subList(0, ScanHighlightPayload.MAX_POSITIONS);
+            }
+            groups.add(new ScanHighlightPayload.Group(entry.getKey(), List.copyOf(positions)));
+        }
+
+        ModNetworking.send(server, new ScanHighlightPayload(
+                clicked, reach + CANCEL_MARGIN, duration, fidelity, List.copyOf(groups)));
+
+        Strain after = strain.plusScan(now);
+        Strain.set(head, after);
+        // Crossing the ceiling is the moment that costs something. This scan is still shown; the
+        // next one is what gets refused.
+        if (after.isBlockedAt(now)) {
+            server.addEffect(new MobEffectInstance(MobEffects.NAUSEA, Strain.NAUSEA_TICKS, 0));
+        }
     }
 
     /**

@@ -18,6 +18,8 @@ package com.chillpavz.oredetectorreborn.fabric;
 import com.chillpavz.oredetectorreborn.fabric.config.OreDetectorConfigData;
 import com.chillpavz.oredetectorreborn.fabric.loot.BreezeLootInjection;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
+import com.chillpavz.oredetectorreborn.network.ModNetworking;
+import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
 import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
 import com.chillpavz.oredetectorreborn.registry.ModBlocks;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
@@ -31,6 +33,8 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.event.player.ItemEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -63,6 +67,11 @@ public class OreDetectorFabric implements ModInitializer {
         ModMenus.MENUS.forEach((id, type) -> Registry.register(BuiltInRegistries.MENU, id, type));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.KEY, ModCreativeTabs.MAIN);
 
+
+        // The payload TYPE must be registered on both sides; only the client registers a handler.
+        PayloadTypeRegistry.clientboundPlay().register(
+                ScanHighlightPayload.TYPE, ScanHighlightPayload.STREAM_CODEC);
+        ModNetworking.setSender(ServerPlayNetworking::send);
 
         BreezeLootInjection.register();
         ItemEvents.USE.register(OreGrindingInteraction::tryGrind);

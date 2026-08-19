@@ -15,11 +15,17 @@
  */
 package com.chillpavz.oredetectorreborn.neoforge.client;
 
+import com.chillpavz.oredetectorreborn.client.ClientClock;
 import com.chillpavz.oredetectorreborn.client.ResonanceChamberScreen;
-import com.chillpavz.oredetectorreborn.registry.ModMenus;
+import com.chillpavz.oredetectorreborn.client.ScanHighlight;
+import net.minecraft.client.Minecraft;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import com.chillpavz.oredetectorreborn.registry.ModMenus;
 
-/** Client-only setup: binds the Resonance Chamber's menu to its screen. */
+/**
+ * Client-only setup: the Resonance Chamber's screen, and the scan highlight the goggles draw.
+ */
 public final class OreDetectorNeoForgeClient {
 
     private OreDetectorNeoForgeClient() {
@@ -27,5 +33,19 @@ public final class OreDetectorNeoForgeClient {
 
     public static void onRegisterScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenus.RESONANCE_CHAMBER, ResonanceChamberScreen::new);
+    }
+
+    /**
+     * Draws this tick's highlight. ClientTickEvent.Post fires from the tail of Minecraft.tick(),
+     * which vanilla already runs inside a gizmo collector, so nothing has to be opened here.
+     */
+    public static void onClientTick(ClientTickEvent.Post event) {
+        Minecraft client = Minecraft.getInstance();
+        if (client.level == null || client.player == null) {
+            ScanHighlight.clear();
+            return;
+        }
+        ClientClock.set(client.level.getGameTime());
+        ScanHighlight.tick(client.level.getGameTime(), client.player.getEyePosition());
     }
 }

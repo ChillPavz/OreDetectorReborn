@@ -19,6 +19,8 @@ import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigData;
 import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigScreen;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
+import com.chillpavz.oredetectorreborn.network.ModNetworking;
+import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
 import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
 import com.chillpavz.oredetectorreborn.registry.ModBlocks;
 import com.chillpavz.oredetectorreborn.registry.ModCreativeTabs;
@@ -40,6 +42,8 @@ import net.minecraft.world.InteractionResult;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 @Mod(Constants.MOD_ID)
@@ -61,12 +65,19 @@ public class OreDetectorNeoForge {
         // wrong bus fails silently.
         NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onRightClickItem);
         eventBus.addListener(OreDetectorNeoForge::onBuildTabContents);
+        // RegisterPayloadHandlersEvent is a MOD bus event.
+        eventBus.addListener(OreDetectorNeoForge::onRegisterPayloads);
+        ModNetworking.setSender(PacketDistributor::sendToPlayer);
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             OreDetectorConfigScreen.register(container);
             // RegisterMenuScreensEvent is a MOD bus event, unlike RightClickItem above.
             eventBus.addListener(
                     com.chillpavz.oredetectorreborn.neoforge.client.OreDetectorNeoForgeClient::onRegisterScreens);
+            // ClientTickEvent is a GAME bus event, like RightClickItem above and unlike the two
+            // registrations either side of it.
+            NeoForge.EVENT_BUS.addListener(
+                    com.chillpavz.oredetectorreborn.neoforge.client.OreDetectorNeoForgeClient::onClientTick);
         }
     }
 
@@ -83,6 +94,19 @@ public class OreDetectorNeoForge {
             ModBlocks.BLOCK_ITEMS.forEach(helper::register);
         });
         event.register(Registries.CREATIVE_MODE_TAB, helper -> helper.register(ModCreativeTabs.KEY, ModCreativeTabs.MAIN));
+    }
+
+    /**
+     * Registers the scan highlight payload. The handler is installed unconditionally because the
+     * registrar needs the same view of the protocol on both sides; the class it hands off to
+     * touches no client-only type, so this is safe on a dedicated server.
+     */
+    private static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        event.registrar(Constants.MOD_ID).playToClient(
+                ScanHighlightPayload.TYPE,
+                ScanHighlightPayload.STREAM_CODEC,
+                (payload, context) -> com.chillpavz.oredetectorreborn.client.ScanHighlight
+                        .accept(payload, context.player().level().getGameTime()));
     }
 
     private static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {

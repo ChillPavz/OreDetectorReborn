@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.item.OreTank;
+import com.chillpavz.oredetectorreborn.item.Strain;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -54,6 +55,16 @@ public final class ModDataComponents {
             DataComponentType.<OreTank>builder()
                     .persistent(OreTank.CODEC)
                     .networkSynchronized(OreTank.STREAM_CODEC)
+                    .build());
+
+    /**
+     * How hard the goggles have been pushed lately. Persistent so it survives a relog, and network
+     * synchronised so the wearer's tooltip can show it decaying.
+     */
+    public static final DataComponentType<Strain> STRAIN = register("strain",
+            DataComponentType.<Strain>builder()
+                    .persistent(Strain.CODEC)
+                    .networkSynchronized(Strain.STREAM_CODEC)
                     .build());
 
     private ModDataComponents() {

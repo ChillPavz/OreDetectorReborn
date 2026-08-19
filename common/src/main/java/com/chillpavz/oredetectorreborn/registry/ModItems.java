@@ -85,7 +85,7 @@ public final class ModItems {
 
     private static Item createGoggles() {
         Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "goggles");
-        Item item = new Item(new Item.Properties()
+        Item item = new com.chillpavz.oredetectorreborn.item.GogglesItem(new Item.Properties()
                 .setId(ResourceKey.create(Registries.ITEM, id))
                 .durability(500)
                 .repairable(BREEZE_SHARD)
