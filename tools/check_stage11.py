@@ -138,8 +138,18 @@ for loader in ("fabric", "neoforge"):
 # Cloth falls back to the raw key for a missing label, and shows no tooltip at all for a
 # missing one, so an option can look finished while telling the player nothing about what
 # it does.
-option_fields = re.findall(r"public int (\w+)\s*=", source(
-    "fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/config/OreDetectorConfigData.java"))
+# The ANNOTATION is what makes cloth look a tooltip key up at all. Without
+# @ConfigEntry.Gui.Tooltip the entry is given no tooltip, however many lang keys exist, so
+# checking only the keys verifies the wrong half and passes on a screen with no hover text
+# anywhere. count() defaults to 1 and selects "<key>.@Tooltip"; higher selects the indexed
+# "<key>.@Tooltip[0]", "[1]", ... form, and the two must agree or the lines come out blank.
+config_java = source(
+    "fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/config/OreDetectorConfigData.java")
+option_fields = re.findall(r"public int (\w+)\s*=", config_java)
+tooltip_counts = {}
+for annot, count, field in re.findall(
+        r"@ConfigEntry\.Gui\.Tooltip(\(count\s*=\s*(\d+)\))?\s*public int (\w+)", config_java):
+    tooltip_counts[field] = int(count) if count else 1
 print()
 print("  config options: %s" % ", ".join(option_fields))
 
@@ -152,10 +162,21 @@ for loader in ("fabric", "neoforge"):
         base = "text.autoconfig.%s.option.%s" % (NS, option)
         if base not in lang:
             bad("%s has no label, so the slider shows its raw key" % base)
-        # Cloth reads a single-line tooltip as <key>.@Tooltip and a multi-line one as
-        # <key>.@Tooltip[0], [1], ... with no count recorded anywhere.
-        if base + ".@Tooltip" not in lang and base + ".@Tooltip[0]" not in lang:
-            bad("%s has no hover description, so the option explains nothing" % base)
+        if option not in tooltip_counts:
+            bad("%s has no @ConfigEntry.Gui.Tooltip annotation, so cloth never looks up a tooltip for it" % option)
+            continue
+        count = tooltip_counts[option]
+        if count == 1:
+            if base + ".@Tooltip" not in lang:
+                bad("%s.@Tooltip is missing, so the option explains nothing" % base)
+        else:
+            for i in range(count):
+                if "%s.@Tooltip[%d]" % (base, i) not in lang:
+                    bad("%s.@Tooltip[%d] is missing; count = %d promises that many lines"
+                        % (base, i, count))
+            if "%s.@Tooltip[%d]" % (base, count) in lang:
+                bad("%s has a @Tooltip[%d] line that count = %d will never show"
+                    % (base, count, count))
     print("  all %d config options have a label and a description: OK"
           % len(option_fields))
 

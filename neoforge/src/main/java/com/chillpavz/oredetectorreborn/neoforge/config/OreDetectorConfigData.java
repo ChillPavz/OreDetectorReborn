@@ -31,13 +31,16 @@ public class OreDetectorConfigData implements ConfigData {
     // three or more, and sideways is three quarters of down. Column width follows the same tiers
     // (3x3, 5x5, 7x7) and is not separately configurable, or the two could disagree.
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.REACH_STEP_MIN, max = OreDetectorConfig.REACH_STEP_MAX)
+    @ConfigEntry.Gui.Tooltip(count = 2)
     public int reachStep = OreDetectorConfig.DEFAULT_REACH_STEP;
 
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.COOLDOWN_MIN, max = OreDetectorConfig.COOLDOWN_MAX)
+    @ConfigEntry.Gui.Tooltip
     public int cooldownTicks = OreDetectorConfig.DEFAULT_COOLDOWN;
 
     // Detector beep volume as a percentage (0%..100%).
     @ConfigEntry.BoundedDiscrete(min = 0, max = 100)
+    @ConfigEntry.Gui.Tooltip
     public int soundVolumePercent = 40;
 
     // --- Goggles strain -----------------------------------------------------------------------
@@ -45,16 +48,19 @@ public class OreDetectorConfigData implements ConfigData {
     // only the refusal to visualise.
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.NAUSEA_SECONDS_MIN,
             max = OreDetectorConfig.NAUSEA_SECONDS_MAX)
+    @ConfigEntry.Gui.Tooltip
     public int nauseaSeconds = OreDetectorConfig.DEFAULT_NAUSEA_SECONDS;
 
     // Strain added per visualisation, against a fixed ceiling of 100.
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.STRAIN_PER_SCAN_MIN,
             max = OreDetectorConfig.STRAIN_PER_SCAN_MAX)
+    @ConfigEntry.Gui.Tooltip
     public int strainPerScan = OreDetectorConfig.DEFAULT_STRAIN_PER_SCAN;
 
     // Ticks for one point of strain to bleed off. Higher is slower.
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.STRAIN_DECAY_TICKS_MIN,
             max = OreDetectorConfig.STRAIN_DECAY_TICKS_MAX)
+    @ConfigEntry.Gui.Tooltip(count = 2)
     public int strainDecayTicks = OreDetectorConfig.DEFAULT_STRAIN_DECAY_TICKS;
 
     public void applyToRuntime() {
