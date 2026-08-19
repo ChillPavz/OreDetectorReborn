@@ -36,10 +36,6 @@ public class OreDetectorConfigData implements ConfigData {
     @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.COOLDOWN_MIN, max = OreDetectorConfig.COOLDOWN_MAX)
     public int cooldownTicks = OreDetectorConfig.DEFAULT_COOLDOWN;
 
-    // Durability as a percentage (25%..400%); applied at item creation, so a restart is required.
-    @ConfigEntry.BoundedDiscrete(min = 25, max = 400)
-    public int durabilityPercent = 100;
-
     // Detector beep volume as a percentage (0%..100%).
     @ConfigEntry.BoundedDiscrete(min = 0, max = 100)
     public int soundVolumePercent = 40;
@@ -50,6 +46,6 @@ public class OreDetectorConfigData implements ConfigData {
         // until those items are removed.
         OreDetectorConfig.apply(OreDetectorConfig.DEFAULT_DOWN_REACH, OreDetectorConfig.DEFAULT_SIDE_REACH,
                 OreDetectorConfig.DEFAULT_COLUMN_RADIUS, cooldownTicks,
-                durabilityPercent / 100.0, soundVolumePercent / 100.0);
+                1.0, soundVolumePercent / 100.0);
     }
 }

@@ -45,7 +45,6 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 @Mod(Constants.MOD_ID)
 public class OreDetectorNeoForge {
 
-    private static final String[] CREATE_MOD_IDS = {"create", "create-fly", "createfly", "create_fly"};
 
     public OreDetectorNeoForge(IEventBus eventBus, ModContainer container) {
         // Load config first so items pick up the durability multiplier when they are created.
@@ -82,9 +81,6 @@ public class OreDetectorNeoForge {
         event.register(Registries.ITEM, helper -> {
             ModItems.ITEMS.forEach(helper::register);
             ModBlocks.BLOCK_ITEMS.forEach(helper::register);
-            if (isCreateLoaded()) {
-                helper.register(ModItems.ZINC_ID, ModItems.createZinc());
-            }
         });
         event.register(Registries.CREATIVE_MODE_TAB, helper -> helper.register(ModCreativeTabs.KEY, ModCreativeTabs.MAIN));
     }
@@ -102,18 +98,7 @@ public class OreDetectorNeoForge {
         if (event.getTabKey() == ModCreativeTabs.KEY) {
             ModItems.ITEMS.values().forEach(item -> ModItems.creativeStacks(item).forEach(event::accept));
             ModBlocks.BLOCK_ITEMS.values().forEach(event::accept);
-            if (isCreateLoaded()) {
-                event.accept(ModItems.ZINC_DETECTOR);
-            }
         }
     }
 
-    private static boolean isCreateLoaded() {
-        for (String id : CREATE_MOD_IDS) {
-            if (net.neoforged.fml.ModList.get().isLoaded(id)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

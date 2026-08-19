@@ -40,8 +40,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class OreDetectorFabric implements ModInitializer {
 
-    // Create Fly (ZurrTum) is a Fabric port of Create; it registers under the "create" namespace.
-    private static final String[] CREATE_MOD_IDS = {"create", "create-fly", "createfly", "create_fly"};
 
     @Override
     public void onInitialize() {
@@ -65,10 +63,6 @@ public class OreDetectorFabric implements ModInitializer {
         ModMenus.MENUS.forEach((id, type) -> Registry.register(BuiltInRegistries.MENU, id, type));
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.KEY, ModCreativeTabs.MAIN);
 
-        boolean createLoaded = isCreateLoaded();
-        if (createLoaded) {
-            Registry.register(BuiltInRegistries.ITEM, ModItems.ZINC_ID, ModItems.createZinc());
-        }
 
         BreezeLootInjection.register();
         ItemEvents.USE.register(OreGrindingInteraction::tryGrind);
@@ -79,18 +73,6 @@ public class OreDetectorFabric implements ModInitializer {
                             output.accept(stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS)));
             ModBlocks.BLOCK_ITEMS.values().forEach(item ->
                     output.accept(new ItemStack(item), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
-            if (createLoaded) {
-                output.accept(new ItemStack(ModItems.ZINC_DETECTOR), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-            }
         });
-    }
-
-    private static boolean isCreateLoaded() {
-        for (String id : CREATE_MOD_IDS) {
-            if (FabricLoader.getInstance().isModLoaded(id)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

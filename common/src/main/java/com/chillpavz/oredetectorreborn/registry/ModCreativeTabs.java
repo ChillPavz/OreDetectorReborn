@@ -35,7 +35,7 @@ public final class ModCreativeTabs {
 
     public static final CreativeModeTab MAIN = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
             .title(Component.translatable("itemGroup.ore_detector_reborn.ore_detector"))
-            .icon(() -> new ItemStack(ModItems.IRON_DETECTOR))
+            .icon(() -> new ItemStack(ModItems.ORE_DETECTOR))
             .build();
 
     private ModCreativeTabs() {

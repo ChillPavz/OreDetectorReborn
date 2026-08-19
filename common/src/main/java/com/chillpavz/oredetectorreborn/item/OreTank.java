@@ -35,10 +35,10 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
  */
 public record OreTank(Map<String, Integer> charges) {
 
-    /** Three bottles at 100 mB each. */
-    public static final int CAPACITY = 300;
-    /** One bottle of Attunement Liquid. */
-    public static final int BOTTLE = 100;
+    /** Three bottles. Matches the cauldron's own quarter levels, since a bottle is 250 mB. */
+    public static final int CAPACITY = 750;
+    /** One bottle, the same 250 mB a vanilla water bottle holds. */
+    public static final int BOTTLE = 250;
     /** Beyond this many distinct ores a pour is refused. */
     public static final int MAX_TYPES = 6;
 
@@ -109,7 +109,7 @@ public record OreTank(Map<String, Integer> charges) {
     /**
      * Pours a bottle in. Fills the free space and leaves every other charge untouched; the caller
      * consumes the whole bottle even when only part of it fits, which is the only way to load more
-     * than three types into a 300 mB tank.
+     * than three types into the tank.
      */
     public OreTank pour(String oreType, int amount) {
         if (amount <= 0) {

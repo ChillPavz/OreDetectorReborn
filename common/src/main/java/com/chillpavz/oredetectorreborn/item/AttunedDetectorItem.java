@@ -229,7 +229,9 @@ public class AttunedDetectorItem extends Item {
         int radius = columnRadius(types);
 
         Map<String, Integer> found = new LinkedHashMap<>();
-        for (int depth = 1; depth <= reach; depth++) {
+        // depth 0 is the block that was clicked. It must be included: clicking directly on
+        // an ore has to count it.
+        for (int depth = 0; depth < reach; depth++) {
             for (int a = -radius; a <= radius; a++) {
                 for (int b = -radius; b <= radius; b++) {
                     BlockPos pos = offset(clicked, into, depth, a, b);
@@ -278,12 +280,18 @@ public class AttunedDetectorItem extends Item {
             playBeep(player, false);
             return;
         }
-        Component message = null;
+        // Built on an empty, uncoloured root so the separators stay ordinary text. Appending to a
+        // coloured component would tint the commas with the first ore's colour.
+        net.minecraft.network.chat.MutableComponent message = Component.empty();
+        boolean first = true;
         for (Map.Entry<String, Integer> entry : found.entrySet()) {
-            Component part = Component.literal(entry.getValue() + " ")
+            if (!first) {
+                message.append(Component.literal(", "));
+            }
+            message.append(Component.literal(entry.getValue() + " ")
                     .append(OreLookup.displayName(entry.getKey()))
-                    .withColor(OreLookup.colorOf(entry.getKey()));
-            message = message == null ? part : message.copy().append(Component.literal(", ")).append(part);
+                    .withColor(OreLookup.colorOf(entry.getKey())));
+            first = false;
         }
         if (player instanceof ServerPlayer server) {
             actionBar(server, Component.translatable("hud." + Constants.MOD_ID + ".found_multi", message));
