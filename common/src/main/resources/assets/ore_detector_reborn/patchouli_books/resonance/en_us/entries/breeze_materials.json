@@ -7,13 +7,13 @@
     {
       "type": "patchouli:text",
       "title": "What to bring home",
-      "text": "A Trial Chamber supplies all four materials this mod runs on.$(br2)$(li)$(thing)Breeze Rods$() drop from Breezes.$(li)$(thing)Breeze Shards$() are in supply chests and corridor pots.$(li)$(thing)Breeze Crystals$() come from ordinary vaults.$(li)$(thing)Heavy Cores$() come from ominous vaults."
+      "text": "A Trial Chamber supplies all four materials this mod runs on.$(li)$(thing)Breeze Rods$() drop from Breezes.$(li)$(thing)Breeze Shards$() are in supply chests and corridor pots.$(li)$(thing)Breeze Crystals$() come from ordinary vaults.$(li)$(thing)Heavy Cores$() come from ominous vaults."
     },
     {
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:breeze_shard",
       "title": "Breeze Shard",
-      "text": "The workhorse. Shards repair both the detector and the goggles, 250 durability at a time in an anvil, so you will keep wanting them long after the first raid.$(br2)Expect roughly eight to eleven from a full chamber."
+      "text": "The workhorse. Shards repair both the detector and the goggles, 250 durability at a time in an anvil, so you will keep needing them long after the first raid.$(br2)Expect roughly eight to eleven from a full chamber."
     },
     {
       "type": "patchouli:spotlight",

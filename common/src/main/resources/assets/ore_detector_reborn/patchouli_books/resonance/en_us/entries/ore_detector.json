@@ -9,7 +9,7 @@
       "type": "patchouli:crafting",
       "recipe": "ore_detector_reborn:ore_detector",
       "title": "Ore Detector",
-      "text": "Two Heavy Cores, three Breeze Rods and a comparator. One detector replaces the eleven separate ones the mod used to have."
+      "text": "Two Heavy Cores, three Breeze Rods and a comparator. One detector replaces the eleven separate vanilla ore detectors the mod used to have."
     },
     {
       "type": "patchouli:text",

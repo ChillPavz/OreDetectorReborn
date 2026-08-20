@@ -13,7 +13,7 @@
     {
       "type": "patchouli:text",
       "title": "Running it",
-      "text": "$(li)Fuel is $(thing)Breeze Powder$(), one per twenty batches.$(li)The ingredient slot takes $(thing)Crushed Ore$(), or plain $(item)Redstone Dust$() straight from the ground.$(li)The three lower slots take $(item)Glass Bottles$(), not water bottles.$(br2)A batch takes twenty seconds and fills all three bottles at once."
+      "text": "$(li)Fuel is $(thing)Breeze Powder$(), one per twenty batches.$(li)The ingredient slot takes $(thing)Crushed Ore$(), or plain $(item)Redstone Dust$() straight from the ground.$(li)The three lower slots take $(item)Water Bottles$().$(br2)A batch takes twenty seconds and fills all three bottles at once."
     }
   ]
 }

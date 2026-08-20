@@ -117,6 +117,60 @@ for cid, cat in sorted(categories.items()):
 
 print("  every entry has a real category, and every item reference resolves: OK")
 
+# --- book.json's creative tab and model must both exist ----------------------------------------
+# Patchouli registers the book into the tab NAMED here. A tab id that does not exist registers to
+# nothing, silently, which is exactly how the book stayed out of this mod's own tab.
+tabs = set(re.findall(
+    r'fromNamespaceAndPath\(Constants\.MOD_ID,\s*"([^"]+)"\)',
+    io.open("common/src/main/java/com/chillpavz/oredetectorreborn/registry/ModCreativeTabs.java",
+            encoding="utf-8").read()))
+tab = book.get("creative_tab", "")
+if tab.startswith(NS + ":"):
+    if tab.split(":", 1)[1] not in tabs:
+        bad("book.json's creative_tab is %r but this mod registers %s; the book would go nowhere"
+            % (tab, sorted(NS + ":" + x for x in tabs)))
+    else:
+        print("  book.json points at a creative tab this mod actually registers: OK")
+
+# "model" names an ITEM DEFINITION (assets/<ns>/items/<path>.json), not a model file. That is why
+# patchouli:book_brown resolves to assets/patchouli/items/book_brown.json.
+model = book.get("model", "")
+if model.startswith(NS + ":"):
+    definition = "common/src/main/resources/assets/%s/items/%s.json" % (NS, model.split(":", 1)[1])
+    if not os.path.isfile(definition):
+        bad("book.json's model is %r but %s does not exist" % (model, definition))
+    else:
+        print("  the book's own item definition exists: OK")
+
+# --- formatting macros ---------------------------------------------------------------------------
+# Patchouli renders a macro it cannot resolve as a literal [ERROR] in the page. $(l) is the one that
+# bites: a link needs a target, $(l:category/entry), and a bare $(l) is a link to nowhere.
+MACRO = re.compile(r"\$\(([^)]*)\)")
+texts = []
+for name, entry in entries.items():
+    for i, page in enumerate(entry.get("pages", [])):
+        for field in ("text", "title"):
+            if isinstance(page.get(field), str):
+                texts.append(("entry %s page %d %s" % (name, i, field), page[field]))
+texts.append(("book.json landing_text", book.get("landing_text", "")))
+for cid, cat in categories.items():
+    texts.append(("category %s description" % cid, cat.get("description", "")))
+
+for where, text in texts:
+    for macro in MACRO.findall(text):
+        if macro == "l":
+            bad("%s uses a bare $(l), which is a link with no target and renders as [ERROR]"
+                % where)
+        if macro.startswith("l:"):
+            # A link target must name a real entry, or the page renders a dead link.
+            target = macro[2:].split("#")[0]
+            if target and target.split("/")[-1] not in entries:
+                bad("%s links to %r, which is not an entry" % (where, target))
+    if text.count("$(") != text.count(")") and "$(" in text:
+        pass  # counting parens is unreliable in prose; the macro scan above is the real check
+
+print("  no dangling link macros: OK")
+
 # --- the recipe that mints the book -------------------------------------------------------------
 CONDITION = {
     "fabric": ("fabric:load_conditions", "fabric:registry_contains"),
