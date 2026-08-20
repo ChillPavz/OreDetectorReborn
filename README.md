@@ -1,49 +1,85 @@
-# Ore Detector Reborn 2.0
+# Ore Detector Reborn
 
-A ground-up rework of Ore Detector Reborn for Minecraft **26.1, 26.1.1 and 26.1.2** (Fabric and
-NeoForge), built around the Trial Chamber. Where the 1.x line gave you twelve single-ore detectors,
-2.0 gives you **one** detector that you attune to whichever ore you want to find.
+One ore detector, attuned to whatever you want to find, built around the Trial Chamber.
+For Minecraft **26.1, 26.1.1 and 26.1.2** on **Fabric** and **NeoForge**.
 
-> **In development.** The 1.x line continues separately and still supports Minecraft 1.20 through
-> 26.2.
-
-This version ships the **Tome of Resonance**, an in-game guide covering the whole loop. It needs
-[Patchouli](https://modrinth.com/mod/patchouli), which is optional: without it you lose the book
-and nothing else. Craft it from a book and a Breeze Shard.
+Instead of carrying a separate detector for every ore, you brew an **Attunement Liquid** from that
+ore and pour it in. The detector finds what it is attuned to, and its range depends on how focused
+you keep it.
 
 ## The loop
 
 1. **Raid a Trial Chamber.** Breeze Rods, Breeze Shards, Breeze Crystals and Heavy Cores are the
    mod's structural materials, and every one of them comes from inside a chamber.
-2. **Grind ore into dust.** Hold shears in your off hand and raw ore material in your main hand, then
-   right-click. Rarer material blunts the shears faster.
-3. **Brew Attunement Liquid.** A **Resonance Chamber**, built like a brewing stand but burning Breeze
-   Powder, turns ore dust into bottled Attunement Liquid.
-4. **Attune the detector.** Pour the liquid in. The detector now finds that ore. Load it with a
-   single ore type for full range, or mix several and trade range for coverage.
-5. **Scan.** Right-click a surface and the detector reports what is behind it, exactly as before.
+2. **Grind ore into dust.** Hold shears in your off hand and the material in your main hand, then
+   right-click. The input is the processed form: the ingot where one exists, otherwise whatever the
+   ore drops. Rarer material blunts the shears faster.
+3. **Brew Attunement Liquid.** A **Resonance Chamber**, built like a brewing stand but burning
+   Breeze Powder, turns ore dust into bottled Attunement Liquid.
+4. **Attune the detector.** Pour a bottle in. The detector now finds that ore.
+5. **Scan.** Right-click a surface and the beam fires into it, reporting what it finds in the
+   action bar, tinted per ore.
+
+## Focus beats capacity
+
+Range is decided by how many **distinct** liquids are loaded, not by how full the tank is.
+
+| Distinct liquids | Down | Sideways | Column |
+|---|---|---|---|
+| 1 | 24 | 18 | 3x3 |
+| 2 | 16 | 12 | 5x5 |
+| 3 or more | 8 | 6 | 7x7 |
+
+A focused detector sees deep and narrow; a loaded one sees wide and shallow. The tank holds
+**750 mB**, three bottles, across at most six distinct ores.
 
 ## Two resource pools
 
-The Attuned Ore Detector tracks wear and fuel separately:
+| Pool | Capacity | Drains | Restored by |
+|---|---|---|---|
+| Durability | 1000 | a flat 1 per scan | Breeze Shard, 250 at a time |
+| Attunement Liquid | 750 mB | 1 mB per ore block found, from that ore's own charge | pouring in another bottle |
 
-| Pool | Capacity | Drains |
-|---|---|---|
-| Durability | 1000 | 1 per scan, plus more for each ore block actually found, scaled by rarity |
-| Attunement Liquid | 600 units (6 bottles) | a flat 15 per scan |
+Draining a charge back out is a held right-click on a cauldron. The liquid is nullified on the way
+out, so one **Resonance Cauldron** and one **Nullified Bucket** cover every mix you could make.
+
+## Goggles
+
+Wear the goggles and a scan draws what it found as coloured boxes **through the rock**, for about
+twelve seconds. They show nothing on their own: this is not free x-ray vision, it draws only what
+the detector already reported and only what the liquid actually paid for, nearest first.
+
+Each visualisation adds **Strain**, which bleeds off on its own. Push past the ceiling and the
+goggles give you Nausea and refuse to draw until they recover. The detector itself is never
+blocked, so the numbers keep coming even when the picture will not. All three strain values are
+configurable, and the effect can be switched off entirely.
+
+An eleven step **advancement tree** lays the whole progression out in game.
+
+## The Tome of Resonance
+
+With [Patchouli](https://modrinth.com/mod/patchouli) installed you are handed the **Tome of
+Resonance** the first time you enter a world: three chapters and ten entries covering the whole
+loop, with the recipes drawn in. Patchouli is optional, and without it you lose the book and
+nothing else. You can craft another from a plain book.
 
 ## Modded ores
 
-Modded ores are a first-class feature, not an add-on. Any ore that carries the usual common tags
-plugs into the same pipeline: dust, liquid, detection. Create's zinc, Universal Ores and Seamless
-Ores all work through that one mechanism rather than through special cases.
+Create's zinc grinds and detects like any vanilla ore, and the ore variants added by **Seamless
+Ores** and **Universal Ores** count as their plain counterparts. They are matched by name, so a
+mod you do not have installed simply never matches anything.
 
-## Relationship to the 1.x line
+Wider support that picks up any ore mod through the common ore tags is planned.
 
-2.0 is a **separate mod id** (`ore_detector_reborn`, where the 1.x line is `oredetector`), so the two
-install side by side without colliding. Nothing carries over between them: different items, tabs,
-recipes and config files. If you want the twelve classic detectors, or you play below 1.21, stay on
-the 1.x line. Trial Chambers arrived in 1.21, which is why this rework cannot be backported further.
+## Relationship to Ore Detector Legacy
+
+This is a separate mod from **Ore Detector Legacy**, which is where the original twelve single-ore
+detectors live. Different mod id (`ore_detector_reborn`, where Legacy is `oredetector`), so the two
+install side by side without colliding: different items, tabs, recipes and config files. Nothing
+carries over between them.
+
+If you want the classic detectors, or you play below 1.21, use Legacy. Trial Chambers arrived in
+1.21, which is what this rework is built on.
 
 ## Building
 
@@ -64,7 +100,9 @@ files.
 | Cloth Config | required | required | powers the config screen |
 | Mod Menu | optional | not applicable | adds the config button on Fabric |
 | Create | optional | optional | adds zinc to the ore pipeline |
+| Seamless Ores | optional | optional | its ore variants are detected too |
 | Universal Ores | optional | not applicable | its ore variants are detected too |
+| Patchouli | optional | optional | renders the Tome of Resonance |
 
 ## Licence and credits
 
@@ -72,10 +110,6 @@ Licensed under the **[PolyForm Shield License 1.0.0](https://polyformproject.org
 (see `LICENSE`). The source is public and you are free to read it, learn from it, modify it and
 redistribute it. The one thing the licence does not permit is using this code to provide a product
 that competes with Ore Detector Reborn.
-
-To be clear about what that does and does not cover: it is a restriction on **this code and these
-assets**, not on the ideas. Game mechanics are not anyone's property, and nothing here stops you
-building your own ore detection mod.
 
 This project began as an unofficial port of [Ore Detector](https://github.com/restonic4/OreDetector)
 by **restonic4** (MIT), and material still descends from it. `NOTICE` records exactly what, along
