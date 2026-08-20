@@ -54,18 +54,26 @@ public class NullifiedBucketItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
         // SOURCE fluids only, so a thin flowing edge does not count as somewhere to pour.
         BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
-        if (hit.getType() != BlockHitResult.Type.BLOCK) {
+        BlockPos pos = hit.getType() == BlockHitResult.Type.BLOCK ? hit.getBlockPos() : null;
+        // Standing IN the water is the case the raycast cannot answer: it starts inside the fluid
+        // and reports a miss, so emptying appeared to work sometimes and not others depending on
+        // where the player was standing. Fall back to the block they are actually in.
+        if (pos == null || !isDisposable(level, pos)) {
+            BlockPos inside = player.blockPosition();
+            pos = isDisposable(level, inside) ? inside : null;
+        }
+        if (pos == null) {
             return InteractionResult.PASS;
         }
-        BlockPos pos = hit.getBlockPos();
         var fluid = level.getFluidState(pos);
-        boolean disposable = fluid.isSource()
-                && (fluid.getType() == Fluids.WATER || fluid.getType() == Fluids.LAVA);
-        if (!disposable) {
-            return InteractionResult.PASS;
-        }
         if (!level.isClientSide()) {
-            stack.shrink(1);
+            // The empty bucket comes back in EVERY mode. Creative does not consume the full one,
+            // which is normal, but it should still hand over what emptying it produced: the old
+            // code shrank the stack and added the bucket unconditionally, so what you ended up
+            // holding depended on which slot the addition landed in and looked random.
+            if (!player.hasInfiniteMaterials()) {
+                stack.shrink(1);
+            }
             ItemStack empty = new ItemStack(Items.BUCKET);
             if (!player.getInventory().add(empty)) {
                 player.drop(empty, false);
@@ -75,6 +83,14 @@ public class NullifiedBucketItem extends Item {
                         ? SoundEvents.FIRE_EXTINGUISH : SoundEvents.BUCKET_EMPTY,
                 SoundSource.PLAYERS, 0.8F, 1.0F);
         return InteractionResult.SUCCESS;
+    }
+
+
+    /** True when this block holds a water or lava SOURCE, the only things that take the liquid. */
+    private static boolean isDisposable(Level level, BlockPos pos) {
+        var fluid = level.getFluidState(pos);
+        return fluid.isSource()
+                && (fluid.getType() == Fluids.WATER || fluid.getType() == Fluids.LAVA);
     }
 
     @Override
