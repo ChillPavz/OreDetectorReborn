@@ -35,7 +35,7 @@ public final class WelcomeMessage {
      * the message's own version, deliberately not the mod's: a patch release should not re-notify
      * everyone, and a rewritten notice should.
      */
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     private WelcomeMessage() {
     }
