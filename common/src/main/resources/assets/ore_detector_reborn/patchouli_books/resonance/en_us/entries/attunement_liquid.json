@@ -1,7 +1,7 @@
 {
   "name": "Attunement Liquid",
   "category": "ore_detector_reborn:resonance",
-  "icon": "ore_detector_reborn:attunement_liquid[ore_detector_reborn:ore_type=\"gold\"]",
+  "icon": "ore_detector_reborn:attunement_liquid[ore_detector_reborn:ore_type=\"netherite\"]",
   "sortnum": 2,
   "pages": [
     {

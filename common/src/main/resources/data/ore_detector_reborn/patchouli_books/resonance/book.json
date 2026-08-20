@@ -6,7 +6,7 @@
   "use_resource_pack": true,
   "creative_tab": "ore_detector_reborn:ore_detector",
   "advancements_tab": "ore_detector_reborn:root",
-  "index_icon": "ore_detector_reborn:ore_detector",
+  "index_icon": "patchouli:guide_book[patchouli:book=\"ore_detector_reborn:resonance\"]",
   "model": "ore_detector_reborn:tome_of_resonance",
   "show_progress": false,
   "text_color": "352E28",
