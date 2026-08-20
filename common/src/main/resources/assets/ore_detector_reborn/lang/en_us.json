@@ -105,5 +105,6 @@
   "text.autoconfig.ore_detector_reborn.option.reachStep.@Tooltip[0]": "Base reach of the beam. It goes three times this far down on a single loaded liquid, twice on two, and once on three or more.",
   "text.autoconfig.ore_detector_reborn.option.reachStep.@Tooltip[1]": "Sideways and upward reach is three quarters of the downward reach, and the column widens from 3x3 to 7x7 as the beam shortens.",
   "text.autoconfig.ore_detector_reborn.option.cooldownTicks.@Tooltip": "How long the detector rests between scans. 20 ticks is one second.",
-  "text.autoconfig.ore_detector_reborn.option.soundVolumePercent.@Tooltip": "Volume of the detector's beep. Set to 0 to silence it without affecting anything else."
+  "text.autoconfig.ore_detector_reborn.option.soundVolumePercent.@Tooltip": "Volume of the detector's beep. Set to 0 to silence it without affecting anything else.",
+  "tooltip.ore_detector_reborn.goggles_shaders": "A shaderpack is running, so the highlight cannot draw through terrain."
 }

@@ -59,6 +59,40 @@ if "result != InteractionResult.PASS" not in neo_main:
 else:
     print("  NeoForge cancels only on a real grind: OK")
 
+# --- shaderpack compatibility -------------------------------------------------------------------
+# Iris leaves debug_filled_box unmapped and skips the depth clear that gives setAlwaysOnTop its
+# meaning, so with a shaderpack the highlight loses its fill AND stops drawing through terrain.
+# The fill is recoverable through Iris's own assignPipeline API; the see-through is not, so the
+# goggles have to SAY so rather than look broken.
+shader_src = source("common/src/main/java/com/chillpavz/oredetectorreborn/client/ShaderCompat.java")
+# Anchored on the reflective CALL, not the bare name: "assignPipelineX" contains "assignPipeline"
+# and would pass a substring test while calling nothing.
+if not re.search(r'getMethod\(\s*"assignPipeline"', shader_src):
+    bad("nothing registers the filled box pipeline with Iris, so the highlight loses its fill "
+        "under any shaderpack")
+if not re.search(r'getMethod\(\s*"isShaderPackInUse"', shader_src):
+    bad("nothing detects a shaderpack, so the goggles cannot explain why they stop drawing "
+        "through terrain")
+# ScanHighlight is reached from the NeoForge payload handler, which is registered on a dedicated
+# server too, so nothing it touches may drag in a client-only class.
+# Only an IMPORT is forbidden. Reflecting on a client class BY NAME is the whole point of this
+# file, so the string literals must not trip the check.
+if re.search(r"^import net\.minecraft\.client\.", shader_src, re.M):
+    bad("ShaderCompat imports a client-only class; it is reachable from the payload handler "
+        "that a dedicated server registers, so it must stay reflective")
+goggles_src = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/GogglesItem.java")
+if "ShaderCompat.shaderPackInUse()" not in goggles_src:
+    bad("the goggles tooltip never mentions a shaderpack, so the highlight just looks broken")
+for loader in ("fabric", "neoforge"):
+    path = ("%s/src/main/java/com/chillpavz/oredetectorreborn/%s/client/OreDetector%sClient.java"
+            % (loader, loader, "Fabric" if loader == "fabric" else "NeoForge"))
+    text = source(path)
+    if "registerFilledBoxPipeline()" not in text:
+        bad("%s never registers the filled box pipeline with Iris" % loader)
+    if "ShaderCompat.refresh()" not in text:
+        bad("%s never refreshes the shaderpack state, so the tooltip would be stale" % loader)
+print("  shaderpack compatibility wired on both loaders: OK")
+
 # --- the advancement tree ------------------------------------------------------------------------
 ADV = "common/src/main/resources/data/%s/advancement" % NS
 tree = {}
