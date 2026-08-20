@@ -169,7 +169,16 @@ for where, text in texts:
     if text.count("$(") != text.count(")") and "$(" in text:
         pass  # counting parens is unreliable in prose; the macro scan above is the real check
 
-print("  no dangling link macros: OK")
+# $(li) already begins a new line, so a $(br2) in front of the first item leaves a blank line
+# under the title that reads as missing content.
+#
+# Deliberately NOT flagged: a text that merely OPENS with $(li). That looked like the same fault,
+# but the one page confirmed in game to look right does exactly that, so the rule would be wrong.
+for where, text in texts:
+    if "$(br2)$(li)" in text:
+        bad("%s has $(br2) before a list item, which leaves a blank line above the list" % where)
+
+print("  no dangling link macros and no blank lines above lists: OK")
 
 # --- the recipe that mints the book -------------------------------------------------------------
 CONDITION = {
@@ -197,6 +206,25 @@ for loader, (key, kind) in CONDITION.items():
     if got != want:
         bad("%s's book recipe points at %r but the book folder is %r" % (loader, got, want))
     print("  %-8s book recipe is gated and points at the right book: OK" % loader)
+
+# --- Fabric must opt the recipes into sync, or every crafting page is blank ---------------------
+# Fabric does not sync recipes to the client by default and Patchouli opts nothing in itself, so
+# without this the book's recipe pages render as empty space with no title, on Fabric only.
+fabric_main = io.open("fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/"
+                      "OreDetectorFabric.java", encoding="utf-8").read()
+if "RecipeSynchronization.synchronizeRecipeSerializer(" not in fabric_main:
+    bad("Fabric never opts a recipe serializer into sync, so every crafting page in the book "
+        "will be blank there while NeoForge looks fine")
+else:
+    used = set(re.findall(r'"type":\s*"minecraft:(crafting_[a-z]+)"',
+                          "".join(io.open(os.path.join(dp, f), encoding="utf-8").read()
+                                  for dp, dn, fn in os.walk("common/src/main/resources/data")
+                                  for f in fn if f.endswith(".json"))))
+    for serializer in sorted(used):
+        if serializer not in fabric_main:
+            bad("recipes use minecraft:%s but Fabric never opts that serializer into sync"
+                % serializer)
+    print("  fabric opts all %d recipe serializers into sync: OK" % len(used))
 
 # --- the built jars -------------------------------------------------------------------------------
 for loader in ("fabric", "neoforge"):

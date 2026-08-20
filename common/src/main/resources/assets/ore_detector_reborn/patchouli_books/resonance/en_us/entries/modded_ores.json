@@ -7,7 +7,7 @@
     {
       "type": "patchouli:text",
       "title": "What is supported",
-      "text": "$(li)$(thing)Create$(): zinc ore and deepslate zinc ore, and the zinc ingot grinds like copper. Any Create works, including Create Fabric and Create Fly.$(li)$(thing)Seamless Ores$(): every vanilla ore restyled into andesite, diorite, granite and tuff, plus blackstone and basalt variants for the nether ores.$(li)$(thing)Universal Ores$(): the same idea in its own namespace."
+      "text": "Three mods are matched by name today.$(li)$(thing)Create$(): zinc ore and deepslate zinc ore, and the zinc ingot grinds like copper. Any Create works, including Create Fabric and Create Fly.$(li)$(thing)Seamless Ores$(): every vanilla ore restyled into andesite, diorite, granite and tuff, plus blackstone and basalt variants for the nether ores.$(li)$(thing)Universal Ores$(): the same idea in its own namespace."
     },
     {
       "type": "patchouli:text",

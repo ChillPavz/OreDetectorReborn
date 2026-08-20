@@ -36,16 +36,50 @@ import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.event.player.ItemEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 public class OreDetectorFabric implements ModInitializer {
 
+
+    /**
+     * Sends the crafting recipes to clients so the guidebook can draw them.
+     *
+     * <p>Fabric does NOT sync recipes to the client by default; a mod has to opt each serializer
+     * in. Patchouli reads its crafting pages out of whatever arrived, and opts nothing in itself,
+     * so on Fabric every recipe page in every book renders as an empty space with no title. On
+     * NeoForge recipes are synced wholesale, which is why the same book was fine there.
+     *
+     * <p>The cost is honest: this syncs EVERY shaped and shapeless recipe in the game, not only
+     * ours, because the opt-in is per serializer and not per recipe. That is a one-off cost at
+     * join and it is the only lever the API offers.
+     */
+    private static void syncRecipesForTheGuidebook() {
+        // Resolved by id: vanilla exposes no public constants for these, only the registry.
+        for (String name : new String[]{"crafting_shaped", "crafting_shapeless"}) {
+            Identifier id = Identifier.withDefaultNamespace(name);
+            RecipeSerializer<?> serializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(id);
+            if (serializer == null) {
+                continue;
+            }
+            try {
+                RecipeSynchronization.synchronizeRecipeSerializer(serializer);
+            } catch (Throwable failure) {
+                // Losing this costs the recipe pages in the book, nothing else.
+                com.chillpavz.oredetectorreborn.Constants.LOG.error(
+                        "Could not opt {} into recipe sync, so the guidebook's crafting pages "
+                        + "will be blank on this loader.", id, failure);
+            }
+        }
+    }
 
     @Override
     public void onInitialize() {
@@ -74,6 +108,8 @@ public class OreDetectorFabric implements ModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(
                 ScanHighlightPayload.TYPE, ScanHighlightPayload.STREAM_CODEC);
         ModNetworking.setSender(ServerPlayNetworking::send);
+
+        syncRecipesForTheGuidebook();
 
         ServerPlayConnectionEvents.JOIN.register(
                 (handler, sender, server) -> WelcomeMessage.showIfNew(handler.getPlayer()));

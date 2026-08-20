@@ -7,7 +7,7 @@
     {
       "type": "patchouli:text",
       "title": "Fewer liquids, further sight",
-      "text": "Range is decided by how many $(thing)distinct$() liquids are loaded, not by how full the tank is.$(br2)$(li)$(thing)One$(): 24 down, 18 sideways, 3x3.$(li)$(thing)Two$(): 16 down, 12 sideways, 5x5.$(li)$(thing)Three or more$(): 8 down, 6 sideways, 7x7."
+      "text": "Range is decided by how many $(thing)distinct$() liquids are loaded, not by how full the tank is.$(li)$(thing)One$(): 24 down, 18 sideways, 3x3.$(li)$(thing)Two$(): 16 down, 12 sideways, 5x5.$(li)$(thing)Three or more$(): 8 down, 6 sideways, 7x7."
     },
     {
       "type": "patchouli:text",

@@ -19,7 +19,7 @@
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:breeze_crystals",
       "title": "Breeze Crystals",
-      "text": "The lens material. Two of them make one pair of goggles and that is the only thing they are for, so a single chamber is enough.$(br2)Vaults only. Breezes never drop them."
+      "text": "The lens material. Two of them make one pair of goggles and that is the only thing they are for, so a single chamber is enough.$(br2)Vaults, and the handful of hidden chests that share a vault's loot. Breezes never drop them."
     },
     {
       "type": "patchouli:spotlight",
