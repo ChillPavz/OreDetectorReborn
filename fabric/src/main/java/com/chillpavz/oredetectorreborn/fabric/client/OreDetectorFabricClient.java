@@ -18,6 +18,7 @@ package com.chillpavz.oredetectorreborn.fabric.client;
 import com.chillpavz.oredetectorreborn.client.ClientClock;
 import com.chillpavz.oredetectorreborn.client.ResonanceChamberScreen;
 import com.chillpavz.oredetectorreborn.client.ScanHighlight;
+import com.chillpavz.oredetectorreborn.client.ShaderCompat;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
 import com.chillpavz.oredetectorreborn.registry.ModMenus;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,6 +36,10 @@ public class OreDetectorFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         MenuScreens.register(ModMenus.RESONANCE_CHAMBER, ResonanceChamberScreen::new);
 
+        // Iris leaves the filled box pipeline unmapped, so without this the highlight loses its
+        // fill the moment a shaderpack is on. Its own loader modules use this same API.
+        ShaderCompat.registerFilledBoxPipeline();
+
         ClientPlayNetworking.registerGlobalReceiver(ScanHighlightPayload.TYPE,
                 (payload, context) -> ScanHighlight.accept(payload,
                         context.player().level().getGameTime(), context.player().level().dimension()));
@@ -46,6 +51,7 @@ public class OreDetectorFabricClient implements ClientModInitializer {
                 return;
             }
             ClientClock.set(client.level.getGameTime());
+            ShaderCompat.refresh();
             ScanHighlight.tick(client.level.getGameTime(), client.player,
                     client.level.dimension());
         });

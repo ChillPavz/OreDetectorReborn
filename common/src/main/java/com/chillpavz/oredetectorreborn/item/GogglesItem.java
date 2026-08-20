@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 
 import com.chillpavz.oredetectorreborn.Constants;
 import com.chillpavz.oredetectorreborn.client.ClientClock;
+import com.chillpavz.oredetectorreborn.client.ShaderCompat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -45,6 +46,13 @@ public class GogglesItem extends Item {
                                 Consumer<Component> adder, TooltipFlag flag) {
         adder.accept(Component.translatable("tooltip." + Constants.MOD_ID + ".goggles")
                 .withStyle(ChatFormatting.GRAY));
+
+        // A shaderpack stops the highlight drawing through terrain, and there is no way to tell
+        // from in game that this is the reason rather than the goggles being broken.
+        if (ShaderCompat.shaderPackInUse()) {
+            adder.accept(Component.translatable("tooltip." + Constants.MOD_ID + ".goggles_shaders")
+                    .withStyle(ChatFormatting.GOLD));
+        }
 
         long now = ClientClock.gameTime();
         Strain strain = Strain.of(stack);
