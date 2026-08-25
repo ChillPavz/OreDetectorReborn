@@ -10,7 +10,10 @@ being taken on trust.
 """
 import io, json, os, re, sys, zipfile
 
-NS, VER = "ore_detector_reborn", "2.0.0"
+NS = "ore_detector_reborn"
+# Read from gradle.properties, never hardcoded: a version bump used to break every jar
+# path in here, which reads as the jars being missing rather than as a stale constant.
+VER = re.search(r"^version=(.+)$", io.open("gradle.properties", encoding="utf-8").read(), re.M).group(1).strip()
 # The Minecraft version is read from gradle.properties rather than hardcoded, so these
 # scripts work unchanged on every backport branch.
 MC = re.search(r"^minecraft_version=(.+)$",

@@ -14,7 +14,8 @@ MC = re.search(r"^minecraft_version=(.+)$",
                io.open("gradle.properties", encoding="utf-8").read(),
                re.M).group(1).strip()
 
-VER = "2.0.0"
+# Read from gradle.properties, never hardcoded.
+VER = re.search(r"^version=(.+)$", io.open("gradle.properties", encoding="utf-8").read(), re.M).group(1).strip()
 ok = True
 def bad(m):
     global ok; ok = False; print("  FAIL: " + m)
