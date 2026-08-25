@@ -1,0 +1,44 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:resonance/crushed_ore",
+  "category": "ore_detector_reborn:resonance",
+  "name": "Crushed Ore",
+  "icon": {
+    "id": "ore_detector_reborn:crushed_ore",
+    "components": {
+      "ore_detector_reborn:ore_type": "iron"
+    }
+  },
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 0,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "id": "grinding",
+      "title": "Grinding",
+      "text": "**Sneak** and right click a **Grindstone**. Your main hand can be empty, or holding the material.  \nA plain right click still opens Repair and Disenchant, so the grindstone keeps its usual job. Drop the material in, take the dust out.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:spotlight",
+      "id": "yield",
+      "title": "Yield",
+      "item": {
+        "id": "ore_detector_reborn:crushed_ore",
+        "components": {
+          "ore_detector_reborn:ore_type": "coal"
+        }
+      },
+      "text": "Cheap ore grinds well, precious ore does not. The yield is the whole cost.\n\n- Coal, Copper, Zinc: 4 dust.\n- Lapis: 3 dust.\n- Iron, Gold, Quartz, Amethyst: 2 dust.\n- Diamond, Emerald: 1 dust.\n- Netherite: 1 dust."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "exceptions",
+      "title": "Two exceptions",
+      "text": "**Redstone** has no dust of ours, because the ore already drops one. Feed vanilla Redstone Dust to the chamber directly.  \n**Netherite** takes the ingot, not scrap. That is four scrap and four gold for a single dust, and it is meant to be the most expensive thing you can attune to.",
+      "show_title_separator": true
+    }
+  ],
+  "description": "Ore into dust, at a grindstone."
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book"
+  ],
+  "result": {
+    "id": "modonomicon:modonomicon",
+    "count": 1,
+    "components": {
+      "modonomicon:book_id": "ore_detector_reborn:resonance"
+    }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:registry_contains",
+      "registry": "minecraft:item",
+      "values": [
+        "modonomicon:modonomicon"
+      ]
+    }
+  ]
+}

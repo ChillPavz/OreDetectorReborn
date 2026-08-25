@@ -1,0 +1,69 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:field_work/ore_detector",
+  "category": "ore_detector_reborn:field_work",
+  "name": "Ore Detector",
+  "icon": "ore_detector_reborn:ore_detector",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 0,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "id": "craft",
+      "title1": "Ore Detector",
+      "recipe_id_1": "ore_detector_reborn:ore_detector",
+      "text": "Two Heavy Cores, three Breeze Rods and a comparator. One detector replaces the eleven separate vanilla ore detectors the mod used to have."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "scanning",
+      "title": "Scanning",
+      "text": "Right click a **surface** with it in your **main hand**. The beam fires straight into that face and reports what it finds in the action bar, tinted per ore. The box it swept is outlined through the rock for a couple of seconds, so you can see how far and how wide that was.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "scan_cost",
+      "title": "What a scan costs",
+      "show_title_separator": true,
+      "text": "It costs **1 durability** a scan whatever it finds, and a measure of that ore's liquid for every block found. Cheap ore is cheap to look for; valuable ore is not."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "pools",
+      "title": "Two pools",
+      "text": "**Durability** is 1000 and is mechanical wear. A Breeze Shard in an anvil restores 250, and that repair costs the same handful of levels every time. It never climbs, so a detector lasts as long as you keep finding shards.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "liquid_pool",
+      "title": "The tank",
+      "show_title_separator": true,
+      "text": "**Liquid** is the tank, 500 finds across at most five ores. Hover the detector to see what is loaded and how far it reaches."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "dry",
+      "title": "Running dry",
+      "show_title_separator": true,
+      "text": "Running dry does not break it. The last of a charge is spent on whatever it can still cover, that ore drops out of the tank, and the detector stops answering for it until you pour more in."
+    },
+    {
+      "type": "modonomicon:spotlight",
+      "id": "cost",
+      "title": "What a bottle carries",
+      "item": "ore_detector_reborn:crushed_ore",
+      "text": "The tank holds **500 finds**, and one find of any ore costs one millibucket. Rarity is in the brewing, not in the reading: one dust is three bottles, so a dust of coal carries 495 finds and a dust of ancient debris carries 36."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "cost_more",
+      "title": "Brewing it",
+      "show_title_separator": true,
+      "text": "Three bottles of a cheap ore very nearly fill the tank. An expensive one takes many more, which is the point: brew it once and you can carry as many finds of it as you like."
+    }
+  ],
+  "description": "The one item the mod is named for."
+}

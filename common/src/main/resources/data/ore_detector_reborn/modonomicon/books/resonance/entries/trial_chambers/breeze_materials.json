@@ -1,0 +1,41 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:trial_chambers/breeze_materials",
+  "category": "ore_detector_reborn:trial_chambers",
+  "name": "Chamber Materials",
+  "icon": "ore_detector_reborn:breeze_shard",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 0,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "id": "intro",
+      "title": "What to bring home",
+      "text": "A Trial Chamber supplies all four materials this mod runs on.\n\n- **Breeze Rods** drop from Breezes.\n- **Breeze Shards** are in supply chests and corridor pots.\n- **Breeze Crystals** come from ordinary vaults.\n- **Heavy Cores** come from ominous vaults.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:spotlight",
+      "id": "shard",
+      "title": "Breeze Shard",
+      "item": "ore_detector_reborn:breeze_shard",
+      "text": "The workhorse. Shards repair both the detector and the goggles, 250 durability at a time in an anvil at a flat cost that never rises, so you will keep needing them long after the first raid.  \nExpect roughly eight to eleven from a full chamber."
+    },
+    {
+      "type": "modonomicon:spotlight",
+      "id": "crystals",
+      "title": "Breeze Crystals",
+      "item": "ore_detector_reborn:breeze_crystals",
+      "text": "The lens material. Two of them make one pair of goggles and that is the only thing they are for, so a single chamber is enough.  \nVaults, and the handful of hidden chests that share a vault's loot. Breezes never drop them."
+    },
+    {
+      "type": "modonomicon:spotlight",
+      "id": "core",
+      "title": "Heavy Core",
+      "item": "minecraft:heavy_core",
+      "text": "Vanilla's own ominous vault drop, and the hard gate on this mod. The detector takes **two**, so a detector is a real expedition rather than an afternoon."
+    }
+  ],
+  "description": "The four things a raid is for."
+}

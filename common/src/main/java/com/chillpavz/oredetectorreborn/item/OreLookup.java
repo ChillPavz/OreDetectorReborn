@@ -58,6 +58,14 @@ public final class OreLookup {
         // Zinc has no vanilla block, so only its colour is set here; the blocks that count as
         // zinc come from ModdedOres.
         COLOURS.put("zinc", 0xB8CFCC);
+        // Energized Power's tin: the pale grey-white of its own ingot texture.
+        COLOURS.put("tin", 0xD5DCE0);
+        // Powah's uraninite. Sampled from the dust texture rather than guessed: its
+        // commonest opaque pixels are #00ED12 and #00C911, fully saturated. The first
+        // value here was an eyeballed olive and read as washed out beside every other
+        // ore. Distinct from emerald (0x3BE37A), which is a mint green with a lot of
+        // blue in it.
+        COLOURS.put("uraninite", 0x00E512);
     }
 
     private OreLookup() {

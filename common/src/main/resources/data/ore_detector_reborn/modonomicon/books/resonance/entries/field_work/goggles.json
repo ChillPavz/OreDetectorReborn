@@ -1,0 +1,60 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:field_work/goggles",
+  "category": "ore_detector_reborn:field_work",
+  "name": "X-Ray Goggles",
+  "icon": "ore_detector_reborn:goggles",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 2,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "id": "craft",
+      "title1": "X-Ray Goggles",
+      "recipe_id_1": "ore_detector_reborn:goggles",
+      "text": "String, a Netherite Ingot and two Breeze Crystals. Worn on the head."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "seeing",
+      "title": "Seeing the scan",
+      "text": "With the goggles on, a scan draws every block it reported as a coloured box **through the rock**, for about twelve seconds.  \nThey show nothing on their own. Nothing is revealed that the detector did not already tell you: the boxes are exactly the blocks it just reported.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "strain",
+      "title": "Strain",
+      "text": "Each visualisation adds **20 strain**, which bleeds off on its own. Cross **100** and the goggles give you **Nausea** and refuse to draw until they recover.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "strain_more",
+      "title": "Wear",
+      "show_title_separator": true,
+      "text": "Hover them to see the number. The detector itself is never blocked, so the counts keep coming even when the picture will not.  \nGoggles wear by 1 per ore block reported while worn, and take Breeze Shards like the detector."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "haste",
+      "title": "Haste",
+      "text": "A scan that finds something also grants **Haste** while the goggles are on, for twelve seconds.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "haste_more",
+      "title": "Which is stronger",
+      "show_title_separator": true,
+      "text": "**Haste II** on a single loaded liquid, **Haste I** on two or more. A focused tank sweeps the smallest volume of the three, so it gets the stronger hand.  \nStrain refuses it exactly as it refuses the highlight."
+    }
+  ],
+  "description": "Seeing what the detector reported.",
+  "parents": [
+    {
+      "entry": "ore_detector_reborn:field_work/ore_detector"
+    }
+  ]
+}

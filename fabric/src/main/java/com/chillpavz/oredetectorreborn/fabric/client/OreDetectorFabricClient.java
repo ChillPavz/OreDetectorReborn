@@ -20,6 +20,8 @@ import com.chillpavz.oredetectorreborn.client.ResonanceChamberScreen;
 import com.chillpavz.oredetectorreborn.client.ScanHighlight;
 import com.chillpavz.oredetectorreborn.client.ShaderCompat;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.network.ScanVolumePayload;
+import com.chillpavz.oredetectorreborn.client.GrindScreen;
 import com.chillpavz.oredetectorreborn.registry.ModMenus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -35,6 +37,7 @@ public class OreDetectorFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MenuScreens.register(ModMenus.RESONANCE_CHAMBER, ResonanceChamberScreen::new);
+        MenuScreens.register(ModMenus.GRIND, GrindScreen::new);
 
         // Iris leaves the filled box pipeline unmapped, so without this the highlight loses its
         // fill the moment a shaderpack is on. Its own loader modules use this same API.
@@ -42,6 +45,10 @@ public class OreDetectorFabricClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(ScanHighlightPayload.TYPE,
                 (payload, context) -> ScanHighlight.accept(payload,
+                        context.player().level().getGameTime(), context.player().level().dimension()));
+
+        ClientPlayNetworking.registerGlobalReceiver(ScanVolumePayload.TYPE,
+                (payload, context) -> ScanHighlight.acceptVolume(payload,
                         context.player().level().getGameTime(), context.player().level().dimension()));
 
         // END_CLIENT_TICK fires at the tail of Minecraft.tick(), which vanilla already runs inside
@@ -58,6 +65,6 @@ public class OreDetectorFabricClient implements ClientModInitializer {
 
         // Leaving a world must drop the highlight, or it would reappear over unrelated terrain in
         // the next one.
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ScanHighlight.clear());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ScanHighlight.clearAll());
     }
 }

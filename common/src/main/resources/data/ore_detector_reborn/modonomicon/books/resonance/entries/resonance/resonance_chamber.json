@@ -1,0 +1,32 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:resonance/resonance_chamber",
+  "category": "ore_detector_reborn:resonance",
+  "name": "Resonance Chamber",
+  "icon": "ore_detector_reborn:resonance_chamber",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 2,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "id": "craft",
+      "title1": "Resonance Chamber",
+      "recipe_id_1": "ore_detector_reborn:resonance_chamber",
+      "text": "A Breeze Rod over three cobblestone. It behaves like a brewing stand: fuel on the left, an ingredient on top, three bottles below."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "running",
+      "title": "Running it",
+      "text": "- Fuel is **Breeze Powder**, one per twenty batches.\n- The ingredient slot takes **Crushed Ore**, or plain **Redstone Dust** straight from the ground.\n- The three lower slots take **Water Bottles**.  \nA batch takes twenty seconds and fills all three bottles at once.",
+      "show_title_separator": true
+    }
+  ],
+  "description": "A brewing stand for ore.",
+  "parents": [
+    {
+      "entry": "ore_detector_reborn:resonance/crushed_ore"
+    }
+  ]
+}

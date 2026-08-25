@@ -1,0 +1,39 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:field_work/range",
+  "category": "ore_detector_reborn:field_work",
+  "name": "Focus and Range",
+  "icon": "minecraft:spyglass",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 2,
+  "y": -2,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "id": "table",
+      "title": "Fewer liquids, further sight",
+      "text": "Range is decided by how many **distinct** liquids are loaded, not by how full the tank is.\n\n- **One**: 24 down, 18 sideways, 3x3.\n- **Two**: 16 down, 12 sideways, 5x5.\n- **Three or more**: 8 down, 6 sideways, 7x7.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "trade",
+      "title": "The trade",
+      "text": "A focused detector sees **deep and narrow**. A loaded one sees **wide and shallow**, and costs more liquid per click because it finds more.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "trade_more",
+      "title": "How many at once",
+      "show_title_separator": true,
+      "text": "The tank holds five distinct ores at most. Pouring a bottle in fills whatever space is free and leaves the other charges alone, so a partial pour is allowed and still uses the whole bottle."
+    }
+  ],
+  "description": "Why fewer liquids see further.",
+  "parents": [
+    {
+      "entry": "ore_detector_reborn:field_work/ore_detector"
+    }
+  ]
+}

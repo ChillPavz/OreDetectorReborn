@@ -1,0 +1,49 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:resonance/attunement_liquid",
+  "category": "ore_detector_reborn:resonance",
+  "name": "Attunement Liquid",
+  "icon": {
+    "id": "ore_detector_reborn:attunement_liquid",
+    "components": {
+      "ore_detector_reborn:ore_type": "netherite"
+    }
+  },
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 4,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:spotlight",
+      "id": "liquid",
+      "title": "Attunement Liquid",
+      "item": {
+        "id": "ore_detector_reborn:attunement_liquid",
+        "components": {
+          "ore_detector_reborn:ore_type": "diamond"
+        }
+      },
+      "text": "A bottle remembers which ore it was brewed from, and that is what the detector is attuned to.  \nA millibucket is **one ore reported**, the same for every material, so the tank is simply how many finds you are carrying."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "worth",
+      "title": "What a bottle is worth",
+      "show_title_separator": true,
+      "text": "What differs is what a bottle is worth.\n\n- Coal, Copper, Zinc, Tin: 165.\n- Lapis: 90.\n- Iron, Gold, Quartz, Amethyst, Uraninite: 45.\n- Diamond, Emerald: 25.\n- Ancient Debris: 12."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "pouring",
+      "title": "Pouring it in",
+      "show_title_separator": true,
+      "text": "Pour one in by holding the bottle in your main hand and the detector in your off hand, then holding right click."
+    }
+  ],
+  "description": "What the detector actually drinks.",
+  "parents": [
+    {
+      "entry": "ore_detector_reborn:resonance/resonance_chamber"
+    }
+  ]
+}

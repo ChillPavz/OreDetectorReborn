@@ -139,7 +139,12 @@ public final class ModItems {
         // enumerating it left every modded ore out of the tab. Zinc had a texture, a name, a
         // select case and a working grind, and still could not be found in creative.
         if (item == CRUSHED_ORE) {
+            // Foreign-dust materials are skipped: we never make a Crushed Ore for those, so
+            // offering one in the tab would hand out a dust that no chamber will accept and that
+            // no grinder can produce. Third time this tab has been the thing that exposes a split
+            // table, so it is filtered from the SAME source the grinder reads.
             return OreGrinding.allOreTypes().stream()
+                    .filter(ore -> !OreGrinding.isForeignDust(ore))
                     .map(ore -> CrushedOreItem.of(CRUSHED_ORE, ore, 1))
                     .toList();
         }

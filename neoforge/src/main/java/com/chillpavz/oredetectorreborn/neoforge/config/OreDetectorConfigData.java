@@ -43,6 +43,25 @@ public class OreDetectorConfigData implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public int soundVolumePercent = 40;
 
+    // What one bottle of Attunement Liquid is worth, as a percentage of the tiered default.
+    // A millibucket is one ore reported, so this is how many finds a bottle carries.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.BOTTLE_YIELD_MIN,
+            max = OreDetectorConfig.BOTTLE_YIELD_MAX)
+    @ConfigEntry.Gui.Tooltip(count = 2)
+    public int bottleYieldPercent = OreDetectorConfig.DEFAULT_BOTTLE_YIELD;
+
+    // How fast liquid moves in and out of the detector. Higher is faster.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.POUR_SPEED_MIN,
+            max = OreDetectorConfig.POUR_SPEED_MAX)
+    @ConfigEntry.Gui.Tooltip(count = 2)
+    public int pourSpeedPercent = OreDetectorConfig.DEFAULT_POUR_SPEED;
+
+    // Seconds of Haste a successful scan grants while the goggles are worn. 0 turns it off.
+    @ConfigEntry.BoundedDiscrete(min = OreDetectorConfig.HASTE_SECONDS_MIN,
+            max = OreDetectorConfig.HASTE_SECONDS_MAX)
+    @ConfigEntry.Gui.Tooltip(count = 2)
+    public int hasteSeconds = OreDetectorConfig.DEFAULT_HASTE_SECONDS;
+
     // --- Goggles strain -----------------------------------------------------------------------
     // Nausea on crossing the strain ceiling, in seconds. 0 switches the effect off and leaves
     // only the refusal to visualise.
@@ -65,6 +84,9 @@ public class OreDetectorConfigData implements ConfigData {
 
     public void applyToRuntime() {
         OreDetectorConfig.applyReachStep(reachStep);
+        OreDetectorConfig.applyBottleYield(bottleYieldPercent);
+        OreDetectorConfig.applyPourSpeed(pourSpeedPercent);
+        OreDetectorConfig.applyHaste(hasteSeconds);
         // The legacy per-ore detectors still read the old reach fields; they keep their defaults
         // until those items are removed.
         OreDetectorConfig.apply(OreDetectorConfig.DEFAULT_DOWN_REACH, OreDetectorConfig.DEFAULT_SIDE_REACH,

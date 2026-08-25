@@ -1,0 +1,10 @@
+{
+  "name": "Tome of Resonance",
+  "tooltip": "Everything Ore Detector Reborn adds, from a Trial Chamber raid to a working detector.",
+  "creative_tab": "ore_detector_reborn:ore_detector",
+  "generate_book_item": true,
+  "display_mode": "node",
+  "show_recently_unlocked": false,
+  "allow_open_book_with_invalid_links": false,
+  "model": "ore_detector_reborn:tome_of_resonance"
+}

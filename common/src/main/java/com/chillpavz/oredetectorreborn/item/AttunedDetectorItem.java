@@ -29,6 +29,7 @@ import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import com.chillpavz.oredetectorreborn.registry.ModItems;
 import com.chillpavz.oredetectorreborn.network.ModNetworking;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.network.ScanVolumePayload;
 import com.chillpavz.oredetectorreborn.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -68,6 +69,46 @@ public class AttunedDetectorItem extends Item {
     /** Ticks to pour one bottle. Deliberately close to eating, so it reads as a channelled action. */
     public static final int POUR_TICKS = 32;
 
+    /**
+     * The shortest a pour or a drain can be, before the config scalar.
+     *
+     * <p>Without a floor the arithmetic is honest and the feel is wrong: a netherite bottle is
+     * twelve millibuckets, which came out at two ticks and read as a click rather than a
+     * channelled action. Scaling everything up instead would have fixed that at the cost of the
+     * common case, since the multiplier needed to make netherite land makes a coal bottle a six
+     * second hold. A floor plus the proportional part leaves coal exactly where it was and gives
+     * the small bottles their weight back.
+     */
+    public static final int MIN_FLOW_TICKS = 6;
+
+    /**
+     * How long moving this much liquid takes, in or out.
+     *
+     * <p>The same curve both ways, because a bottle going in and the same amount coming out should
+     * feel like the same action.
+     */
+    public static int flowTicks(int millibuckets) {
+        int base = MIN_FLOW_TICKS
+                + millibuckets * (POUR_TICKS - MIN_FLOW_TICKS) / LIQUID_PER_POUR;
+        return OreDetectorConfig.scaleFlowTicks(base);
+    }
+
+    /**
+     * The millibuckets a pour or a drain moves in {@link #POUR_TICKS}.
+     *
+     * <p>The biggest bottle in the game, so moving that much takes one pour's time and everything
+     * smaller is proportionally quicker. A full tank of one ore is about five seconds either way.
+     *
+     * <p><b>Pouring is paced by this too, not per bottle.</b> Bottles stopped being one size when
+     * rarity moved into what a bottle is worth, so a fixed time per bottle would have made filling
+     * a tank with netherite a minute of holding right click: forty-odd bottles at a second and a
+     * half each. Time now follows the liquid moved, which is the number the player can see.
+     */
+    public static final int LIQUID_PER_POUR = 165;
+
+    /** How long the scan volume is outlined for. Short: it is feedback, not an overlay. */
+    public static final int VOLUME_TICKS = 40;
+
     /** How long a rested pair of goggles holds the highlight up: twelve seconds. */
     public static final int HIGHLIGHT_TICKS = 240;
 
@@ -80,6 +121,18 @@ public class AttunedDetectorItem extends Item {
 
     public AttunedDetectorItem(Properties properties) {
         super(properties);
+    }
+
+    /**
+     * Keeps the anvil's prior-work penalty off this item; see {@link RepairCosts}. Without it the
+     * Breeze Shard repair loop this item is designed around dies at the seventh anvil visit.
+     */
+    @Override
+    public void inventoryTick(ItemStack stack, net.minecraft.server.level.ServerLevel level,
+                              net.minecraft.world.entity.Entity entity,
+                              net.minecraft.world.entity.EquipmentSlot slot) {
+        super.inventoryTick(stack, level, entity, slot);
+        RepairCosts.clear(stack);
     }
 
     public static OreTank tankOf(ItemStack stack) {
@@ -219,9 +272,15 @@ public class AttunedDetectorItem extends Item {
                 player.level(), pos, tankOf(detector).amountOf(ore))) {
             return 0;
         }
-        // A bottle's worth takes as long as pouring one in, and a dribble is proportionally quick.
+        // PACED BY MILLIBUCKETS, NOT BY BOTTLES, and that distinction is the whole point.
+        //
+        // It used to be per bottle, so emptying one bottle's worth took one pour's time whatever
+        // the ore. That is defensible arithmetic and it reads as a bug: 12 mB of netherite is a
+        // full bottle and drained as slowly as 165 mB of coal, so the smaller number took longer.
+        // Now that a millibucket is one ore reported, the millibucket count is the number the
+        // player can actually see, and it is the one the hold has to follow.
         int amount = tankOf(detector).amountOf(ore);
-        return Math.max(1, amount * POUR_TICKS / OreTank.BOTTLE);
+        return flowTicks(amount);
     }
 
     private static void drain(Level level, Player player, ItemStack detector) {
@@ -295,21 +354,45 @@ public class AttunedDetectorItem extends Item {
 
         OreTank remaining = tank;
         int reported = 0;
-        // What each ore's charge actually covered. The action bar reports everything FOUND, but
-        // only this much was paid for, and only this much is drawn.
+        // What each ore's charge actually covered, IN BLOCKS. The action bar reports everything
+        // FOUND, but only this much was paid for, and only this much is drawn.
+        //
+        // Blocks and millibuckets were the same number while every ore cost a flat 1 mB, and they
+        // are not any more: the cost per block is tiered, so a coal charge stretches 750 blocks
+        // and a netherite charge 37. Keep this map counting BLOCKS - it drives the highlight and
+        // the goggles' wear, neither of which cares what the liquid cost.
         Map<String, Integer> paidFor = new LinkedHashMap<>();
+        // Ores whose charge was exhausted by this scan, so the player can be told which ones just
+        // stopped working rather than discovering it on the next click.
+        java.util.List<String> ranDry = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : found.entrySet()) {
-            int available = remaining.amountOf(entry.getKey());
-            int spend = Math.min(available, entry.getValue());
-            remaining = remaining.drain(entry.getKey(), spend);
-            paidFor.put(entry.getKey(), spend);
-            reported += spend;
+            String ore = entry.getKey();
+            int blocksFound = entry.getValue();
+            int available = remaining.amountOf(ore);
+            // ONE MILLIBUCKET IS ONE ORE, for every material alike. Rarity is in what a bottle is
+            // worth, not in what a block costs to report; see OreGrinding.bottleSizeOf.
+            //
+            // That flat rate is also why the dregs bug cannot come back. When the price of a block
+            // was tiered, a charge below that price bought nothing, so it never drained and the
+            // scan still reported every block it saw: unlimited free detection for one
+            // millibucket. At a flat 1 any charge at all buys at least one block.
+            int affordable = Math.min(blocksFound, available);
+            if (affordable < blocksFound) {
+                // The charge could not cover everything found, so it is spent out and the ore
+                // leaves the tank. That makes running dry a single visible event.
+                ranDry.add(ore);
+            }
+            remaining = remaining.drain(ore, affordable);
+            paidFor.put(ore, affordable);
+            reported += affordable;
         }
         setTank(detector, remaining);
+        showVolume(player, clicked, into, reach, radius);
         wearGoggles(player, reported);
         visualise(level, player, clicked, reach, hits, paidFor);
 
-        report(player, found, reported);
+        rewardScan(player, reported > 0, types);
+        report(player, paidFor, ranDry);
         player.getCooldowns().addCooldown(detector, OreDetectorConfig.cooldownTicks);
         return InteractionResult.SUCCESS;
     }
@@ -401,6 +484,65 @@ public class AttunedDetectorItem extends Item {
         }
     }
 
+    /**
+     * Outlines what the scan just swept, for the player who swept it.
+     *
+     * <p>Replaces an earlier particle version that did not work, and the reason is worth keeping:
+     * <b>particles are depth tested, and the beam runs INTO the surface</b>, so every particle past
+     * the entry face was inside solid rock and invisible. Drawing the cross-section on the face
+     * instead was visible but showed only width, and in practice the small gusts were so faint that
+     * all anyone saw was the single burst on a hit, which read as "it only appears when it finds
+     * something".
+     *
+     * <p>A gizmo has none of those problems: {@code setAlwaysOnTop} makes vanilla clear the depth
+     * buffer for the pass, so the whole box draws through terrain and shows depth AND width at
+     * once. Stroke only, since a filled box tens of blocks long would white out the screen.
+     *
+     * <p>Sent on EVERY scan, hit or miss, and to everyone, goggles or not. It reveals nothing
+     * about ore, only the box the player themselves chose to point at.
+     */
+    private static void showVolume(Player player, BlockPos clicked, Direction into, int reach,
+                                   int radius) {
+        if (player instanceof ServerPlayer server) {
+            ModNetworking.send(server, new ScanVolumePayload(
+                    clicked.immutable(), into, reach, radius, VOLUME_TICKS));
+        }
+    }
+
+    /**
+     * The mining bonus a successful scan grants, if the player is wearing the goggles.
+     *
+     * <p>Deliberately NOT a standalone item or an upgrade. It rides on the goggles because they
+     * already cost durability, liquid and strain to use, so the reward is self limiting: it only
+     * arrives after a scan that was paid for, and only for as long as the highlight it belongs to.
+     *
+     * <p><b>Stronger on a FOCUSED tank.</b> Haste II on a single loaded liquid, Haste I on two or
+     * more. The focused build already only wins on depth, and its total scanned volume is actually
+     * the smallest of the three, so this gives it a second reason to exist that is not reach.
+     *
+     * <p>Gated on the same strain the highlight is, so strain has exactly one meaning: the goggles
+     * have had enough. A version that kept granting Haste while refusing to draw would leave the
+     * goggles half working in a state nobody could reason about.
+     *
+     * <p>Only on a scan that FOUND something, or it would reward clicking at bare walls, which is
+     * the one case where the bonus has nothing to be spent on.
+     */
+    private static void rewardScan(Player player, boolean foundAnything, int types) {
+        if (!foundAnything || OreDetectorConfig.hasteSeconds <= 0) {
+            return;
+        }
+        if (!player.getItemBySlot(EquipmentSlot.HEAD).is(ModItems.GOGGLES)) {
+            return;
+        }
+        ItemStack goggles = player.getItemBySlot(EquipmentSlot.HEAD);
+        if (Strain.of(goggles).isBlockedAt(player.level().getGameTime())) {
+            return;
+        }
+        int amplifier = types <= 1 ? 1 : 0;
+        player.addEffect(new MobEffectInstance(MobEffects.HASTE,
+                OreDetectorConfig.hasteSeconds * 20, amplifier, true, true, true));
+    }
+
     private static BlockPos offset(BlockPos origin, Direction into, int depth, int a, int b) {
         BlockPos base = origin.relative(into, depth);
         return switch (into.getAxis()) {
@@ -410,8 +552,35 @@ public class AttunedDetectorItem extends Item {
         };
     }
 
-    private static void report(Player player, Map<String, Integer> found, int reported) {
+    /**
+     * Says what the scan actually resolved.
+     *
+     * <p><b>This reports what the liquid PAID FOR, not everything the beam touched, and that
+     * reverses an earlier decision deliberately.</b> Reporting the full count while charging for
+     * part of it was defensible when the two differed only at the moment a tank ran out. It stopped
+     * being defensible once the cost per block became tiered: a charge below one block's cost paid
+     * for nothing, so the detector reported every block it saw for free, forever. Paying for what
+     * you are told is the only version of this that cannot be farmed.
+     *
+     * @param found   blocks per ore that the charge actually covered
+     * @param ranDry  ores whose charge this scan exhausted
+     */
+    private static void report(Player player, Map<String, Integer> paid,
+                               java.util.List<String> ranDry) {
+        // Copied rather than filtered in place: this map is the caller's, and visualise() reads it.
+        // It happens to run first today, which is exactly the kind of thing that stops being true.
+        Map<String, Integer> found = new LinkedHashMap<>();
+        paid.forEach((ore, count) -> {
+            if (count > 0) {
+                found.put(ore, count);
+            }
+        });
         if (found.isEmpty()) {
+            if (player instanceof ServerPlayer server && !ranDry.isEmpty()) {
+                actionBar(server, dryMessage(ranDry));
+                playBeep(player, false);
+                return;
+            }
             if (player instanceof ServerPlayer server) {
                 actionBar(server, Component.translatable("hud." + Constants.MOD_ID + ".none_multi")
                         .withStyle(ChatFormatting.GRAY));
@@ -433,9 +602,28 @@ public class AttunedDetectorItem extends Item {
             first = false;
         }
         if (player instanceof ServerPlayer server) {
-            actionBar(server, Component.translatable("hud." + Constants.MOD_ID + ".found_multi", message));
+            net.minecraft.network.chat.MutableComponent line = Component.translatable(
+                    "hud." + Constants.MOD_ID + ".found_multi", message);
+            if (!ranDry.isEmpty()) {
+                line.append(Component.literal(" ")).append(dryMessage(ranDry));
+            }
+            actionBar(server, line);
         }
         playBeep(player, true);
+    }
+
+    /** "Iron ran dry", naming the ores this scan used the last of. */
+    private static Component dryMessage(java.util.List<String> ranDry) {
+        net.minecraft.network.chat.MutableComponent names = Component.empty();
+        for (int i = 0; i < ranDry.size(); i++) {
+            if (i > 0) {
+                names.append(Component.literal(", "));
+            }
+            names.append(OreLookup.displayName(ranDry.get(i))
+                    .copy().withColor(OreLookup.colorOf(ranDry.get(i))));
+        }
+        return Component.translatable("hud." + Constants.MOD_ID + ".ran_dry", names)
+                .withStyle(ChatFormatting.GRAY);
     }
 
     /** Player.displayClientMessage is gone at 26.x; the action bar is a ServerPlayer system message. */
@@ -466,9 +654,11 @@ public class AttunedDetectorItem extends Item {
         adder.accept(Component.translatable("tooltip." + Constants.MOD_ID + ".tank",
                 tank.total(), OreTank.CAPACITY).withStyle(ChatFormatting.GRAY));
         for (Map.Entry<String, Integer> entry : tank.sorted()) {
+            // No rate shown: a millibucket is one ore for every material, so the number IS the
+            // count of finds left for that ore.
             adder.accept(Component.literal(" ")
                     .append(OreLookup.displayName(entry.getKey()))
-                    .append(Component.literal(": " + entry.getValue() + " mB"))
+                    .append(Component.literal(": " + entry.getValue()))
                     .withColor(OreLookup.colorOf(entry.getKey())));
         }
         int width = columnRadius(types) * 2 + 1;

@@ -16,6 +16,7 @@
 package com.chillpavz.oredetectorreborn.item;
 
 import com.chillpavz.oredetectorreborn.Constants;
+import com.chillpavz.oredetectorreborn.config.OreDetectorConfig;
 import com.chillpavz.oredetectorreborn.registry.ModDataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -52,6 +53,17 @@ public class AttunementLiquidItem extends Item {
         return stack;
     }
 
+    /**
+     * What one bottle of this ore is worth, after the config scalar.
+     *
+     * <p>Tiered by how valuable the ore is: 165 for coal down to 12 for netherite. That is where
+     * rarity lives now, rather than in the price of reporting a block, which is a flat 1 for
+     * everything.
+     */
+    private static int bottleSize(String oreType) {
+        return OreDetectorConfig.scaleBottleYield(OreGrinding.bottleSizeOf(oreType));
+    }
+
     /** The detector this bottle could pour into, or null if the off hand cannot take it. */
     private static ItemStack pourTarget(Player player, ItemStack bottle) {
         String ore = bottle.get(ModDataComponents.ORE_TYPE);
@@ -63,7 +75,8 @@ public class AttunementLiquidItem extends Item {
             return null;
         }
         // A completely full tank, or a seventh ore type, refuses rather than swallowing the bottle.
-        return AttunedDetectorItem.tankOf(detector).acceptable(ore) > 0 ? detector : null;
+        return AttunedDetectorItem.tankOf(detector).acceptable(ore, bottleSize(ore)) > 0
+                ? detector : null;
     }
 
     @Override
@@ -81,8 +94,16 @@ public class AttunementLiquidItem extends Item {
 
     @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return entity instanceof Player player && pourTarget(player, stack) != null
-                ? AttunedDetectorItem.POUR_TICKS : 0;
+        if (!(entity instanceof Player player) || pourTarget(player, stack) == null) {
+            return 0;
+        }
+        // Paced by what actually goes in, not a flat time per bottle. Bottles are no longer one
+        // size, so a flat time would mean forty-odd holds of a second and a half to fill a tank
+        // with netherite; this makes a small bottle quick and a big one the full pour.
+        String ore = stack.get(ModDataComponents.ORE_TYPE);
+        int moved = AttunedDetectorItem.tankOf(player.getOffhandItem())
+                .acceptable(ore, bottleSize(ore));
+        return AttunedDetectorItem.flowTicks(moved);
     }
 
     @Override
@@ -101,13 +122,13 @@ public class AttunementLiquidItem extends Item {
         }
         String ore = stack.get(ModDataComponents.ORE_TYPE);
         OreTank tank = AttunedDetectorItem.tankOf(detector);
-        int accepted = tank.acceptable(ore);
+        int accepted = tank.acceptable(ore, bottleSize(ore));
         if (accepted <= 0) {
             return stack;
         }
         if (!level.isClientSide()) {
-            // The whole bottle goes even when only part of it fits. That is the only way to get
-            // more than three ore types into a 300 mB tank.
+            // The whole bottle goes even when only part of it fits, so topping up a nearly full
+            // tank costs a bottle rather than being refused.
             AttunedDetectorItem.setTank(detector, tank.pour(ore, accepted));
             stack.shrink(1);
             if (!player.getInventory().add(new ItemStack(Items.GLASS_BOTTLE))) {

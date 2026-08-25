@@ -1,0 +1,48 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:field_work/modded_ores",
+  "category": "ore_detector_reborn:field_work",
+  "name": "Other Mods' Ores",
+  "icon": "minecraft:raw_copper",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 4,
+  "y": 2,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "id": "supported",
+      "title": "What is supported",
+      "text": "Five mods are matched by name today.\n\n- **Create**: zinc ore and deepslate zinc ore, and the zinc ingot grinds like copper. Any Create works, including Create Fabric and Create Fly.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "supported_more",
+      "title": "Restyled ores",
+      "show_title_separator": true,
+      "text": "- **Seamless Ores**: every vanilla ore restyled into andesite, diorite, granite and tuff, plus blackstone and basalt variants for the nether ores.\n- **Universal Ores**: the same idea in its own namespace."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "energized",
+      "title": "Energized Power",
+      "text": "**Tin ore** and deepslate tin ore, and its tin ingot grinds at a grindstone.  \nIt hands back **their** Tin Dust, not one of ours, at the same one for one rate their own pulverizer uses. One tin dust makes Tin Attunement Liquid in the chamber exactly like any other dust.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "powah",
+      "title": "Powah",
+      "show_title_separator": true,
+      "text": "**Uraninite ore**, in all six of its blocks: stone and deepslate, each in poor, normal and dense.  \nThe smelted **Uraninite** grinds at a grindstone into our own Uraninite Dust, because Powah ships no dust of its own. Two dust per uraninite, and 4 mB a block to look for."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "missing",
+      "title": "If a mod is missing",
+      "text": "Nothing breaks when one of those is absent. Their ores are matched by name, so an id that is not registered simply never matches anything.  \nWider support that picks up **any** ore mod through the common ore tags is planned.",
+      "show_title_separator": true
+    }
+  ],
+  "description": "What else the detector recognises."
+}

@@ -1,0 +1,39 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:field_work/draining",
+  "category": "ore_detector_reborn:field_work",
+  "name": "Draining and Re-attuning",
+  "icon": "ore_detector_reborn:nullified_bucket",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 2,
+  "y": 2,
+  "pages": [
+    {
+      "type": "modonomicon:text",
+      "id": "drain",
+      "title": "Getting it back out",
+      "text": "Hold right click on a **cauldron** with the detector to drain it. It removes **one ore at a time, smallest charge first**, so a stray 10 mB in the way clears in a short pull without costing the charges you wanted.",
+      "show_title_separator": true
+    },
+    {
+      "type": "modonomicon:spotlight",
+      "id": "bucket",
+      "title": "Nullified Bucket",
+      "item": "ore_detector_reborn:nullified_bucket",
+      "text": "Draining **forgets** which ore the liquid was, which is why one fluid covers every mix."
+    },
+    {
+      "type": "modonomicon:text",
+      "id": "bucket_more",
+      "title": "The cauldron",
+      "show_title_separator": true,
+      "text": "The cauldron holds a bucket's worth and fills in quarters, but it counts what you actually put in: a small charge costs a small amount rather than a whole quarter. The bucket empties into water or lava only."
+    }
+  ],
+  "description": "Getting a charge back out again.",
+  "parents": [
+    {
+      "entry": "ore_detector_reborn:field_work/ore_detector"
+    }
+  ]
+}

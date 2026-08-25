@@ -30,6 +30,8 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import com.chillpavz.oredetectorreborn.network.ScanVolumePayload;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -101,6 +103,12 @@ public final class ScanHighlight {
         entries = List.of();
     }
 
+    /** Drops everything, volume included. Called when the player leaves a world. */
+    public static void clearAll() {
+        clear();
+        volume = null;
+    }
+
     /**
      * Emits this tick's highlight. Must be called from a client tick, which vanilla already runs
      * inside a gizmo collector, so no collector has to be opened here.
@@ -110,6 +118,19 @@ public final class ScanHighlight {
      * @param dimension the world the player is in now, so a highlight cannot cross a portal
      */
     public static void tick(long gameTime, Player player, ResourceKey<Level> dimension) {
+        if (!disabled) {
+            try {
+                // FIRST, and outside every check below: the volume belongs to the scan, not to the
+                // goggles, so none of the goggles' conditions may gate it. Putting it after them
+                // would silently make the one effect meant for everybody goggles-only.
+                tickVolume(gameTime, dimension);
+            } catch (Throwable failure) {
+                disabled = true;
+                volume = null;
+                Constants.LOG.error("Could not draw the scan volume, so it will stop being drawn "
+                        + "for this session.", failure);
+            }
+        }
         if (entries.isEmpty() || disabled) {
             return;
         }
@@ -162,6 +183,63 @@ public final class ScanHighlight {
             Constants.LOG.error("Could not draw the scan highlight, so the goggles will stop "
                     + "showing one for this session.", failure);
         }
+    }
+
+    // --- the scan volume ------------------------------------------------------------------------
+    // Separate from the highlight above in every way that matters: it is drawn for ANY scan by any
+    // player, wearing goggles or not, it says nothing about ore, and it is short. Its only job is
+    // to answer "how much did that actually look at", which is the thing playtesters could not
+    // work out from the tooltip.
+
+    /** How hard the volume outline is drawn before its fade. */
+    private static final int VOLUME_ALPHA = 170;
+    private static final float VOLUME_STROKE = 2.0F;
+    /** The Breeze-ish pale cyan the rest of the mod's own furniture uses. */
+    private static final int VOLUME_RGB = 0x9FE8E0;
+    /** Fades over its last half second. */
+    private static final int VOLUME_FADE_TICKS = 10;
+
+    private static AABB volume;
+    private static ResourceKey<Level> volumeDimension;
+    private static long volumeExpiresAtTick;
+
+    /** Takes a scan's shape. A later scan replaces an earlier one rather than stacking. */
+    public static void acceptVolume(ScanVolumePayload payload, long gameTime,
+                                    ResourceKey<Level> dimension) {
+        int radius = Math.max(0, Math.min(ScanVolumePayload.MAX_RADIUS, payload.radius()));
+        int reach = Math.max(1, Math.min(ScanVolumePayload.MAX_REACH, payload.reach()));
+        // depth 0 is the clicked block itself, so the far end is reach - 1 blocks further in.
+        BlockPos far = payload.origin().relative(payload.into(), reach - 1);
+        // Grown by the column radius on the two axes across the beam. Doing it by union of the two
+        // end blocks and then inflating is what keeps this correct for all six directions without
+        // a switch on the axis.
+        AABB box = new AABB(payload.origin()).minmax(new AABB(far));
+        double x = payload.into().getStepX() == 0 ? radius : 0;
+        double y = payload.into().getStepY() == 0 ? radius : 0;
+        double z = payload.into().getStepZ() == 0 ? radius : 0;
+        volume = box.inflate(x, y, z);
+        volumeDimension = dimension;
+        volumeExpiresAtTick = gameTime + Math.max(1, payload.durationTicks());
+    }
+
+    private static void tickVolume(long gameTime, ResourceKey<Level> dimension) {
+        if (volume == null) {
+            return;
+        }
+        long remaining = volumeExpiresAtTick - gameTime;
+        if (remaining <= 0 || !dimension.equals(volumeDimension)) {
+            volume = null;
+            return;
+        }
+        float fade = Math.min(1.0F, remaining / (float) VOLUME_FADE_TICKS);
+        int alpha = Math.round(VOLUME_ALPHA * fade);
+        if (alpha <= 0) {
+            return;
+        }
+        // Stroke only, no fill. A filled box this size would white out the screen, and the outline
+        // is what carries the information: where the beam stopped, and how wide it was.
+        Gizmos.cuboid(volume, GizmoStyle.stroke(ARGB.color(alpha, VOLUME_RGB), VOLUME_STROKE))
+                .setAlwaysOnTop();
     }
 
     private record Entry(BlockPos pos, int rgb) {

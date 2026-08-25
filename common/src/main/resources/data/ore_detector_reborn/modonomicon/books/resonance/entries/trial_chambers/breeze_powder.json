@@ -1,0 +1,32 @@
+{
+  "type": "modonomicon:content",
+  "id": "ore_detector_reborn:trial_chambers/breeze_powder",
+  "category": "ore_detector_reborn:trial_chambers",
+  "name": "Breeze Powder",
+  "icon": "ore_detector_reborn:breeze_powder",
+  "background": "ore_detector_reborn:book/entry_background",
+  "x": 2,
+  "y": 0,
+  "pages": [
+    {
+      "type": "modonomicon:crafting_recipe",
+      "id": "powder",
+      "title1": "Breeze Powder",
+      "recipe_id_1": "ore_detector_reborn:breeze_powder",
+      "text": "One rod, two powder, exactly as a Blaze Rod works. Powder fuels the Resonance Chamber: one is worth twenty batches, so a single rod goes a very long way."
+    },
+    {
+      "type": "modonomicon:crafting_recipe",
+      "id": "wind",
+      "title1": "Wind Charges have moved",
+      "recipe_id_1": "minecraft:wind_charge",
+      "text": "Breeze Rods now have a second job, so the vanilla recipe that turned one rod into four Wind Charges would have made rods worth two very different things.  \nIt is replaced by this one, mirroring the Fire Charge: **clay ball, gunpowder and Breeze Powder** for three."
+    }
+  ],
+  "description": "Rods into fuel, and what that did to Wind Charges.",
+  "parents": [
+    {
+      "entry": "ore_detector_reborn:trial_chambers/breeze_materials"
+    }
+  ]
+}

@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.chillpavz.oredetectorreborn.Constants;
+import com.chillpavz.oredetectorreborn.menu.GrindMenu;
 import com.chillpavz.oredetectorreborn.menu.ResonanceChamberMenu;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.flag.FeatureFlags;
@@ -32,6 +33,10 @@ public final class ModMenus {
     public static final MenuType<ResonanceChamberMenu> RESONANCE_CHAMBER =
             register("resonance_chamber",
                     new MenuType<>(ResonanceChamberMenu::new, FeatureFlags.VANILLA_SET));
+
+    /** The grinder, opened by sneak-clicking a vanilla grindstone with a grindable material. */
+    public static final MenuType<GrindMenu> GRIND =
+            register("grind", new MenuType<>(GrindMenu::new, FeatureFlags.VANILLA_SET));
 
     private ModMenus() {
     }
