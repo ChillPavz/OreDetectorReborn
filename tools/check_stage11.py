@@ -35,29 +35,232 @@ def source(path):
     return text
 
 
-# --- the Fabric use-event contract ------------------------------------------------------------
+# --- the Fabric block-event contract ----------------------------------------------------------
+# Grinding moved from a shears gesture on ItemEvents.USE to a sneak-click on a grindstone through
+# UseBlockCallback, and THE TWO EVENTS DO NOT SHARE A CONTRACT. Both were read out of the mixin
+# bytecode, not assumed:
+#   ItemEvents.USE     -> NULL means "not handled"; ANY non-null result is returned to the caller
+#                         instead of running the item's own use(). Returning PASS there cancelled
+#                         equipping, pouring, bucket emptying and draining, on Fabric only.
+#   UseBlockCallback   -> PASS means "not handled", the ordinary reading, and it is injected at the
+#                         HEAD of ServerPlayerGameMode.useItemOn so it fires while sneaking too.
+# So the null translation that was MANDATORY on the old event is now a BUG on the new one, which is
+# why this check is inverted rather than deleted.
 fabric_main = source("fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/OreDetectorFabric.java")
-# Checked as two specific facts rather than by extracting a block: a non-greedy regex over the
-# whole file happily runs past the end of this registration into the next one and then reports
-# whatever it finds there, which is a misleading pass or a misleading message.
-if "ItemEvents.USE.register(" not in fabric_main:
-    bad("ItemEvents.USE is not registered at all, so grinding does nothing on Fabric")
-elif "ItemEvents.USE.register(OreGrindingInteraction::tryGrind)" in fabric_main:
-    bad("ItemEvents.USE is registered with a bare method reference, so it hands Fabric "
-        "InteractionResult.PASS. Fabric returns any non-null result INSTEAD of running the item's "
-        "own use(), so that cancels equipping, pouring, bucket emptying and draining")
-elif "PASS ? null" not in fabric_main.replace("InteractionResult.", ""):
-    bad("the ItemEvents.USE handler does not translate PASS to null, so Fabric treats every "
-        "right-click as handled and cancels the item's own use()")
+# Checked as specific facts rather than by extracting a block: a non-greedy regex over the whole
+# file happily runs past the end of this registration into the next one and then reports whatever
+# it finds there, which is a misleading pass or a misleading message.
+if "UseBlockCallback.EVENT.register(" not in fabric_main:
+    bad("UseBlockCallback is not registered at all, so the grinder never opens on Fabric")
+elif "ItemEvents.USE.register(" in fabric_main:
+    bad("ItemEvents.USE is still registered. Grinding no longer rides on it, and a handler left "
+        "there returning PASS cancels the vanilla interaction for every item in the game")
+elif "PASS ? null" in fabric_main.replace("InteractionResult.", ""):
+    bad("the UseBlockCallback handler translates PASS to null. That was required for "
+        "ItemEvents.USE and is wrong here: UseBlockCallback compares the result against PASS, so "
+        "null is not 'not handled' and the callback stops declining cleanly")
 else:
-    print("  Fabric ItemEvents.USE maps PASS to null: OK")
+    print("  Fabric uses UseBlockCallback and returns PASS to decline: OK")
 
 # NeoForge's is the mirror image: it must CANCEL only on a non-PASS result.
 neo_main = source("neoforge/src/main/java/com/chillpavz/oredetectorreborn/neoforge/OreDetectorNeoForge.java")
-if "result != InteractionResult.PASS" not in neo_main:
+if "PlayerInteractEvent.RightClickBlock" not in neo_main:
+    bad("NeoForge listens on the wrong interact event; the grinder needs RightClickBlock")
+elif "result != InteractionResult.PASS" not in neo_main:
     bad("NeoForge's grind handler does not gate its cancel on a non-PASS result")
 else:
     print("  NeoForge cancels only on a real grind: OK")
+
+# --- the sneak gate ---------------------------------------------------------------------------
+# Without it the handler swallows EVERY right-click on a grindstone whenever the player happens to
+# be holding an ingot, which takes Repair and Disenchant away with nothing logged. The sneak
+# pairing is also what keeps the interaction free: sneak plus a non-placeable item on a block does
+# nothing in vanilla, and every grindable material is a non-BlockItem.
+grind = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/OreGrindingInteraction.java")
+if "isSecondaryUseActive()" not in grind:
+    bad("the grind interaction does not check isSecondaryUseActive(), so it hijacks every plain "
+        "right-click on a grindstone and breaks vanilla Repair and Disenchant")
+elif "Blocks.GRINDSTONE" not in grind:
+    bad("the grind interaction does not check the clicked block is a grindstone, so it fires "
+        "on every block in the game")
+else:
+    print("  grinding is gated on sneak AND on the block being a grindstone: OK")
+
+# Redstone must stay out of the grind table: it is the only BlockItem that would collide with the
+# sneak-place gesture, and redstone ore already drops its own dust.
+table = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/OreGrinding.java")
+if 'add("redstone"' in table or "Items.REDSTONE," in table:
+    bad("redstone is in the grind table. It is a BlockItem, so sneak-clicking a grindstone with "
+        "it would both place it and open the grinder, and redstone ore already drops its dust")
+else:
+    print("  redstone stays out of the grind table: OK")
+
+# --- the bottle yield ladder --------------------------------------------------------------------
+# Two tunables meet here (dust yield and bottle size), so the check belongs on their RELATIONSHIP
+# rather than on either number looking sensible alone. Both now point the SAME way: an ore that
+# grinds generously should also bottle generously, because both express "this is cheap". That is
+# the inverse of the arrangement this replaced, where the second number was the price of reporting
+# a block and therefore ran opposite to the yield.
+table = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/OreGrinding.java")
+entries = re.findall(r'add(?:Modded)?\(\s*(?:"[a-z_]+",\s*"[a-z_]+",\s*)?"([a-z]+)",\s*'
+                     r'(?:Items\.[A-Z_]+,\s*)?(\d+),\s*(\d+)\)', table)
+foreign_ores = {m[2] for m in re.findall(
+    r'addForeign\("([^"]+)",\s*"([^"]+)",\s*"([^"]+)"', table)}
+if len(entries) < 12:
+    bad("only %d grindable materials parsed out of OreGrinding; the ladder check is not seeing "
+        "the real table" % len(entries))
+else:
+    broken = [o for o, _, size in entries if int(size) <= 0]
+    if broken:
+        bad("these ores have a bottle worth 0 mB, so they could never attune anything: "
+            + ", ".join(broken))
+    else:
+        print("  all %d grindable ores have a positive bottle yield: OK" % len(entries))
+
+    # Foreign-dust materials are exempt: their dust yield is pinned to 1 to stop an ingot
+    # duplication loop, not because the material is precious, so it carries no information about
+    # how cheap the ore is.
+    ladder = [(o, int(y), int(s)) for o, y, s in entries if o not in foreign_ores]
+    wrong = []
+    for oi, yi, si in ladder:
+        for oj, yj, sj in ladder:
+            if yi > yj and si < sj:
+                wrong.append("%s (yield %d, bottle %d) vs %s (yield %d, bottle %d)"
+                             % (oi, yi, si, oj, yj, sj))
+    if wrong:
+        bad("the bottle ladder disagrees with the grinding tiers; an ore that grinds MORE "
+            "generously must not bottle LESS generously: " + "; ".join(sorted(set(wrong))[:3]))
+    else:
+        print("  bottle yield runs with dust yield across every pair: OK")
+
+# ONE MILLIBUCKET IS ONE ORE. The scan must not reintroduce a per-block price: that is what made a
+# charge able to fall below the cost of a single block, buy nothing, never drain, and still report
+# everything it saw.
+scan = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/AttunedDetectorItem.java")
+_body = re.search(r"private InteractionResult scan\(.*?\n    \}", scan, re.DOTALL)
+scan_body = _body.group(0) if _body else ""
+if not _body:
+    bad("could not find the scan() method, so every check below it is meaningless")
+elif "costPerBlock" in scan_body or "liquidCostOf" in scan_body:
+    bad("the scan prices a block at more than one millibucket again. That is what let a charge "
+        "fall below the price of a single block, buy nothing, never drain, and still report "
+        "every block it found")
+elif "Math.min(blocksFound, available)" not in scan_body:
+    bad("the scan does not spend one millibucket per ore found")
+elif "paidFor.put(ore, affordable)" not in scan_body:
+    bad("paidFor is not being filled with a BLOCK count. It drives the highlight and the goggles' "
+        "wear, neither of which cares what the liquid cost")
+elif "report(player, paidFor" not in scan_body:
+    bad("the action bar reports the blocks FOUND rather than the blocks PAID FOR")
+elif "ranDry.add(" not in scan_body:   # the NAME alone appears in the declaration and the call
+    bad("the scan does not record which ores ran dry, so the player is never told")
+else:
+    print("  one millibucket per ore, and only paid-for blocks are reported: OK")
+
+# The bottle size has to reach the pour, or every bottle is worth whatever the tank felt like.
+pour = source("common/src/main/java/com/chillpavz/oredetectorreborn/item/AttunementLiquidItem.java")
+if "OreGrinding.bottleSizeOf(" not in pour or "scaleBottleYield(" not in pour:
+    bad("pouring does not read the tiered bottle size, so every ore's bottle is worth the same "
+        "and the whole rarity ladder does nothing")
+else:
+    print("  pouring reads the tiered bottle size and the config scalar: OK")
+
+# The drain hold must follow MILLIBUCKETS, not the ore's bottle size. Pacing it per bottle is
+# defensible arithmetic that reads as a bug in play: 12 mB of netherite is a full bottle and drained
+# as slowly as 165 mB of coal, so the smaller number took longer.
+drain = re.search(r"private static int drainTicks\(.*?\n    \}", scan, re.DOTALL)
+if not drain:
+    bad("drainTicks is missing")
+elif "bottleSizeOf(" in drain.group(0):
+    bad("the drain hold is paced by the ore's bottle size again, so a small charge of an expensive "
+        "ore takes as long to empty as a large charge of a cheap one")
+else:
+    print("  the drain hold follows the millibuckets shown to the player: OK")
+
+# --- pour and drain feel -------------------------------------------------------------------------
+# Both directions share one curve, on purpose, and it has a FLOOR. Without one the arithmetic is
+# honest and the feel is wrong: a twelve millibucket netherite bottle came out at two ticks and read
+# as a click. Scaling everything up instead fixes that at the cost of the common case, because the
+# multiplier netherite needs makes a coal bottle a six second hold.
+_flow = re.search(r"public static int flowTicks\(.*?\n    \}", scan, re.DOTALL)
+if not _flow:
+    bad("flowTicks is missing, so pouring and draining have no shared timing at all")
+elif "int base = MIN_FLOW_TICKS" not in _flow.group(0):   # the floor must be the ADDITIVE base;
+    # the name alone appears twice in this method and in its own declaration, so its mere presence
+    # proves nothing about whether a floor is actually being applied
+    bad("the pour and drain timing has no floor, so a small bottle is effectively instant and "
+        "stops reading as a channelled action")
+elif "flowTicks(" not in source("common/src/main/java/com/chillpavz/oredetectorreborn/item/"
+                                "AttunementLiquidItem.java"):
+    bad("pouring does not use the shared flow timing, so pouring and draining can drift apart")
+elif "scaleFlowTicks(" not in scan:
+    bad("the flow timing ignores the config scalar, so the pour speed option does nothing")
+else:
+    print("  pouring and draining share one floored, configurable curve: OK")
+
+# --- the scan puff -------------------------------------------------------------------------------
+# It must never be drawn at a hit position: that would hand every player the goggles' information
+# for free, and the goggles cost durability, liquid and strain.
+# The volume outline REPLACED a particle version that could not work: particles are depth
+# tested and the beam runs into rock, so everything past the entry face was invisible, and the
+# faint face puff that remained only read as "it appears when it finds something". A gizmo
+# draws through terrain, which is the whole point.
+#
+# BOTH halves are checked: a method nobody calls is as silent as no method at all, and deleting
+# only the call slipped past an earlier version of this guard in a sabotage run.
+volume = re.search(r"private static void showVolume\(.*?\n    \}", scan, re.DOTALL)
+if "showVolume(player, clicked, into," not in scan_body:
+    bad("the scan never calls showVolume(), so a scan that found nothing is still "
+        "indistinguishable from a scan that never fired, and nothing shows how far it reached")
+elif not volume:
+    bad("the showVolume method is missing entirely")
+elif re.search(r"\bhits\b|\bpaidFor\b|\bfound\b", volume.group(0)):
+    bad("showVolume reads the scan RESULT. It must send only the shape swept; anything about "
+        "where ore is belongs to the goggles, which cost durability, liquid and strain")
+else:
+    print("  the scan volume is sent for every scan and carries no ore data: OK")
+
+# It must be drawn OUTSIDE the goggles checks, or the one effect meant for every player
+# silently becomes goggles-only. That is a one-line mistake with no symptom for anyone who
+# happens to be wearing them while testing.
+highlight = source("common/src/main/java/com/chillpavz/oredetectorreborn/client/ScanHighlight.java")
+_tick = re.search(r"public static void tick\(.*?\n    \}", highlight, re.DOTALL)
+if not _tick:
+    bad("could not find ScanHighlight.tick, so the volume placement is unchecked")
+else:
+    body = _tick.group(0)
+    if "tickVolume(" not in body:
+        bad("ScanHighlight.tick never draws the scan volume")
+    elif body.index("tickVolume(") > body.index("entries.isEmpty()"):
+        bad("the scan volume is drawn AFTER the goggles checks, so it only appears for players "
+            "wearing goggles. It belongs to the scan and must come first")
+    else:
+        print("  the volume is drawn before every goggles check: OK")
+
+# --- the goggles' Haste reward ------------------------------------------------------------
+# Three gates, each of which is a real design decision rather than caution.
+if "rewardScan(" not in scan_body:
+    bad("a successful scan never grants the goggles reward")
+else:
+    reward = re.search(r"private static void rewardScan\(.*?\n    \}", scan, re.DOTALL)
+    if not reward:
+        bad("rewardScan is called but not defined")
+    else:
+        body = reward.group(0)
+        if "ModItems.GOGGLES" not in body:
+            bad("the Haste reward does not require the goggles, so the detector grants mining "
+                "speed on its own and the goggles stop being the thing that earns it")
+        elif "isBlockedAt(" not in body:
+            bad("the Haste reward is not gated on strain, so strain has two meanings: it "
+                "refuses the highlight while still handing out the bonus")
+        elif "if (!foundAnything" not in body:   # the PARAMETER name alone proves nothing; the branch is what matters
+            bad("the Haste reward is not gated on finding something, so it pays for clicking "
+                "at bare walls")
+        elif "types <= 1 ? 1 : 0" not in body:
+            bad("the Haste amplifier no longer favours a single loaded liquid. That inversion "
+                "is the point: a focused tank scans the smallest volume and needs the reason")
+        else:
+            print("  Haste needs the goggles, an unstrained pair, and a real find: OK")
 
 # --- shaderpack compatibility -------------------------------------------------------------------
 # Iris leaves debug_filled_box unmapped and skips the depth clear that gives setAlwaysOnTop its

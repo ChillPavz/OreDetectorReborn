@@ -7,7 +7,16 @@
     {
       "type": "patchouli:text",
       "title": "What is supported",
-      "text": "Three mods are matched by name today.$(li)$(thing)Create$(): zinc ore and deepslate zinc ore, and the zinc ingot grinds like copper. Any Create works, including Create Fabric and Create Fly.$(li)$(thing)Seamless Ores$(): every vanilla ore restyled into andesite, diorite, granite and tuff, plus blackstone and basalt variants for the nether ores.$(li)$(thing)Universal Ores$(): the same idea in its own namespace."
+      "text": "Five mods are matched by name today.$(li)$(thing)Create$(): zinc ore and deepslate zinc ore, and the zinc ingot grinds like copper. Any Create works, including Create Fabric and Create Fly.$(li)$(thing)Seamless Ores$(): every vanilla ore restyled into andesite, diorite, granite and tuff, plus blackstone and basalt variants for the nether ores.$(li)$(thing)Universal Ores$(): the same idea in its own namespace."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(thing)Energized Power$(): tin ore and deepslate tin ore, and its tin ingot grinds at a grindstone.$(br2)It hands back $(thing)their$() Tin Dust, not one of ours, at the same one for one rate their own pulverizer uses. One tin dust makes Tin Attunement Liquid in the chamber exactly like any other dust."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Powah",
+      "text": "$(thing)Uraninite ore$(), in all six of its blocks: stone and deepslate, each in poor, normal and dense.$(br2)The smelted $(thing)Uraninite$() grinds at a grindstone into our own Uraninite Dust, because Powah ships no dust of its own. Two dust per uraninite, and 4 mB a block to look for."
     },
     {
       "type": "patchouli:text",

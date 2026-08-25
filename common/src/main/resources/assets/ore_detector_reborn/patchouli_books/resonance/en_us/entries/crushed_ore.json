@@ -7,13 +7,13 @@
     {
       "type": "patchouli:text",
       "title": "Grinding",
-      "text": "Hold $(item)Shears$() in your $(thing)off hand$() and the material in your $(thing)main hand$(), then right click.$(br2)The input is the $(thing)processed$() form: the ingot where one exists, otherwise whatever the ore drops. The dust falls at your feet and the shears take the wear."
+      "text": "$(thing)Sneak$() and right click a $(item)Grindstone$(). Your main hand can be $(thing)empty$(), or holding the material.$(br2)A plain right click still opens Repair and Disenchant, so the grindstone keeps its usual job. Drop the material in, take the dust out."
     },
     {
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:crushed_ore[ore_detector_reborn:ore_type=\"coal\"]",
-      "title": "Yield and wear",
-      "text": "Cheap ore grinds well, precious ore does not.$(li)Coal, Copper, Zinc: 4 dust, 2 wear.$(li)Lapis: 3 dust, 3 wear.$(li)Iron, Gold, Quartz, Amethyst: 2 dust, 4 wear.$(li)Diamond, Emerald: 1 dust, 6 wear.$(li)Netherite: 1 dust, 10 wear."
+      "title": "Yield",
+      "text": "Cheap ore grinds well, precious ore does not. The yield is the whole cost.$(li)Coal, Copper, Zinc: 4 dust.$(li)Lapis: 3 dust.$(li)Iron, Gold, Quartz, Amethyst: 2 dust.$(li)Diamond, Emerald: 1 dust.$(li)Netherite: 1 dust."
     },
     {
       "type": "patchouli:text",

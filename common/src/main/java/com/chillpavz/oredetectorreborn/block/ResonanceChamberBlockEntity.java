@@ -104,7 +104,10 @@ public class ResonanceChamberBlockEntity extends BaseContainerBlockEntity {
         if (stack.is(Items.REDSTONE)) {
             return "redstone";
         }
-        return null;
+        // A dust belonging to another mod, for a material where duplicating theirs would have been
+        // silly. Without this the grinder could make the dust and the chamber would refuse it,
+        // which is a dead end with nothing logged.
+        return com.chillpavz.oredetectorreborn.item.OreGrinding.oreTypeOfForeignDust(stack);
     }
 
     public static boolean isFuel(ItemStack stack) {

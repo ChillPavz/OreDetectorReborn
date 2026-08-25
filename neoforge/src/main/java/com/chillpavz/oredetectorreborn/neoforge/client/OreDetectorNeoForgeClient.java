@@ -22,6 +22,7 @@ import com.chillpavz.oredetectorreborn.client.ShaderCompat;
 import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import com.chillpavz.oredetectorreborn.client.GrindScreen;
 import com.chillpavz.oredetectorreborn.registry.ModMenus;
 
 /**
@@ -34,6 +35,7 @@ public final class OreDetectorNeoForgeClient {
 
     public static void onRegisterScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenus.RESONANCE_CHAMBER, ResonanceChamberScreen::new);
+        event.register(ModMenus.GRIND, GrindScreen::new);
 
         // Iris leaves the filled box pipeline unmapped, so without this the highlight loses its
         // fill the moment a shaderpack is on. Its own loader modules use this same API.
@@ -47,7 +49,7 @@ public final class OreDetectorNeoForgeClient {
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null || client.player == null) {
-            ScanHighlight.clear();
+            ScanHighlight.clearAll();
             return;
         }
         ClientClock.set(client.level.getGameTime());

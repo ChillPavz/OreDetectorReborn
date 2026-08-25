@@ -13,7 +13,7 @@
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:nullified_bucket",
       "title": "Nullified Bucket",
-      "text": "Draining $(thing)forgets$() which ore the liquid was, which is why one fluid covers every mix.$(br2)The cauldron fills in quarters of 250 mB. A full one is a bucket's worth, and the bucket empties into water or lava only."
+      "text": "Draining $(thing)forgets$() which ore the liquid was, which is why one fluid covers every mix.$(br2)The cauldron holds a bucket's worth and fills in quarters, but it counts what you actually put in: a small charge costs a small amount rather than a whole quarter. The bucket empties into water or lava only."
     }
   ]
 }

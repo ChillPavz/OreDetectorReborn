@@ -1,5 +1,5 @@
 {
-  "name": "Goggles",
+  "name": "X-Ray Goggles",
   "category": "ore_detector_reborn:field_work",
   "icon": "ore_detector_reborn:goggles",
   "sortnum": 2,
@@ -7,18 +7,23 @@
     {
       "type": "patchouli:crafting",
       "recipe": "ore_detector_reborn:goggles",
-      "title": "Goggles",
+      "title": "X-Ray Goggles",
       "text": "String, a Netherite Ingot and two Breeze Crystals. Worn on the head."
     },
     {
       "type": "patchouli:text",
       "title": "Seeing the scan",
-      "text": "With the goggles on, a scan draws every block it reported as a coloured box $(thing)through the rock$(), for about twelve seconds.$(br2)They show nothing on their own. This is not x-ray vision: it draws only what the detector already told you, and only what the liquid actually paid for."
+      "text": "With the goggles on, a scan draws every block it reported as a coloured box $(thing)through the rock$(), for about twelve seconds.$(br2)They show nothing on their own. Nothing is revealed that the detector did not already tell you: the boxes are exactly the blocks it just reported."
     },
     {
       "type": "patchouli:text",
       "title": "Strain",
       "text": "Each visualisation adds $(thing)20 strain$(), which bleeds off on its own. Cross $(thing)100$() and the goggles give you $(thing)Nausea$() and refuse to draw until they recover.$(br2)Hover them to see the number. The detector itself is never blocked, so the counts keep coming even when the picture will not.$(br2)Goggles wear by 1 per ore block reported while worn, and take Breeze Shards like the detector."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Haste",
+      "text": "A scan that finds something also grants $(thing)Haste$() while the goggles are on, for twelve seconds.$(br2)$(thing)Haste II$() on a single loaded liquid, $(thing)Haste I$() on two or more. A focused tank sweeps the smallest volume of the three, so it gets the stronger hand.$(br2)Strain refuses it exactly as it refuses the highlight."
     }
   ]
 }

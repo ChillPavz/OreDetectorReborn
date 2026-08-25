@@ -8,7 +8,7 @@
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:attunement_liquid[ore_detector_reborn:ore_type=\"diamond\"]",
       "title": "Attunement Liquid",
-      "text": "One bottle is $(thing)250 mB$() of one ore. It remembers which ore it was brewed from, and that is what the detector is attuned to.$(br2)Pour it in by holding the bottle in your main hand and the detector in your off hand, then holding right click."
+      "text": "A bottle remembers which ore it was brewed from, and that is what the detector is attuned to.$(br2)A millibucket is $(thing)one ore reported$(), the same for every material, so the tank is simply how many finds you are carrying. What differs is what a bottle is worth.$(li)Coal, Copper, Zinc, Tin: 165.$(li)Lapis: 90.$(li)Iron, Gold, Quartz, Amethyst, Uraninite: 45.$(li)Diamond, Emerald: 25.$(li)Ancient Debris: 12.$(br2)Pour one in by holding the bottle in your main hand and the detector in your off hand, then holding right click."
     }
   ]
 }

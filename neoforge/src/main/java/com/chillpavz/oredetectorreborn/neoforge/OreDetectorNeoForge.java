@@ -21,6 +21,7 @@ import com.chillpavz.oredetectorreborn.neoforge.config.OreDetectorConfigScreen;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
 import com.chillpavz.oredetectorreborn.network.ModNetworking;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.network.ScanVolumePayload;
 import com.chillpavz.oredetectorreborn.welcome.WelcomeMessage;
 import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
 import com.chillpavz.oredetectorreborn.registry.ModBlocks;
@@ -63,9 +64,9 @@ public class OreDetectorNeoForge {
         });
 
         eventBus.addListener(OreDetectorNeoForge::onRegister);
-        // RightClickItem is a GAME bus event, not a mod bus one. Registering it on the
+        // RightClickBlock is a GAME bus event, not a mod bus one. Registering it on the
         // wrong bus fails silently.
-        NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onRightClickItem);
+        NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onRightClickBlock);
         // PlayerLoggedInEvent is a GAME bus event too.
         NeoForge.EVENT_BUS.addListener(OreDetectorNeoForge::onPlayerJoin);
         eventBus.addListener(OreDetectorNeoForge::onBuildTabContents);
@@ -112,6 +113,12 @@ public class OreDetectorNeoForge {
                 (payload, context) -> com.chillpavz.oredetectorreborn.client.ScanHighlight
                         .accept(payload, context.player().level().getGameTime(),
                                 context.player().level().dimension()));
+        event.registrar(Constants.MOD_ID).playToClient(
+                ScanVolumePayload.TYPE,
+                ScanVolumePayload.STREAM_CODEC,
+                (payload, context) -> com.chillpavz.oredetectorreborn.client.ScanHighlight
+                        .acceptVolume(payload, context.player().level().getGameTime(),
+                                context.player().level().dimension()));
     }
 
     private static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -120,9 +127,9 @@ public class OreDetectorNeoForge {
         }
     }
 
-    private static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-        InteractionResult result = OreGrindingInteraction.tryGrind(
-                event.getLevel(), event.getEntity(), event.getHand());
+    private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        InteractionResult result = OreGrindingInteraction.tryOpenGrinder(
+                event.getLevel(), event.getEntity(), event.getHand(), event.getPos());
         if (result != InteractionResult.PASS) {
             event.setCancellationResult(result);
             event.setCanceled(true);

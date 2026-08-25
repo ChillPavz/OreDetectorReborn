@@ -14,12 +14,18 @@
     {
       "type": "patchouli:text",
       "title": "Scanning",
-      "text": "Right click a $(thing)surface$() with it in your $(thing)main hand$(). The beam fires straight into that face and reports what it finds in the action bar, tinted per ore.$(br2)It costs $(thing)1 durability$() a scan whatever it finds, and $(thing)1 mB$() of that ore's liquid for every block found."
+      "text": "Right click a $(thing)surface$() with it in your $(thing)main hand$(). The beam fires straight into that face and reports what it finds in the action bar, tinted per ore. The box it swept is outlined through the rock for a couple of seconds, so you can see how far and how wide that was.$(br2)It costs $(thing)1 durability$() a scan whatever it finds, and a measure of that ore's liquid for every block found. Cheap ore is cheap to look for; valuable ore is not."
     },
     {
       "type": "patchouli:text",
       "title": "Two pools",
-      "text": "$(thing)Durability$() is 1000 and is mechanical wear. A Breeze Shard in an anvil restores 250.$(br2)$(thing)Liquid$() is the tank, 750 mB, three bottles. Hover the detector to see what is loaded and how far it reaches.$(br2)Running dry does not break it. The tank simply stops answering for that ore."
+      "text": "$(thing)Durability$() is 1000 and is mechanical wear. A Breeze Shard in an anvil restores 250, and that repair costs the same handful of levels every time. It never climbs, so a detector lasts as long as you keep finding shards.$(br2)$(thing)Liquid$() is the tank, 500 finds across at most five ores. Hover the detector to see what is loaded and how far it reaches.$(br2)Running dry does not break it. The last of a charge is spent on whatever it can still cover, that ore drops out of the tank, and the detector stops answering for it until you pour more in."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "ore_detector_reborn:crushed_ore",
+      "title": "What a bottle carries",
+      "text": "The tank holds $(thing)500 finds$(), and one find of any ore costs one millibucket. Rarity is in the brewing, not in the reading: one dust is three bottles, so a dust of coal carries 495 finds and a dust of ancient debris carries 36.$(br2)Three bottles of a cheap ore very nearly fill the tank. An expensive one takes many more, which is the point: brew it once and you can carry as many finds of it as you like."
     }
   ]
 }

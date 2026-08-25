@@ -20,6 +20,7 @@ import com.chillpavz.oredetectorreborn.fabric.loot.BreezeLootInjection;
 import com.chillpavz.oredetectorreborn.item.OreGrindingInteraction;
 import com.chillpavz.oredetectorreborn.network.ModNetworking;
 import com.chillpavz.oredetectorreborn.network.ScanHighlightPayload;
+import com.chillpavz.oredetectorreborn.network.ScanVolumePayload;
 import com.chillpavz.oredetectorreborn.welcome.WelcomeMessage;
 import com.chillpavz.oredetectorreborn.registry.ModBlockEntities;
 import com.chillpavz.oredetectorreborn.registry.ModBlocks;
@@ -33,7 +34,7 @@ import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
-import net.fabricmc.fabric.api.event.player.ItemEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
@@ -107,6 +108,8 @@ public class OreDetectorFabric implements ModInitializer {
         // The payload TYPE must be registered on both sides; only the client registers a handler.
         PayloadTypeRegistry.clientboundPlay().register(
                 ScanHighlightPayload.TYPE, ScanHighlightPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(
+                ScanVolumePayload.TYPE, ScanVolumePayload.STREAM_CODEC);
         ModNetworking.setSender(ServerPlayNetworking::send);
 
         syncRecipesForTheGuidebook();
@@ -115,16 +118,17 @@ public class OreDetectorFabric implements ModInitializer {
                 (handler, sender, server) -> WelcomeMessage.showIfNew(handler.getPlayer()));
 
         BreezeLootInjection.register();
-        // NOT a method reference. Fabric's USE event uses NULL for "I did not handle this", and
-        // returns ANY non-null result straight to the caller instead of running the item's own
-        // use(). Handing it InteractionResult.PASS therefore CANCELS the vanilla interaction:
-        // it silently broke equipping the goggles, pouring liquid into the detector, emptying the
-        // Nullified Bucket and draining into a cauldron, all four on Fabric only. NeoForge's
-        // equivalent event reads PASS correctly, which is why none of it showed up there.
-        ItemEvents.USE.register((level, player, hand) -> {
-            InteractionResult result = OreGrindingInteraction.tryGrind(level, player, hand);
-            return result == InteractionResult.PASS ? null : result;
-        });
+        // UseBlockCallback, NOT ItemEvents.USE, and the two do NOT share a contract. This one is
+        // injected at the HEAD of ServerPlayerGameMode.useItemOn, so it fires even while sneaking
+        // (vanilla's own sneak check comes later), and it treats InteractionResult.PASS as "not
+        // handled" in the ordinary way. ItemEvents.USE, which grinding used to ride on, instead
+        // treats NULL as "not handled" and returns any non-null result INSTEAD of running the
+        // item's own use() - which is how returning PASS there once silently broke equipping the
+        // goggles, pouring liquid, emptying the bucket and draining, on Fabric only. Both contracts
+        // were read out of the mixin bytecode rather than assumed. Returning the wrong sentinel to
+        // either one breaks unrelated interactions across the whole game with nothing logged.
+        UseBlockCallback.EVENT.register((player, level, hand, hit) ->
+                OreGrindingInteraction.tryOpenGrinder(level, player, hand, hit.getBlockPos()));
 
         CreativeModeTabEvents.modifyOutputEvent(ModCreativeTabs.KEY).register(output -> {
             ModItems.ITEMS.values().forEach(item ->

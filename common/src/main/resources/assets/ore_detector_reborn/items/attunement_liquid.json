@@ -87,6 +87,20 @@
           "type": "minecraft:model",
           "model": "ore_detector_reborn:item/zinc_resonance"
         }
+      },
+      {
+        "when": "tin",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/tin_resonance"
+        }
+      },
+      {
+        "when": "uraninite",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/uraninite_resonance"
+        }
       }
     ],
     "fallback": {

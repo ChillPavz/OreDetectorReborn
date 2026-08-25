@@ -51,12 +51,14 @@ import net.minecraft.world.phys.BlockHitResult;
  * <p>FOUR quarter levels rather than vanilla's three, so each is exactly 250 mB and a full one is
  * 1000, the same as a bucket.
  */
-public class NullifiedCauldronBlock extends AbstractCauldronBlock {
+public class NullifiedCauldronBlock extends AbstractCauldronBlock
+        implements net.minecraft.world.level.block.EntityBlock {
 
     public static final MapCodec<NullifiedCauldronBlock> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(propertiesCodec()).apply(instance, NullifiedCauldronBlock::new));
 
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 1, 4);
+    public static final int MIN_LEVEL = 1;
     public static final int MAX_LEVEL = 4;
     /** One level. Four of them make a bucket. */
     public static final int PER_LEVEL = 250;
@@ -90,30 +92,61 @@ public class NullifiedCauldronBlock extends AbstractCauldronBlock {
         return new ItemStack(Items.CAULDRON);
     }
 
-    public static int millibucketsIn(BlockState state) {
-        return state.is(ModBlocks.NULLIFIED_CAULDRON) ? state.getValue(LEVEL) * PER_LEVEL : 0;
+    /**
+     * Exactly what is in the cauldron.
+     *
+     * <p>Reads the block entity, and falls back to the blockstate for a cauldron placed before
+     * that existed: level times PER_LEVEL is precisely what the amount used to mean, so an old one
+     * keeps the contents it had.
+     */
+    public static int millibucketsIn(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (!state.is(ModBlocks.NULLIFIED_CAULDRON)) {
+            return 0;
+        }
+        return level.getBlockEntity(pos) instanceof NullifiedCauldronBlockEntity cauldron
+                ? cauldron.millibuckets()
+                : state.getValue(LEVEL) * PER_LEVEL;
     }
 
-    /** True if this position can take that much more liquid without going over a full bucket. */
+    /**
+     * The quarter level drawn for an amount.
+     *
+     * <p>Rounds UP, so any liquid at all shows something and a nearly full cauldron looks full,
+     * which matters because that is also when it starts refusing drains. Crossing a quarter moves
+     * the picture up; below the next quarter it stays where it was.
+     */
+    private static int levelFor(int millibuckets) {
+        return Math.max(MIN_LEVEL, Math.min(MAX_LEVEL,
+                (millibuckets + PER_LEVEL - 1) / PER_LEVEL));
+    }
+
+    /**
+     * True if this position can take that much more liquid without going over a full bucket.
+     *
+     * <p>Exact now: a dribble costs a dribble. It used to round up to a whole quarter, which was
+     * fine while every charge was a multiple of a bottle and wasteful once a bottle stopped being
+     * one size. Anything that would tip it past a full bucket is still refused outright rather
+     * than clamped, so nothing is silently swallowed.
+     */
     public static boolean canAccept(Level level, BlockPos pos, int millibuckets) {
         BlockState state = level.getBlockState(pos);
         if (!state.is(ModBlocks.NULLIFIED_CAULDRON) && !state.is(Blocks.CAULDRON)) {
             return false;
         }
-        // Rounded UP to a whole level, because the cauldron only shows quarters. A dribble still
-        // costs a quarter, and anything that would tip it past 1000 mB is refused outright: empty
-        // it with a bucket first.
-        int wanted = Math.max(1, (millibuckets + PER_LEVEL - 1) / PER_LEVEL);
-        return millibucketsIn(state) / PER_LEVEL + wanted <= MAX_LEVEL;
+        return millibucketsIn(level, pos) + millibuckets <= CAPACITY;
     }
 
     /** Adds liquid, turning a plain cauldron into one of these. Call only after {@link #canAccept}. */
     public static void addTo(Level level, BlockPos pos, int millibuckets) {
-        BlockState state = level.getBlockState(pos);
-        int existing = millibucketsIn(state) / PER_LEVEL;
-        int wanted = Math.max(1, (millibuckets + PER_LEVEL - 1) / PER_LEVEL);
+        int total = Math.min(CAPACITY, millibucketsIn(level, pos) + millibuckets);
+        // The block is replaced first so the block entity exists to write the exact amount into,
+        // including for a plain vanilla cauldron or one placed before the entity existed.
         level.setBlock(pos, ModBlocks.NULLIFIED_CAULDRON.defaultBlockState()
-                .setValue(LEVEL, Math.min(MAX_LEVEL, existing + wanted)), 3);
+                .setValue(LEVEL, levelFor(total)), 3);
+        if (level.getBlockEntity(pos) instanceof NullifiedCauldronBlockEntity cauldron) {
+            cauldron.setMillibuckets(total);
+        }
         level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 0.8F);
     }
 
@@ -135,6 +168,11 @@ public class NullifiedCauldronBlock extends AbstractCauldronBlock {
         }
         level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new NullifiedCauldronBlockEntity(pos, state);
     }
 
     @Override

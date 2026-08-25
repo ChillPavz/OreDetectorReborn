@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.chillpavz.oredetectorreborn.Constants;
+import com.chillpavz.oredetectorreborn.block.NullifiedCauldronBlockEntity;
 import com.chillpavz.oredetectorreborn.block.ResonanceChamberBlockEntity;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -35,6 +36,11 @@ public final class ModBlockEntities {
     public static final BlockEntityType<ResonanceChamberBlockEntity> RESONANCE_CHAMBER =
             register("resonance_chamber", new BlockEntityType<>(
                     ResonanceChamberBlockEntity::new, Set.of(ModBlocks.RESONANCE_CHAMBER)));
+
+    /** Holds the cauldron's EXACT contents; the blockstate's level is only the picture of it. */
+    public static final BlockEntityType<NullifiedCauldronBlockEntity> NULLIFIED_CAULDRON =
+            register("nullified_cauldron", new BlockEntityType<>(
+                    NullifiedCauldronBlockEntity::new, Set.of(ModBlocks.NULLIFIED_CAULDRON)));
 
     private ModBlockEntities() {
     }

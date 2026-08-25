@@ -35,12 +35,23 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
  */
 public record OreTank(Map<String, Integer> charges) {
 
-    /** Three bottles. Matches the cauldron's own quarter levels, since a bottle is 250 mB. */
-    public static final int CAPACITY = 750;
-    /** One bottle, the same 250 mB a vanilla water bottle holds. */
-    public static final int BOTTLE = 250;
-    /** Beyond this many distinct ores a pour is refused. */
-    public static final int MAX_TYPES = 6;
+    /**
+     * How many ore blocks the detector can carry the answer to.
+     *
+     * <p>A millibucket is one ore reported, for every material alike, so this is a count of finds
+     * rather than a volume of anything. Three bottles of a cheap ore very nearly fill it, which is
+     * the anchor the number was chosen around.
+     */
+    public static final int CAPACITY = 500;
+    /**
+     * Beyond this many distinct ores a pour is refused.
+     *
+     * <p>Five rather than six: the range table already stops distinguishing at three, so the
+     * cap is about how much of a jack of all trades one detector may be, and against a tank
+     * of 500 five is a full loadout rather than a hoard. All five at once fits comfortably,
+     * one bottle each of netherite, diamond, iron, lapis and coal being 337 of the 500.
+     */
+    public static final int MAX_TYPES = 5;
 
     public static final OreTank EMPTY = new OreTank(Map.of());
 
@@ -94,22 +105,27 @@ public record OreTank(Map<String, Integer> charges) {
     /**
      * How much of a bottle this tank would actually accept.
      *
+     * <p>The bottle's own size is passed in rather than read here, because it depends on which ore
+     * the liquid was brewed from: a bottle of coal is worth many more finds than a bottle of
+     * netherite. {@link com.chillpavz.oredetectorreborn.item.OreGrinding#bottleSizeOf} is the
+     * table, and the config scalar is applied before it reaches this.
+     *
      * @return 0 when the pour must be refused: the tank is full, or the ore would be a seventh type
      */
-    public int acceptable(String oreType) {
+    public int acceptable(String oreType, int bottleSize) {
         if (freeSpace() <= 0) {
             return 0;
         }
         if (!charges.containsKey(oreType) && typeCount() >= MAX_TYPES) {
             return 0;
         }
-        return Math.min(BOTTLE, freeSpace());
+        return Math.min(bottleSize, freeSpace());
     }
 
     /**
      * Pours a bottle in. Fills the free space and leaves every other charge untouched; the caller
-     * consumes the whole bottle even when only part of it fits, which is the only way to load more
-     * than three types into the tank.
+     * consumes the whole bottle even when only part of it fits, which is what lets a player top up
+     * a nearly full tank rather than being refused.
      */
     public OreTank pour(String oreType, int amount) {
         if (amount <= 0) {

@@ -80,6 +80,13 @@
           "type": "minecraft:model",
           "model": "ore_detector_reborn:item/zinc_dust"
         }
+      },
+      {
+        "when": "uraninite",
+        "model": {
+          "type": "minecraft:model",
+          "model": "ore_detector_reborn:item/uraninite_dust"
+        }
       }
     ],
     "fallback": {

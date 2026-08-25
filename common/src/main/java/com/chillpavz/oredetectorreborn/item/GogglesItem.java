@@ -41,6 +41,18 @@ public class GogglesItem extends Item {
         super(properties);
     }
 
+    /**
+     * Keeps the anvil's prior-work penalty off this item; see {@link RepairCosts}. Without it the
+     * Breeze Shard repair loop this item is designed around dies at the seventh anvil visit.
+     */
+    @Override
+    public void inventoryTick(ItemStack stack, net.minecraft.server.level.ServerLevel level,
+                              net.minecraft.world.entity.Entity entity,
+                              net.minecraft.world.entity.EquipmentSlot slot) {
+        super.inventoryTick(stack, level, entity, slot);
+        RepairCosts.clear(stack);
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
                                 Consumer<Component> adder, TooltipFlag flag) {

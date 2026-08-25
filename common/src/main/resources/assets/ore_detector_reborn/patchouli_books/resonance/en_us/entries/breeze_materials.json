@@ -13,13 +13,13 @@
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:breeze_shard",
       "title": "Breeze Shard",
-      "text": "The workhorse. Shards repair both the detector and the goggles, 250 durability at a time in an anvil, so you will keep needing them long after the first raid.$(br2)Expect roughly eight to eleven from a full chamber."
+      "text": "The workhorse. Shards repair both the detector and the X-Ray Goggles, 250 durability at a time in an anvil at a flat cost that never rises, so you will keep needing them long after the first raid.$(br2)Expect roughly eight to eleven from a full chamber."
     },
     {
       "type": "patchouli:spotlight",
       "item": "ore_detector_reborn:breeze_crystals",
       "title": "Breeze Crystals",
-      "text": "The lens material. Two of them make one pair of goggles and that is the only thing they are for, so a single chamber is enough.$(br2)Vaults, and the handful of hidden chests that share a vault's loot. Breezes never drop them."
+      "text": "The lens material. Two of them make one pair of X-Ray Goggles and that is the only thing they are for, so a single chamber is enough.$(br2)Vaults, and the handful of hidden chests that share a vault's loot. Breezes never drop them."
     },
     {
       "type": "patchouli:spotlight",

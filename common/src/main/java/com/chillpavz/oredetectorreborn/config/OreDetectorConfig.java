@@ -117,6 +117,65 @@ public final class OreDetectorConfig {
                     strainPerScan, Math.round(decayPerScan), cooldownTicks);
         }
     }
+    // --- Goggle reward ------------------------------------------------------------------------
+    // Haste on a successful scan while the goggles are worn. 0 turns it off entirely, which is the
+    // setting for anyone who thinks a detector should not touch mining speed at all.
+
+    public static final int HASTE_SECONDS_MIN = 0;
+    public static final int HASTE_SECONDS_MAX = 30;
+    public static final int DEFAULT_HASTE_SECONDS = 12;
+
+    public static volatile int hasteSeconds = DEFAULT_HASTE_SECONDS;
+
+    /** Clamps and stores how long the goggles' Haste lasts. */
+    public static void applyHaste(int seconds) {
+        hasteSeconds = clampInt(seconds, HASTE_SECONDS_MIN, HASTE_SECONDS_MAX);
+    }
+
+    // --- Pour and drain speed -----------------------------------------------------------------
+    // One knob for both, because the two mirror each other: what a bottle takes to go in is what
+    // the same amount takes to come out. Higher is faster.
+
+    public static final int POUR_SPEED_MIN = 25;
+    public static final int POUR_SPEED_MAX = 400;
+    public static final int DEFAULT_POUR_SPEED = 100;
+
+    public static volatile int pourSpeedPercent = DEFAULT_POUR_SPEED;
+
+    /** Clamps and stores the pour and drain speed. */
+    public static void applyPourSpeed(int percent) {
+        pourSpeedPercent = clampInt(percent, POUR_SPEED_MIN, POUR_SPEED_MAX);
+    }
+
+    /** A hold length after the speed scalar. Higher percent means fewer ticks. */
+    public static int scaleFlowTicks(int ticks) {
+        return Math.max(1, Math.round(ticks * 100.0F / pourSpeedPercent));
+    }
+
+    // --- Bottle yield -------------------------------------------------------------------------
+    // One millibucket is one ore reported, so the only lever left is how much a bottle is worth.
+    // This scales every tier at once: below 100 the same brewing carries fewer finds, above it
+    // more. It replaces the old per-block cost option, which no longer has anything to scale.
+    //
+    // The floor is 25 rather than 0 because a bottle worth nothing could never attune anything,
+    // which is not a setting anybody wants; the way to make scanning cheap is to turn this up.
+
+    public static final int BOTTLE_YIELD_MIN = 25;
+    public static final int BOTTLE_YIELD_MAX = 400;
+    public static final int DEFAULT_BOTTLE_YIELD = 100;
+
+    public static volatile int bottleYieldPercent = DEFAULT_BOTTLE_YIELD;
+
+    /** Clamps and stores the bottle yield scalar. */
+    public static void applyBottleYield(int percent) {
+        bottleYieldPercent = clampInt(percent, BOTTLE_YIELD_MIN, BOTTLE_YIELD_MAX);
+    }
+
+    /** One bottle's worth after the scalar, never rounded away to nothing. */
+    public static int scaleBottleYield(int base) {
+        return Math.max(1, Math.round(base * bottleYieldPercent / 100.0F));
+    }
+
     public static volatile double durabilityMultiplier = DEFAULT_DURABILITY_MULT;
     public static volatile double soundVolume = DEFAULT_SOUND_VOLUME;
 

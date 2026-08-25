@@ -127,7 +127,10 @@ WIRING = {
         ("fabric/src/main/java/com/chillpavz/oredetectorreborn/fabric/client/OreDetectorFabricClient.java",
          [("ClientPlayNetworking.registerGlobalReceiver(", "no receiver, so scan results are ignored"),
           ("ScanHighlight.tick(", "no client tick hook, so the highlight is never drawn"),
-          ("ScanHighlight.clear(", "the highlight is never dropped when leaving a world")]),
+          # clearAll, not clear: the scan VOLUME lives beside the highlight now, and clear() alone
+          # would leave a box hanging in whatever world the player joins next.
+          ("ScanHighlight.clearAll(", "the highlight and volume are never dropped when leaving a "
+                                     "world; clear() alone leaves the volume behind")]),
     ],
     "neoforge": [
         ("neoforge/src/main/java/com/chillpavz/oredetectorreborn/neoforge/OreDetectorNeoForge.java",
@@ -136,7 +139,10 @@ WIRING = {
           ("ScanHighlight\n", None)]),
         ("neoforge/src/main/java/com/chillpavz/oredetectorreborn/neoforge/client/OreDetectorNeoForgeClient.java",
          [("ScanHighlight.tick(", "no client tick hook, so the highlight is never drawn"),
-          ("ScanHighlight.clear(", "the highlight is never dropped when leaving a world")]),
+          # clearAll, not clear: the scan VOLUME lives beside the highlight now, and clear() alone
+          # would leave a box hanging in whatever world the player joins next.
+          ("ScanHighlight.clearAll(", "the highlight and volume are never dropped when leaving a "
+                                     "world; clear() alone leaves the volume behind")]),
     ],
 }
 for loader, files in WIRING.items():

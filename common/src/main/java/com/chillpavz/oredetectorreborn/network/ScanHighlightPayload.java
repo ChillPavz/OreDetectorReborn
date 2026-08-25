@@ -51,7 +51,7 @@ public record ScanHighlightPayload(BlockPos origin, int cancelRadius, int durati
      * trust the sender.
      */
     public static final int MAX_POSITIONS = 512;
-    /** Six is the tank's own type cap, so a well-formed packet can never exceed it. */
+    /** Comfortably above the tank's own type cap, so a well-formed packet can never reach it. */
     public static final int MAX_GROUPS = 8;
 
     public static final Type<ScanHighlightPayload> TYPE = new Type<>(
