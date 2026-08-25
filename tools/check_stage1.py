@@ -8,7 +8,8 @@ log line, and a loot modifier in the wrong jar simply never fires.
 import zipfile, json, io, re, sys
 
 NS = "ore_detector_reborn"
-VER = "2.0.0"
+# Read from gradle.properties, never hardcoded.
+VER = re.search(r"^version=(.+)$", io.open("gradle.properties", encoding="utf-8").read(), re.M).group(1).strip()
 ok = True
 def bad(m):
     global ok; ok = False; print("  FAIL: " + m)
